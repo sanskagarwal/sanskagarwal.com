@@ -3,6 +3,6 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "./app"
+    directory: "./src"
     schedule:
       interval: "weekly"
