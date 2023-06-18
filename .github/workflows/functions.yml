@@ -1,46 +1,44 @@
-name: Deploy Next App
+name: Deploy Functions
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
       - functions/**
-  workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: sanskagarwal
-  PACKAGE_PATH: 'src'
+  AZURE_FUNCTIONAPP_NAME: 'sanskagarwal-functions'
+  PACKAGE_PATH: 'functions'
   NODE_VERSION: '18.x'
 
-permissions:
-  contents: read
-
 jobs:
-  publish:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v3
 
-    - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
+    - name: Setup Node ${{ env.NODE_VERSION }} Environment
       uses: actions/setup-node@v3
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
         cache-dependency-path: ${{ env.PACKAGE_PATH }}/package-lock.json
 
-    - name: npm install, build, and test
+    - name: 'Resolve Project Dependencies Using Npm'
+      shell: bash
       run: |
         pushd './${{ env.PACKAGE_PATH }}'
         npm install
-        npm run build
+        npm run build --if-present
         npm run test --if-present
         popd
 
-    - name: 'Deploy to Azure WebApp'
-      id: deploy-to-webapp
-      uses: azure/webapps-deploy@v2
+    - name: 'Run Azure Functions Action'
+      uses: Azure/functions-action@v1
+      id: fa
       with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: ${{ env.PACKAGE_PATH }}
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
