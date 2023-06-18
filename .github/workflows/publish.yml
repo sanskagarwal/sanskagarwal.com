@@ -1,6 +1,10 @@
+name: Deploy Next App
+
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - functions/**
   workflow_dispatch:
 
 env:
@@ -15,9 +19,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v3
 
-    - name: 'Set up Node.js'
+    - name: 'Setup Node ${{ env.NODE_VERSION }} Environment'
       uses: actions/setup-node@v3
       with:
         node-version: ${{ env.NODE_VERSION }}
@@ -26,10 +31,11 @@ jobs:
 
     - name: npm install, build, and test
       run: |
-        cd ${{ env.PACKAGE_PATH }}
+        pushd './${{ env.PACKAGE_PATH }}'
         npm install
         npm run build
         npm run test --if-present
+        popd
 
     - name: 'Deploy to Azure WebApp'
       id: deploy-to-webapp
