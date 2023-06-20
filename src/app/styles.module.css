@@ -1,3 +1,30 @@
 .layout {
     min-height: 100vh;
 }
+
+.centerBlock {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sidebarStyle {
+    border-right: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.alignRight {
+    float: right;
+    margin-right: 10px;
+}
+
+.alignBottom {
+    width: 100%;
+    position: absolute;
+    bottom: 20px;
+    display: block;
+}
+
+.antDesignIcon span {
+    vertical-align: text-top;
+    font-size: large;
+}
