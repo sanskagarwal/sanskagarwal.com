@@ -1,6 +1,8 @@
 import { Metadata } from "next";
-import 'semantic-ui-css/semantic.min.css'
+
+import "semantic-ui-css/semantic.min.css";
 import "./globals.css";
+import Navbar from "./_components/Navbar";
 
 export const metadata: Metadata = {
     title: "Sanskar Agarwal",
@@ -14,7 +16,12 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body>{children}</body>
+            <body>
+                <div className="mainWrapper grid">
+                    <Navbar />
+                    <div className="grid content p-4">{children}</div>
+                </div>
+            </body>
         </html>
     );
 }

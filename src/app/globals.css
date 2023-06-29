@@ -14,3 +14,24 @@ body {
 * {
     box-sizing: border-box;
 }
+
+.mainWrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "sider header"
+        "sider content";
+}
+
+.header {
+    grid-area: header;
+}
+
+.sider {
+    grid-area: sider;
+}
+
+.content {
+    grid-area: content;
+}
