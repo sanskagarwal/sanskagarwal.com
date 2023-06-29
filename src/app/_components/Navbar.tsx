@@ -1,19 +1,55 @@
 "use client";
 
-import React, { SyntheticEvent, useEffect, useState } from "react";
-import { Button, Menu, Divider, Image, Icon } from "semantic-ui-react";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+    Button,
+    Menu,
+    Divider,
+    Image,
+    Icon,
+    SemanticICONS,
+} from "semantic-ui-react";
 import { useMediaQuery } from "react-responsive";
 
+type NavLinks = {
+    name: string;
+    url: string;
+    icon: SemanticICONS;
+};
+
+const navLinks: NavLinks[] = [
+    {
+        name: "Home",
+        url: "/",
+        icon: "home",
+    },
+    {
+        name: "Blog",
+        url: "/blog",
+        icon: "edit",
+    },
+    {
+        name: "Resume",
+        url: "/resume",
+        icon: "file alternate",
+    },
+];
+
 const Navbar: React.FC = () => {
-    const [activeMenuItem, setActiveMenuItem] = useState("home");
+    const currentUrl = usePathname();
+    const isNavLink = navLinks.findIndex((link) => link.url === currentUrl);
+    let activeLink = "";
+    if (isNavLink !== -1) {
+        activeLink = navLinks[isNavLink].name;
+    }
+
+    const [activeMenuItem, setActiveMenuItem] = useState(activeLink);
     const [collapsed, setCollapsed] = useState(false);
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
     useEffect(() => setCollapsed(isMobile), [isMobile]);
-
-    const handleItemClick = (e: SyntheticEvent, data: any) => {
-        setActiveMenuItem(data.name);
-    };
 
     return (
         <>
@@ -37,29 +73,26 @@ const Navbar: React.FC = () => {
                     />
                     <p className="text-center">Sanskar Agarwal</p>
                     <Divider />
-                    <Menu.Item
-                        name="home"
-                        active={activeMenuItem === "home"}
-                        onClick={handleItemClick}
-                    >
-                        Home
-                    </Menu.Item>
 
-                    <Menu.Item
-                        name="blog"
-                        active={activeMenuItem === "blog"}
-                        onClick={handleItemClick}
-                    >
-                        Blog
-                    </Menu.Item>
+                    {navLinks.map((navLink) => {
+                        return (
+                            <Link
+                                onClick={() => setActiveMenuItem(navLink.name)}
+                                key={navLink.name}
+                                href={navLink.url}
+                                className={`item ${
+                                    activeMenuItem === navLink.name && "active"
+                                }`}
+                            >
+                                <Icon
+                                    name={navLink.icon}
+                                    className="!float-none"
+                                />{" "}
+                                {navLink.name}
+                            </Link>
+                        );
+                    })}
 
-                    <Menu.Item
-                        name="resume"
-                        active={activeMenuItem === "resume"}
-                        onClick={handleItemClick}
-                    >
-                        Resume
-                    </Menu.Item>
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
                         <Button.Group size="large">
