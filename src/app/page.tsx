@@ -1,36 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-    Button,
-    Menu,
-    Divider,
-} from "semantic-ui-react";
-import MediaQuery from "react-responsive";
+import React, { useEffect, useState } from "react";
+import { Button, Menu, Divider } from "semantic-ui-react";
+import { useMediaQuery } from "react-responsive";
 
 import Sidebar from "./_components/Sidebar";
 
 const Home: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
-    const [mobileCollapsed, setMobileCollapsed] = useState(true);
+    const isMobile = useMediaQuery({ maxWidth: 767 });
+
+    useEffect(() => setCollapsed(isMobile), [isMobile]);
 
     return (
         <div className="mx-0 flex flex-row">
-            <MediaQuery maxWidth={767}>
-                <Sidebar collapsed={mobileCollapsed} />
-            </MediaQuery>
-            <MediaQuery minWidth={768}>
-                <Sidebar collapsed={collapsed} />
-            </MediaQuery>
+            <Sidebar collapsed={collapsed} />
             <div className="min-h-screen flex-auto flex flex-col">
                 <Menu secondary className="!mb-0">
                     <Menu.Item>
                         <Button
                             icon="bars"
-                            onClick={() => {
-                                setCollapsed(!collapsed);
-                                setMobileCollapsed(!mobileCollapsed);
-                            }}
+                            onClick={() => setCollapsed(!collapsed)}
                         />
                     </Menu.Item>
                     <Menu.Menu position="right">
