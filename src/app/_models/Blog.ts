@@ -4,7 +4,7 @@ export interface Blog extends RowDataPacket {
     id: Number;
     url: string;
     title: string;
-    publishedAt: Date;
+    published_at: Date;
     content: string;
     summary: string;
     category: string;

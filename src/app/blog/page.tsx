@@ -1,11 +1,12 @@
 import "server-only";
 
 import React from "react";
+import Link from "next/link";
 import { getBlogs } from "../_dataprovider/BlogDataProvider";
 
 export const revalidate = 3600; // revalidate every hour
 
-const Blog: React.FC = async () => {
+const BlogList: React.FC = async () => {
     const blogs = await getBlogs();
     return (
         <>
@@ -17,12 +18,15 @@ const Blog: React.FC = async () => {
                             <div className="header">{blog.title}</div>
                             <div className="meta">{blog.category}</div>
                             <div className="description">{blog.summary}</div>
+                            <button className="ui button">
+                                <Link href={`/blog/${blog.url}`}>here</Link>
+                            </button>
                         </div>
                     </div>
-                )
+                );
             })}
         </>
     );
 };
 
-export default Blog;
+export default BlogList;

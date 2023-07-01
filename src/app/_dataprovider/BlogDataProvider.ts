@@ -1,14 +1,10 @@
 import "server-only";
 
-import appInsights from "applicationinsights";
 import mysql from "mysql2/promise";
 import { cache } from "react";
 import retry from "async-retry";
 
 import { Blog } from "../_models/Blog";
-
-appInsights.setup().start();
-let telemetryClient = appInsights.defaultClient;
 
 // Create the connection pool. The pool-specific settings are the defaults
 const pool = mysql.createPool({
@@ -49,18 +45,17 @@ export const getBlogs = cache(async (): Promise<Blog[]> => {
     } catch (err) {
         const msg = `Failed to fetch blogs after retries, error: ${err}`;
         console.error(msg);
-        telemetryClient.trackException({ exception: new Error(msg) });
         return [];
     }
 });
 
-export const getBlog = cache(async (blogId: Number): Promise<Blog | null> => {
+export const getBlog = cache(async (blogId: string): Promise<Blog | null> => {
     try {
         return await retry(
             async (bail, attempt: Number) => {
                 console.log(`Fetching blog ${blogId}, attempt #${attempt}`);
                 const [blog] = await pool.execute<Blog[]>(
-                    "SELECT * FROM `blogs` WHERE `id` = ? AND `published_at` IS NOT NULL",
+                    "SELECT * FROM `blogs` WHERE `url` = ? AND `published_at` IS NOT NULL",
                     [blogId]
                 );
                 console.log("Successfully fetched blog");
@@ -78,7 +73,6 @@ export const getBlog = cache(async (blogId: Number): Promise<Blog | null> => {
     } catch (err) {
         const msg = `Failed to fetch blog ${blogId} after retries, error: ${err}`;
         console.error(msg);
-        telemetryClient.trackException({ exception: new Error(msg) });
         return null;
     }
 });
