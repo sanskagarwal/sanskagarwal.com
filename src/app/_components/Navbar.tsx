@@ -9,15 +9,10 @@ import {
     Divider,
     Image,
     Icon,
-    SemanticICONS,
 } from "semantic-ui-react";
 import { useMediaQuery } from "react-responsive";
 
-type NavLinks = {
-    name: string;
-    url: string;
-    icon: SemanticICONS;
-};
+import { NavLinks } from "../_models/NavLinks";
 
 const navLinks: NavLinks[] = [
     {
@@ -39,17 +34,20 @@ const navLinks: NavLinks[] = [
 
 const Navbar: React.FC = () => {
     const currentUrl = usePathname();
-    const isNavLink = navLinks.findIndex((link) => link.url === currentUrl);
-    let activeLink = "";
-    if (isNavLink !== -1) {
-        activeLink = navLinks[isNavLink].name;
-    }
-
-    const [activeMenuItem, setActiveMenuItem] = useState(activeLink);
-    const [collapsed, setCollapsed] = useState(false);
     const isMobile = useMediaQuery({ maxWidth: 767 });
+    const [activeMenuItem, setActiveMenuItem] = useState("");
+    const [collapsed, setCollapsed] = useState(false);
 
     useEffect(() => setCollapsed(isMobile), [isMobile]);
+    useEffect(() => {
+        const isNavLink = navLinks.findIndex((link) => link.url === currentUrl);
+        let activeLink = "";
+        if (isNavLink !== -1) {
+            activeLink = navLinks[isNavLink].name;
+        }
+
+        setActiveMenuItem(activeLink);
+    }, [currentUrl]);
 
     return (
         <>
@@ -87,7 +85,7 @@ const Navbar: React.FC = () => {
                                 <Icon
                                     name={navLink.icon}
                                     className="!float-none"
-                                />{" "}
+                                />
                                 {navLink.name}
                             </Link>
                         );
@@ -96,9 +94,27 @@ const Navbar: React.FC = () => {
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
                         <Button.Group size="large">
-                            <Button icon="linkedin" />
-                            <Button icon="github" />
-                            <Button icon="instagram" />
+                            <a
+                                className="ui icon button"
+                                href="https://www.linkedin.com/in/sanskar-agarwal/"
+                                target="_blank"
+                            >
+                                <Icon name="linkedin" />
+                            </a>
+                            <a
+                                className="ui icon button"
+                                href="https://github.com/sanskagarwal"
+                                target="_blank"
+                            >
+                                <Icon name="github" />
+                            </a>
+                            <a
+                                className="ui icon button"
+                                href="https://www.instagram.com/sansk.agarwal/"
+                                target="_blank"
+                            >
+                                <Icon name="instagram" />
+                            </a>
                         </Button.Group>
                     </div>
                 </Menu>
@@ -114,7 +130,13 @@ const Navbar: React.FC = () => {
                     <Menu.Menu position="right">
                         <Menu.Item>
                             <Button.Group>
-                                <Button icon="bug" />
+                                <a
+                                    className="ui icon button"
+                                    href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
+                                    target="_blank"
+                                >
+                                    <Icon name="bug" />
+                                </a>
                                 <Button icon="sun" />
                             </Button.Group>
                         </Menu.Item>

@@ -18,7 +18,7 @@
     "Content": {
       "type": "richtext"
     },
-    "Group": {
+    "Category": {
       "type": "string"
     },
     "Summary": {
@@ -28,6 +28,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "admin::user"
+    },
+    "Url": {
+      "type": "string"
     }
   }
 }
