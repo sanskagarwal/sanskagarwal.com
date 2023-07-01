@@ -3,7 +3,6 @@ import "server-only";
 import React from "react";
 
 import { getBlog } from "@/app/_dataprovider/BlogDataProvider";
-import { Blog } from "@/app/_models/Blog";
 
 export const revalidate = 3600; // revalidate every hour
 

@@ -19,7 +19,7 @@ const BlogList: React.FC = async () => {
                             <div className="meta">{blog.category}</div>
                             <div className="description">{blog.summary}</div>
                             <button className="ui button">
-                                <Link href={`/blog/${blog.url}`}>here</Link>
+                                <Link href={`/blog/${blog.blog_url}`}>here</Link>
                             </button>
                         </div>
                     </div>

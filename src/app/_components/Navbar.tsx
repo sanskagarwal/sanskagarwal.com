@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
     Button,
     Menu,
     Divider,
-    Image,
     Icon,
 } from "semantic-ui-react";
 import { useMediaQuery } from "react-responsive";
@@ -65,9 +65,10 @@ const Navbar: React.FC = () => {
                 >
                     <Image
                         src="/me.png"
-                        className="w-24 mt-16 mb-1"
+                        className="ui image centered mt-16 mb-1"
                         alt="avatar"
-                        centered
+                        width={100}
+                        height={100}
                     />
                     <p className="text-center">Sanskar Agarwal</p>
                     <Divider />

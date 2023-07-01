@@ -49,14 +49,14 @@ export const getBlogs = cache(async (): Promise<Blog[]> => {
     }
 });
 
-export const getBlog = cache(async (blogId: string): Promise<Blog | null> => {
+export const getBlog = cache(async (blogUrl: string): Promise<Blog | null> => {
     try {
         return await retry(
             async (bail, attempt: Number) => {
-                console.log(`Fetching blog ${blogId}, attempt #${attempt}`);
+                console.log(`Fetching blog ${blogUrl}, attempt #${attempt}`);
                 const [blog] = await pool.execute<Blog[]>(
-                    "SELECT * FROM `blogs` WHERE `url` = ? AND `published_at` IS NOT NULL",
-                    [blogId]
+                    "SELECT * FROM `blogs` WHERE `blog_url` = ? AND `published_at` IS NOT NULL",
+                    [blogUrl]
                 );
                 console.log("Successfully fetched blog");
                 return blog[0];
@@ -65,13 +65,13 @@ export const getBlog = cache(async (blogId: string): Promise<Blog | null> => {
                 retries: 3,
                 onRetry: async (err: Error) => {
                     console.error(
-                        `Failed to fetch blog ${blogId}, error: ${err}`
+                        `Failed to fetch blog ${blogUrl}, error: ${err}`
                     );
                 },
             }
         );
     } catch (err) {
-        const msg = `Failed to fetch blog ${blogId} after retries, error: ${err}`;
+        const msg = `Failed to fetch blog ${blogUrl} after retries, error: ${err}`;
         console.error(msg);
         return null;
     }
