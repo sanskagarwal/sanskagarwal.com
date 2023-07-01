@@ -29,8 +29,8 @@
       "relation": "oneToOne",
       "target": "admin::user"
     },
-    "Url": {
-      "type": "string"
+    "blogUrl": {
+      "type": "uid"
     }
   }
 }
