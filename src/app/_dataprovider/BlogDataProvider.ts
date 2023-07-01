@@ -1,8 +1,14 @@
 import "server-only";
 
+import appInsights from "applicationinsights";
 import mysql from "mysql2/promise";
 import { cache } from "react";
+import retry from "async-retry";
+
 import { Blog } from "../_models/Blog";
+
+appInsights.setup().start();
+let telemetryClient = appInsights.defaultClient;
 
 // Create the connection pool. The pool-specific settings are the defaults
 const pool = mysql.createPool({
@@ -18,13 +24,61 @@ const pool = mysql.createPool({
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
     ssl: {
-        rejectUnauthorized: false
-    }
+        rejectUnauthorized: false,
+    },
 });
 
 export const getBlogs = cache(async (): Promise<Blog[]> => {
-    const [blogs] = await pool.execute<Blog[]>(
-        "SELECT * FROM `blogs` WHERE `published_at` IS NOT NULL"
-    );
-    return blogs;
+    try {
+        return await retry(
+            async (bail, attempt: Number) => {
+                console.log(`Fetching list of blogs, attempt #${attempt}`);
+                const [blogs] = await pool.execute<Blog[]>(
+                    "SELECT * FROM `blogs` WHERE `published_at` IS NOT NULL"
+                );
+                console.log("Successfully fetched blogs");
+                return blogs;
+            },
+            {
+                retries: 3,
+                onRetry: async (err: Error) => {
+                    console.error(`Failed to fetch blog list, error: ${err}`);
+                },
+            }
+        );
+    } catch (err) {
+        const msg = `Failed to fetch blogs after retries, error: ${err}`;
+        console.error(msg);
+        telemetryClient.trackException({ exception: new Error(msg) });
+        return [];
+    }
+});
+
+export const getBlog = cache(async (blogId: Number): Promise<Blog | null> => {
+    try {
+        return await retry(
+            async (bail, attempt: Number) => {
+                console.log(`Fetching blog ${blogId}, attempt #${attempt}`);
+                const [blog] = await pool.execute<Blog[]>(
+                    "SELECT * FROM `blogs` WHERE `id` = ? AND `published_at` IS NOT NULL",
+                    [blogId]
+                );
+                console.log("Successfully fetched blog");
+                return blog[0];
+            },
+            {
+                retries: 3,
+                onRetry: async (err: Error) => {
+                    console.error(
+                        `Failed to fetch blog ${blogId}, error: ${err}`
+                    );
+                },
+            }
+        );
+    } catch (err) {
+        const msg = `Failed to fetch blog ${blogId} after retries, error: ${err}`;
+        console.error(msg);
+        telemetryClient.trackException({ exception: new Error(msg) });
+        return null;
+    }
 });
