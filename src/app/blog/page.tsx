@@ -1,30 +1,41 @@
-import "server-only";
+"use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { getBlogs } from "../_dataprovider/BlogDataProvider";
+import { getBlogs } from "@/app/_dataprovider/ClientBlogDataProvider";
+import { Blog } from "../_models/Blog";
 
-export const revalidate = 3600; // revalidate every hour
+const BlogList: React.FC = () => {
+    const [blogList, setBlogList] = useState<[Blog]>();
 
-const BlogList: React.FC = async () => {
-    const blogs = await getBlogs();
+    useEffect(() => {
+        getBlogs().then((data) => {
+            setBlogList(data);
+        });
+    }, []);
+
     return (
         <>
             <p>List of Blogs</p>
-            {blogs.map((blog) => {
-                return (
-                    <div key={blog.id.toString()} className="ui card">
-                        <div className="content">
-                            <div className="header">{blog.title}</div>
-                            <div className="meta">{blog.category}</div>
-                            <div className="description">{blog.summary}</div>
-                            <button className="ui button">
-                                <Link href={`/blog/${blog.blog_url}`}>here</Link>
-                            </button>
+            {blogList &&
+                blogList.map((blog: Blog) => {
+                    return (
+                        <div key={blog.id.toString()} className="ui card">
+                            <div className="content">
+                                <div className="header">{blog.title}</div>
+                                <div className="meta">{blog.category}</div>
+                                <div className="description">
+                                    {blog.summary}
+                                </div>
+                                <button className="ui button">
+                                    <Link href={`/blog/${blog.blog_url}`}>
+                                        here
+                                    </Link>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
         </>
     );
 };

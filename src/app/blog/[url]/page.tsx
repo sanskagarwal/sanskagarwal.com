@@ -1,25 +1,33 @@
-import "server-only";
+"use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Markdown from "react-markdown";
+import { Container } from "semantic-ui-react";
 
-import { getBlog } from "@/app/_dataprovider/BlogDataProvider";
-
-export const revalidate = 3600; // revalidate every hour
+import { getBlog } from "@/app/_dataprovider/ClientBlogDataProvider";
+import { Blog } from "@/app/_models/Blog";
 
 type Params = {
     url: string;
 };
 
-const BlogPage: React.FC<{ params: Params }> = async ({ params }) => {
-    const blog = await getBlog(params.url);
+const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
+    const [blog, setBlog] = useState<Blog | null>(null);
+
+    useEffect(() => {
+        getBlog(params.url).then((data) => {
+            setBlog(data);
+        });
+    }, [params.url]);
+
     return (
         <>
             {blog && (
-                <div>
+                <Container text>
                     <h1>{blog.title}</h1>
-                    <h4>{blog.published_at.toDateString()}</h4>
-                    <p>{blog.content}</p>
-                </div>
+                    <h4>{new Date(blog.published_at).toDateString()}</h4>
+                    <Markdown>{blog.content}</Markdown>
+                </Container>
             )}
         </>
     );

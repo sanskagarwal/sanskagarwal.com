@@ -1,3 +1,3 @@
 export const Constants = {
-    HEARTBEAT_URI: "https://sanskagarwal.com/heartbeat",
+    HEARTBEAT_URI: "https://sanskagarwal.com/api/heartbeat",
 };

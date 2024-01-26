@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
 
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
-                        <Button.Group size="large">
+                        <Button.Group className="bottom-buttons" size="large">
                             <a
                                 className="ui icon button hover:!text-blue-500"
                                 href="https://www.linkedin.com/in/sanskar-agarwal/"

@@ -42,3 +42,10 @@ body {
     background-attachment: fixed;
     background-size: cover;
 }
+
+/*
+* UI
+*/
+.header .ui.button, .bottom-buttons .ui.button {
+    background: rgba(0,0,0,.05) none !important;
+}
