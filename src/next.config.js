@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     webpack: (config) => {
-        config.externals = [...config.externals, "canvas"];
+        config.resolve.alias.canvas = false;
+
         return config;
     },
 };
