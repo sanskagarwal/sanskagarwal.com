@@ -19,7 +19,7 @@ export default function RootLayout({
             <body>
                 <div className="mainWrapper grid">
                     <Navbar />
-                    <div className="content p-4">{children}</div>
+                    <div className="content">{children}</div>
                 </div>
             </body>
         </html>

@@ -29,8 +29,7 @@ const BlogList: React.FC = () => {
     } = useSWR<Blog[]>("/api/blogs", fetcher);
 
     useEffect(() => {
-        const newLabelColors: { [key: string]: SemanticCOLORS } = {};
-        newLabelColors["all"] = "red";
+        let newLabelColors: { [key: string]: SemanticCOLORS } = {};
         let colorIndex = 1;
         blogList?.forEach((blog: Blog) => {
             if (!newLabelColors[blog.category]) {
@@ -39,9 +38,18 @@ const BlogList: React.FC = () => {
                 ] as SemanticCOLORS;
                 colorIndex++;
             }
+
+            newLabelColors["all"] = "red";
         });
 
-        setLabelColors(newLabelColors);
+        const sortedLabelColors: { [key: string]: SemanticCOLORS } = {};
+        Object.keys(newLabelColors)
+            .sort()
+            .forEach((key) => {
+                sortedLabelColors[key] = newLabelColors[key];
+            });
+
+        setLabelColors(sortedLabelColors);
     }, [blogList]);
 
     const changeActiveLabel = (e: any) => {
@@ -54,7 +62,7 @@ const BlogList: React.FC = () => {
                 {Object.keys(labelColors).map((label: string) => {
                     return (
                         <Button
-                            className="!py-1.5 !text-sm"
+                            className="!py-1.5 !text-sm !font-semibold"
                             key={label}
                             as="a"
                             active={label === activeLabel}
@@ -71,8 +79,8 @@ const BlogList: React.FC = () => {
     };
 
     return (
-        <div className="flex gap-4 flex-col justify-center items-center">
-            <p>Blogs</p>
+        <div className="p-4 flex gap-4 flex-col justify-center items-center">
+            <h2 className="ui header !m-0">Blogs</h2>
             {error && <div>Failed to load blogs</div>}
             {isLoading && (
                 <Card>
