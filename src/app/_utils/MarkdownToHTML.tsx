@@ -34,6 +34,7 @@ const getHTML = (content: string) => {
                     );
                 },
                 blockquote({ node, ...props }) {
+                    // @ts-ignore
                     return <p className="ui message" {...props} />;
                 },
                 ul({ node, ...props }) {
@@ -52,6 +53,7 @@ const getHTML = (content: string) => {
                     const { children, className, node, ...rest } = props;
                     const match = /language-(\w+)/.exec(className || "");
                     return match ? (
+                        // @ts-ignore
                         <SyntaxHighlighter
                             {...rest}
                             PreTag="div"
