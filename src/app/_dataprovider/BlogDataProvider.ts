@@ -29,7 +29,7 @@ export const getBlogs = async (): Promise<Blog[]> => {
             async (bail, attempt: Number) => {
                 console.log(`Fetching list of blogs, attempt #${attempt}`);
                 const [blogs] = await pool.execute<Blog[]>(
-                    "SELECT id, title, summary, blog_url, category FROM `blogs` WHERE `published_at` IS NOT NULL"
+                    "SELECT id, title, summary, blog_url, category, published_at FROM `blogs` WHERE `published_at` IS NOT NULL"
                 );
                 console.log("Successfully fetched blogs");
                 return blogs;
