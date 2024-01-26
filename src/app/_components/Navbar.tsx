@@ -46,8 +46,12 @@ const Navbar: React.FC = () => {
             activeLink = navLinks[isNavLink].name;
         }
 
+        if (isMobile) {
+            setCollapsed(true);
+        }
+
         setActiveMenuItem(activeLink);
-    }, [currentUrl]);
+    }, [currentUrl, isMobile]);
 
     return (
         <>
@@ -79,13 +83,13 @@ const Navbar: React.FC = () => {
                                 onClick={() => setActiveMenuItem(navLink.name)}
                                 key={navLink.name}
                                 href={navLink.url}
-                                className={`item ${
-                                    activeMenuItem === navLink.name && "active"
+                                className={`hover:!text-blue-500 !mb-0 item ${
+                                    activeMenuItem === navLink.name && "active !text-blue-500"
                                 }`}
                             >
                                 <Icon
                                     name={navLink.icon}
-                                    className="!float-none"
+                                    className="!mr-1 !float-none"
                                 />
                                 {navLink.name}
                             </Link>
@@ -94,23 +98,23 @@ const Navbar: React.FC = () => {
 
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
-                        <Button.Group size="large">
+                        <Button.Group className="bottom-buttons" size="large">
                             <a
-                                className="ui icon button"
+                                className="ui icon button hover:!text-blue-500"
                                 href="https://www.linkedin.com/in/sanskar-agarwal/"
                                 target="_blank"
                             >
                                 <Icon name="linkedin" />
                             </a>
                             <a
-                                className="ui icon button"
+                                className="ui icon button hover:!text-blue-500"
                                 href="https://github.com/sanskagarwal"
                                 target="_blank"
                             >
                                 <Icon name="github" />
                             </a>
                             <a
-                                className="ui icon button"
+                                className="ui icon button hover:!text-blue-500"
                                 href="https://www.instagram.com/sansk.agarwal/"
                                 target="_blank"
                             >
@@ -124,6 +128,7 @@ const Navbar: React.FC = () => {
                 <Menu secondary className="!mb-0 !ml-0">
                     <Menu.Item>
                         <Button
+                            className="hover:!text-blue-500"
                             icon="bars"
                             onClick={() => setCollapsed(!collapsed)}
                         />
@@ -132,13 +137,13 @@ const Navbar: React.FC = () => {
                         <Menu.Item>
                             <Button.Group>
                                 <a
-                                    className="ui icon button"
+                                    className="ui icon button hover:!text-blue-500"
                                     href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
                                     target="_blank"
                                 >
                                     <Icon name="bug" />
                                 </a>
-                                <Button icon="sun" />
+                                <Button icon="sun" className="hover:!text-blue-500" />
                             </Button.Group>
                         </Menu.Item>
                     </Menu.Menu>

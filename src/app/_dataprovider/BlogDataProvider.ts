@@ -1,7 +1,6 @@
 import "server-only";
 
 import mysql from "mysql2/promise";
-import { cache } from "react";
 import retry from "async-retry";
 
 import { Blog } from "../_models/Blog";
@@ -24,13 +23,13 @@ const pool = mysql.createPool({
     },
 });
 
-export const getBlogs = cache(async (): Promise<Blog[]> => {
+export const getBlogs = async (): Promise<Blog[]> => {
     try {
         return await retry(
             async (bail, attempt: Number) => {
                 console.log(`Fetching list of blogs, attempt #${attempt}`);
                 const [blogs] = await pool.execute<Blog[]>(
-                    "SELECT * FROM `blogs` WHERE `published_at` IS NOT NULL"
+                    "SELECT id, title, summary, blog_url, category FROM `blogs` WHERE `published_at` IS NOT NULL"
                 );
                 console.log("Successfully fetched blogs");
                 return blogs;
@@ -47,9 +46,9 @@ export const getBlogs = cache(async (): Promise<Blog[]> => {
         console.error(msg);
         return [];
     }
-});
+};
 
-export const getBlog = cache(async (blogUrl: string): Promise<Blog | null> => {
+export const getBlog = async (blogUrl: string): Promise<Blog | null> => {
     try {
         return await retry(
             async (bail, attempt: Number) => {
@@ -75,4 +74,4 @@ export const getBlog = cache(async (blogUrl: string): Promise<Blog | null> => {
         console.error(msg);
         return null;
     }
-});
+};
