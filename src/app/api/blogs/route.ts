@@ -7,3 +7,5 @@ export async function GET() {
     const data = await getBlogs();
     return NextResponse.json(data)
 }
+
+export const dynamic = 'force-dynamic' // defaults to auto

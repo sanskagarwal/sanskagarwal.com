@@ -8,7 +8,7 @@ import { Icon } from "semantic-ui-react";
 const Home: React.FC = () => {
     return (
         <>
-            <div className="flex gap-10 flex-col h-3/6 xl:h-4/6 md:flex-row xl:px-48 lg:px-16">
+            <div className="py-4 flex gap-10 flex-col h-3/6 xl:h-4/6 md:flex-row px-5 md:px-10 lg:px-16 xl:px-48">
                 <div className="basis-1/2 justify-center text-center flex flex-col">
                     <h1 className="ui header">Software Engineer</h1>
                     <p className="!text-lg !text-left">
