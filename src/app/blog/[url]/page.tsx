@@ -2,11 +2,11 @@
 
 import React from "react";
 import useSWR from "swr";
-import Markdown from "react-markdown";
 import { List } from "react-content-loader";
 
 import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
 import { Blog } from "@/app/_models/Blog";
+import getHTML from "@/app/_utils/MarkdownToHTML";
 
 type Params = {
     url: string;
@@ -34,11 +34,20 @@ const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
                     </div>
                 )}
                 {blog && (
-                    <>
-                        <h1>{blog.title}</h1>
-                        <h4>{new Date(blog.published_at).toDateString()}</h4>
-                        <Markdown>{blog.content}</Markdown>
-                    </>
+                    <div className="ui text">
+                        <h1 className="ui header">{blog.title}</h1>
+                        <h6 className="ui header">
+                            {new Date(blog.published_at).toLocaleDateString(
+                                undefined,
+                                {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                }
+                            )}
+                        </h6>
+                        {getHTML(blog.content)}
+                    </div>
                 )}
             </div>
         </div>
