@@ -1,22 +1,32 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useSWR from "swr";
+import { BulletList } from "react-content-loader";
 import Link from "next/link";
-import { getBlogs } from "@/app/_dataprovider/ClientBlogDataProvider";
+
+import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
 import { Blog } from "../_models/Blog";
+import { Card, CardContent } from "semantic-ui-react";
 
 const BlogList: React.FC = () => {
-    const [blogList, setBlogList] = useState<[Blog]>();
-
-    useEffect(() => {
-        getBlogs().then((data) => {
-            setBlogList(data);
-        });
-    }, []);
+    const {
+        data: blogList,
+        isLoading,
+        error,
+    } = useSWR<Blog[]>("/api/blogs", fetcher);
 
     return (
         <>
             <p>List of Blogs</p>
+            {error && <div>Failed to load blogs</div>}
+            {isLoading && (
+                <Card>
+                    <CardContent>
+                        <BulletList />
+                    </CardContent>
+                </Card>
+            )}
             {blogList &&
                 blogList.map((blog: Blog) => {
                     return (

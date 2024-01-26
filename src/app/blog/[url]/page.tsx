@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import useSWR from "swr";
 import Markdown from "react-markdown";
-import { Container } from "semantic-ui-react";
+import { Card, CardContent, Container } from "semantic-ui-react";
+import { List } from "react-content-loader";
 
-import { getBlog } from "@/app/_dataprovider/ClientBlogDataProvider";
+import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
 import { Blog } from "@/app/_models/Blog";
 
 type Params = {
@@ -12,16 +14,22 @@ type Params = {
 };
 
 const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
-    const [blog, setBlog] = useState<Blog | null>(null);
-
-    useEffect(() => {
-        getBlog(params.url).then((data) => {
-            setBlog(data);
-        });
-    }, [params.url]);
+    const {
+        data: blog,
+        isLoading,
+        error,
+    } = useSWR<Blog>(`/api/blogs/${params.url}`, fetcher);
 
     return (
         <>
+            {error && <div>Failed to load the blog</div>}
+            {isLoading && (
+                <Card>
+                    <CardContent>
+                        <List />
+                    </CardContent>
+                </Card>
+            )}
             {blog && (
                 <Container text>
                     <h1>{blog.title}</h1>
