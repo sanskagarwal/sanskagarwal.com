@@ -4,12 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import {
-    Button,
-    Menu,
-    Divider,
-    Icon,
-} from "semantic-ui-react";
+import { Button, Menu, Divider, Icon } from "semantic-ui-react";
 import { useMediaQuery } from "react-responsive";
 
 import { NavLinks } from "../_models/NavLinks";
@@ -32,11 +27,30 @@ const navLinks: NavLinks[] = [
     },
 ];
 
+const socialLinks: NavLinks[] = [
+    {
+        name: "LinkedIn",
+        url: "https://www.linkedin.com/in/sanskar-agarwal/",
+        icon: "linkedin",
+    },
+    {
+        name: "GitHub",
+        url: "https://github.com/sanskagarwal",
+        icon: "github",
+    },
+    {
+        name: "Instagram",
+        url: "https://www.instagram.com/sansk.agarwal/",
+        icon: "instagram",
+    },
+];
+
 const Navbar: React.FC = () => {
     const currentUrl = usePathname();
     const isMobile = useMediaQuery({ maxWidth: 767 });
     const [activeMenuItem, setActiveMenuItem] = useState("");
     const [collapsed, setCollapsed] = useState(false);
+    const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => setCollapsed(isMobile), [isMobile]);
     useEffect(() => {
@@ -53,19 +67,38 @@ const Navbar: React.FC = () => {
         setActiveMenuItem(activeLink);
     }, [currentUrl, isMobile]);
 
+    const systemPreference = useMediaQuery({
+        query: "(prefers-color-scheme: dark)",
+    });
+
+    useEffect(() => {
+        if (systemPreference) {
+            setDarkMode(true);
+            document.body.classList.add("dark");
+        }
+
+        // TODO Remove
+        // document.body.classList.add("dark");
+    }, [systemPreference]);
+
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+        if (darkMode) {
+            document.body.classList.remove("dark");
+        } else {
+            document.body.classList.add("dark");
+        }
+    };
+
     return (
         <>
-            <div className="sider top-0 self-start max-h-screen grid sticky min-h-screen">
+            <div className="dark:!bg-neutral-800 sider top-0 self-start max-h-screen grid sticky min-h-screen">
                 <Menu
                     secondary
                     vertical
-                    className={`flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
+                    className={`!border !border-solid !border-neutral-800/[0.15] dark:!border-neutral-200/[0.15] !shadow-xl flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
                         collapsed ? "overflow-hidden !w-0" : ""
                     }`}
-                    style={{
-                        borderLeft: "1px solid rgba(255,255,255,.1)",
-                        borderRight: "1px solid rgba(34,36,38,.15)",
-                    }}
                 >
                     <Image
                         src="/me.png"
@@ -83,8 +116,9 @@ const Navbar: React.FC = () => {
                                 onClick={() => setActiveMenuItem(navLink.name)}
                                 key={navLink.name}
                                 href={navLink.url}
-                                className={`hover:!text-blue-500 !mb-0 item ${
-                                    activeMenuItem === navLink.name && "active !text-blue-500"
+                                className={`dark:!text-white dark:!font-light hover:!text-blue-500 dark:hover:!text-blue-300 !mx-4 !my-1 item ${
+                                    activeMenuItem === navLink.name &&
+                                    "active !text-blue-500 dark:!text-blue-300"
                                 }`}
                             >
                                 <Icon
@@ -99,33 +133,24 @@ const Navbar: React.FC = () => {
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
                         <Button.Group className="bottom-buttons" size="large">
-                            <a
-                                className="ui icon button hover:!text-blue-500"
-                                href="https://www.linkedin.com/in/sanskar-agarwal/"
-                                target="_blank"
-                            >
-                                <Icon name="linkedin" />
-                            </a>
-                            <a
-                                className="ui icon button hover:!text-blue-500"
-                                href="https://github.com/sanskagarwal"
-                                target="_blank"
-                            >
-                                <Icon name="github" />
-                            </a>
-                            <a
-                                className="ui icon button hover:!text-blue-500"
-                                href="https://www.instagram.com/sansk.agarwal/"
-                                target="_blank"
-                            >
-                                <Icon name="instagram" />
-                            </a>
+                            {socialLinks.map((socialLink) => {
+                                return (
+                                <a
+                                        className="ui icon button hover:!text-blue-500 dark:hover:!text-blue-300 dark:!text-white"
+                                        href={socialLink.url}
+                                        target="_blank"
+                                        key={socialLink.name}
+                                    >
+                                        <Icon name={socialLink.icon} />
+                                    </a>
+                                );
+                            })}
                         </Button.Group>
                     </div>
                 </Menu>
             </div>
             <div className="header grid">
-                <Menu secondary className="!mb-0 !ml-0">
+                <Menu secondary className="dark:!bg-gray-800 dark:!text-white !mb-0 !ml-0 !shadow">
                     <Menu.Item>
                         <Button
                             className="hover:!text-blue-500"
@@ -143,7 +168,11 @@ const Navbar: React.FC = () => {
                                 >
                                     <Icon name="bug" />
                                 </a>
-                                <Button icon="sun" className="hover:!text-blue-500" />
+                                <Button
+                                    icon={darkMode ? "moon" : "sun"}
+                                    className="hover:!text-blue-500"
+                                    onClick={toggleDarkMode}
+                                />
                             </Button.Group>
                         </Menu.Item>
                     </Menu.Menu>

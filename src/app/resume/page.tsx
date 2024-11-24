@@ -31,7 +31,7 @@ const Resume: React.FC = () => {
             >
                 <div className="flex flex-col items-center">
                     <a
-                        className="button download icon right labeled ui !mb-4"
+                        className="button download icon right labeled ui blue !mb-4"
                         href={Constants.Resume_URI}
                         target="_blank"
                         rel="noreferrer"
