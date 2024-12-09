@@ -365,6 +365,7 @@ export interface AdminUser extends Schema.CollectionType {
 export interface ApiBlogBlog extends Schema.CollectionType {
   collectionName: 'blogs';
   info: {
+    description: '';
     displayName: 'Blog';
     pluralName: 'blogs';
     singularName: 'blog';
@@ -373,13 +374,15 @@ export interface ApiBlogBlog extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    blogUrl: Attribute.UID;
-    Content: Attribute.RichText;
+    blogUrl: Attribute.UID & Attribute.Required;
+    category: Attribute.String & Attribute.Required;
+    Content: Attribute.RichText & Attribute.Required;
     createdAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::blog.blog', 'oneToOne', 'admin::user'> &
       Attribute.Private;
     publishedAt: Attribute.DateTime;
-    Title: Attribute.String;
+    summary: Attribute.Text & Attribute.Required;
+    Title: Attribute.String & Attribute.Required;
     updatedAt: Attribute.DateTime;
     updatedBy: Attribute.Relation<'api::blog.blog', 'oneToOne', 'admin::user'> &
       Attribute.Private;

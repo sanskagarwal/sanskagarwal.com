@@ -1,6 +1,4 @@
-import { RowDataPacket } from "mysql2";
-
-export interface Blog extends RowDataPacket {
+export interface Blog {
     id: Number;
     blog_url: string;
     title: string;

@@ -29,6 +29,7 @@ const BlogList: React.FC = () => {
     } = useSWR<Blog[]>("/api/blogs", fetcher);
 
     useEffect(() => {
+        console.log(blogList);
         let newLabelColors: { [key: string]: SemanticCOLORS } = {};
         let colorIndex = 1;
         blogList?.forEach((blog: Blog) => {

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "blog",
     "pluralName": "blogs",
-    "displayName": "Blog"
+    "displayName": "Blog",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -12,13 +13,24 @@
   "pluginOptions": {},
   "attributes": {
     "Title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "Content": {
-      "type": "richtext"
+      "type": "richtext",
+      "required": true
     },
     "blogUrl": {
-      "type": "uid"
+      "type": "uid",
+      "required": true
+    },
+    "category": {
+      "type": "string",
+      "required": true
+    },
+    "summary": {
+      "type": "text",
+      "required": true
     }
   }
 }
