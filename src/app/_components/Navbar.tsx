@@ -4,12 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import {
-    Button,
-    Menu,
-    Divider,
-    Icon,
-} from "semantic-ui-react";
+import { Button, Menu, Divider, Icon } from "semantic-ui-react";
 import { useMediaQuery } from "react-responsive";
 
 import { NavLinks } from "../_models/NavLinks";
@@ -67,34 +62,39 @@ const Navbar: React.FC = () => {
                         borderRight: "1px solid rgba(34,36,38,.15)",
                     }}
                 >
-                    <Image
-                        src="/me.png"
-                        className="ui image centered mt-16 mb-1"
-                        alt="avatar"
-                        width={100}
-                        height={100}
-                    />
-                    <p className="text-center">Sanskar Agarwal</p>
-                    <Divider />
+                    <div className="absolute w-full top-1/4">
+                        <Image
+                            src="/me.png"
+                            className="ui image centered mt-16 mb-1"
+                            alt="avatar"
+                            width={100}
+                            height={100}
+                        />
+                        <p className="text-center">Sanskar Agarwal</p>
+                        <Divider />
 
-                    {navLinks.map((navLink) => {
-                        return (
-                            <Link
-                                onClick={() => setActiveMenuItem(navLink.name)}
-                                key={navLink.name}
-                                href={navLink.url}
-                                className={`hover:!text-blue-500 !mb-0 item ${
-                                    activeMenuItem === navLink.name && "active !text-blue-500"
-                                }`}
-                            >
-                                <Icon
-                                    name={navLink.icon}
-                                    className="!mr-1 !float-none"
-                                />
-                                {navLink.name}
-                            </Link>
-                        );
-                    })}
+                        {navLinks.map((navLink) => {
+                            return (
+                                <Link
+                                    onClick={() =>
+                                        setActiveMenuItem(navLink.name)
+                                    }
+                                    key={navLink.name}
+                                    href={navLink.url}
+                                    className={`hover:!text-blue-500 !mb-0 item ${
+                                        activeMenuItem === navLink.name &&
+                                        "active !text-blue-500"
+                                    }`}
+                                >
+                                    <Icon
+                                        name={navLink.icon}
+                                        className="!mr-1 !float-none"
+                                    />
+                                    {navLink.name}
+                                </Link>
+                            );
+                        })}
+                    </div>
 
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
@@ -143,7 +143,10 @@ const Navbar: React.FC = () => {
                                 >
                                     <Icon name="bug" />
                                 </a>
-                                <Button icon="sun" className="hover:!text-blue-500" />
+                                <Button
+                                    icon="sun"
+                                    className="hover:!text-blue-500"
+                                />
                             </Button.Group>
                         </Menu.Item>
                     </Menu.Menu>
