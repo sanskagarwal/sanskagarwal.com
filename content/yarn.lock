@@ -2047,29 +2047,29 @@
     p-map "4.0.0"
     yup "0.32.9"
 
-"@swc/core-darwin-arm64@1.10.0":
-  version "1.10.0"
-  resolved "https://registry.npmjs.org/@swc/core-darwin-arm64/-/core-darwin-arm64-1.10.0.tgz"
-  integrity sha512-wCeUpanqZyzvgqWRtXIyhcFK3CqukAlYyP+fJpY2gWc/+ekdrenNIfZMwY7tyTFDkXDYEKzvn3BN/zDYNJFowQ==
+"@swc/core-darwin-arm64@1.10.1":
+  version "1.10.1"
+  resolved "https://registry.npmjs.org/@swc/core-darwin-arm64/-/core-darwin-arm64-1.10.1.tgz"
+  integrity sha512-NyELPp8EsVZtxH/mEqvzSyWpfPJ1lugpTQcSlMduZLj1EASLO4sC8wt8hmL1aizRlsbjCX+r0PyL+l0xQ64/6Q==
 
-"@swc/core@^1.3.96":
-  version "1.10.0"
-  resolved "https://registry.npmjs.org/@swc/core/-/core-1.10.0.tgz"
-  integrity sha512-+CuuTCmQFfzaNGg1JmcZvdUVITQXJk9sMnl1C2TiDLzOSVOJRwVD4dNo5dljX/qxpMAN+2BIYlwjlSkoGi6grg==
+"@swc/core@^1.10.1", "@swc/core@^1.3.96":
+  version "1.10.1"
+  resolved "https://registry.npmjs.org/@swc/core/-/core-1.10.1.tgz"
+  integrity sha512-rQ4dS6GAdmtzKiCRt3LFVxl37FaY1cgL9kSUTnhQ2xc3fmHOd7jdJK/V4pSZMG1ruGTd0bsi34O2R0Olg9Zo/w==
   dependencies:
     "@swc/counter" "^0.1.3"
     "@swc/types" "^0.1.17"
   optionalDependencies:
-    "@swc/core-darwin-arm64" "1.10.0"
-    "@swc/core-darwin-x64" "1.10.0"
-    "@swc/core-linux-arm-gnueabihf" "1.10.0"
-    "@swc/core-linux-arm64-gnu" "1.10.0"
-    "@swc/core-linux-arm64-musl" "1.10.0"
-    "@swc/core-linux-x64-gnu" "1.10.0"
-    "@swc/core-linux-x64-musl" "1.10.0"
-    "@swc/core-win32-arm64-msvc" "1.10.0"
-    "@swc/core-win32-ia32-msvc" "1.10.0"
-    "@swc/core-win32-x64-msvc" "1.10.0"
+    "@swc/core-darwin-arm64" "1.10.1"
+    "@swc/core-darwin-x64" "1.10.1"
+    "@swc/core-linux-arm-gnueabihf" "1.10.1"
+    "@swc/core-linux-arm64-gnu" "1.10.1"
+    "@swc/core-linux-arm64-musl" "1.10.1"
+    "@swc/core-linux-x64-gnu" "1.10.1"
+    "@swc/core-linux-x64-musl" "1.10.1"
+    "@swc/core-win32-arm64-msvc" "1.10.1"
+    "@swc/core-win32-ia32-msvc" "1.10.1"
+    "@swc/core-win32-x64-msvc" "1.10.1"
 
 "@swc/counter@^0.1.3":
   version "0.1.3"
