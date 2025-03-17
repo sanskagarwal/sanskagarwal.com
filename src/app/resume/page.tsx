@@ -2,11 +2,14 @@
 
 import React from "react";
 import { pdfjs, Document, Page } from "react-pdf";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
-import { Constants } from "../_utils/Constants";
+import { useMediaQuery } from "react-responsive";
 import { List } from "react-content-loader";
 import { Icon } from "semantic-ui-react";
+
+import { Constants } from "../_utils/Constants";
+
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     "pdfjs-dist/build/pdf.worker.min.js",
@@ -15,6 +18,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const Resume: React.FC = () => {
     const [isLoading, setIsLoading] = React.useState(true);
+    const isXs = useMediaQuery({ maxWidth: 550 });
+    const isSm = useMediaQuery({ maxWidth: 767 });
+    const isMd = useMediaQuery({ maxWidth: 1024 });
+    const isLg = useMediaQuery({ maxWidth: 1280 });
 
     return (
         <div className="grid grid-cols-6">
@@ -24,7 +31,7 @@ const Resume: React.FC = () => {
             >
                 <div className="flex flex-col items-center">
                     <a
-                        className="button download icon right labeled ui !mb-4"
+                        className="button download icon right labeled ui blue !mb-4"
                         href={Constants.Resume_URI}
                         target="_blank"
                         rel="noreferrer"
@@ -40,7 +47,7 @@ const Resume: React.FC = () => {
                     file={encodeURI(Constants.Resume_URI)}
                 >
                     <Page
-                        scale={1.5}
+                        scale={isXs ? 0.6 : isSm ? 0.9 : isMd ? 1 : isLg ? 1.25 : 1.5}
                         pageNumber={1}
                         onLoadSuccess={() => setIsLoading(false)}
                     />

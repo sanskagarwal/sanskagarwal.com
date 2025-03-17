@@ -27,6 +27,24 @@ const navLinks: NavLinks[] = [
     },
 ];
 
+const socialLinks: NavLinks[] = [
+    {
+        name: "LinkedIn",
+        url: "https://www.linkedin.com/in/sanskar-agarwal/",
+        icon: "linkedin",
+    },
+    {
+        name: "GitHub",
+        url: "https://github.com/sanskagarwal",
+        icon: "github",
+    },
+    {
+        name: "Instagram",
+        url: "https://www.instagram.com/sansk.agarwal/",
+        icon: "instagram",
+    },
+];
+
 const Navbar: React.FC = () => {
     const currentUrl = usePathname();
     const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -54,13 +72,9 @@ const Navbar: React.FC = () => {
                 <Menu
                     secondary
                     vertical
-                    className={`flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
+                    className={`!border !border-solid !border-neutral-800/[0.15] !shadow-xl flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
                         collapsed ? "overflow-hidden !w-0" : ""
                     }`}
-                    style={{
-                        borderLeft: "1px solid rgba(255,255,255,.1)",
-                        borderRight: "1px solid rgba(34,36,38,.15)",
-                    }}
                 >
                     <div className="absolute w-full top-1/4">
                         <Image
@@ -81,7 +95,7 @@ const Navbar: React.FC = () => {
                                     }
                                     key={navLink.name}
                                     href={navLink.url}
-                                    className={`hover:!text-blue-500 !mb-0 item ${
+                                    className={`hover:!text-blue-500 !mx-4 !my-1 item ${
                                         activeMenuItem === navLink.name &&
                                         "active !text-blue-500"
                                     }`}
@@ -99,33 +113,27 @@ const Navbar: React.FC = () => {
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
                         <Button.Group className="bottom-buttons" size="large">
-                            <a
-                                className="ui icon button hover:!text-blue-500"
-                                href="https://www.linkedin.com/in/sanskar-agarwal/"
-                                target="_blank"
-                            >
-                                <Icon name="linkedin" />
-                            </a>
-                            <a
-                                className="ui icon button hover:!text-blue-500"
-                                href="https://github.com/sanskagarwal"
-                                target="_blank"
-                            >
-                                <Icon name="github" />
-                            </a>
-                            <a
-                                className="ui icon button hover:!text-blue-500"
-                                href="https://www.instagram.com/sansk.agarwal/"
-                                target="_blank"
-                            >
-                                <Icon name="instagram" />
-                            </a>
+                            {socialLinks.map((socialLink) => {
+                                return (
+                                    <a
+                                        className="ui icon button hover:!text-blue-500"
+                                        href={socialLink.url}
+                                        target="_blank"
+                                        key={socialLink.name}
+                                    >
+                                        <Icon name={socialLink.icon} />
+                                    </a>
+                                );
+                            })}
                         </Button.Group>
                     </div>
                 </Menu>
             </div>
             <div className="header grid">
-                <Menu secondary className="!mb-0 !ml-0">
+                <Menu
+                    secondary
+                    className="!mb-0 !ml-0 !shadow"
+                >
                     <Menu.Item>
                         <Button
                             className="hover:!text-blue-500"
@@ -143,10 +151,6 @@ const Navbar: React.FC = () => {
                                 >
                                     <Icon name="bug" />
                                 </a>
-                                <Button
-                                    icon="sun"
-                                    className="hover:!text-blue-500"
-                                />
                             </Button.Group>
                         </Menu.Item>
                     </Menu.Menu>

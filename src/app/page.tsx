@@ -14,7 +14,7 @@ const Home: React.FC = () => {
                     <div className="self-end col-span-2">
                         <h1 className="ui header">Software Engineer</h1>
                         <p className="!text-lg !text-left">
-                            I'm a Full-Stack Web and Security Engineer
+                            I&apos;m a Full-Stack Web and Security Engineer
                             passionate about building scalable applications and
                             designing secure distributed systems.
                             <br />
@@ -44,7 +44,7 @@ const Home: React.FC = () => {
                         </Link>
                     </div>
                 </div>
-                <div className="basis-1/2 grid grid-cols-2 grid-rows-2 gap-4">
+                <div className="basis-1/2 justify-center text-center grid grid-cols-2 gap-4">
                     <div className="border-dashed row-start-1 row-end-1 col-start-1 col-end-1 self-end justify-self-end">
                         <Image
                             src="/code.svg"
