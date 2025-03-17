@@ -75,6 +75,9 @@ const Navbar: React.FC = () => {
         if (systemPreference) {
             setDarkMode(true);
             document.body.classList.add("dark");
+        } else {
+            setDarkMode(false);
+            document.body.classList.remove("dark");
         }
 
         // TODO Remove
