@@ -37,6 +37,7 @@ const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
                     <div className="ui text">
                         <h1 className="ui header">{blog.title}</h1>
                         <h6 className="ui header">
+                            Publish Date:{" "}
                             {new Date(blog.published_at).toLocaleDateString(
                                 undefined,
                                 {
