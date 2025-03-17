@@ -100,42 +100,46 @@ const Navbar: React.FC = () => {
                         collapsed ? "overflow-hidden !w-0" : ""
                     }`}
                 >
-                    <Image
-                        src="/me.png"
-                        className="ui image centered mt-16 mb-1"
-                        alt="avatar"
-                        width={100}
-                        height={100}
-                    />
-                    <p className="text-center">Sanskar Agarwal</p>
-                    <Divider />
+                    <div className="absolute w-full top-1/4">
+                        <Image
+                            src="/me.png"
+                            className="ui image centered mt-16 mb-1"
+                            alt="avatar"
+                            width={100}
+                            height={100}
+                        />
+                        <p className="text-center">Sanskar Agarwal</p>
+                        <Divider />
 
-                    {navLinks.map((navLink) => {
-                        return (
-                            <Link
-                                onClick={() => setActiveMenuItem(navLink.name)}
-                                key={navLink.name}
-                                href={navLink.url}
-                                className={`dark:!text-white dark:!font-light hover:!text-blue-500 dark:hover:!text-blue-300 !mx-4 !my-1 item ${
-                                    activeMenuItem === navLink.name &&
-                                    "active !text-blue-500 dark:!text-blue-300"
-                                }`}
-                            >
-                                <Icon
-                                    name={navLink.icon}
-                                    className="!mr-1 !float-none"
-                                />
-                                {navLink.name}
-                            </Link>
-                        );
-                    })}
+                        {navLinks.map((navLink) => {
+                            return (
+                                <Link
+                                    onClick={() =>
+                                        setActiveMenuItem(navLink.name)
+                                    }
+                                    key={navLink.name}
+                                    href={navLink.url}
+                                    className={`dark:!text-white dark:!font-light hover:!text-blue-500 dark:hover:!text-blue-300 !mx-4 !my-1 item ${
+                                        activeMenuItem === navLink.name &&
+                                        "active !text-blue-500 dark:!text-blue-300"
+                                    }`}
+                                >
+                                    <Icon
+                                        name={navLink.icon}
+                                        className="!mr-1 !float-none"
+                                    />
+                                    {navLink.name}
+                                </Link>
+                            );
+                        })}
+                    </div>
 
                     <div className="absolute bottom-8 text-center w-full">
                         <Divider />
                         <Button.Group className="bottom-buttons" size="large">
                             {socialLinks.map((socialLink) => {
                                 return (
-                                <a
+                                    <a
                                         className="ui icon button hover:!text-blue-500 dark:hover:!text-blue-300 dark:!text-white"
                                         href={socialLink.url}
                                         target="_blank"
@@ -150,7 +154,10 @@ const Navbar: React.FC = () => {
                 </Menu>
             </div>
             <div className="header grid">
-                <Menu secondary className="dark:!bg-gray-800 dark:!text-white !mb-0 !ml-0 !shadow">
+                <Menu
+                    secondary
+                    className="dark:!bg-gray-800 dark:!text-white !mb-0 !ml-0 !shadow"
+                >
                     <Menu.Item>
                         <Button
                             className="hover:!text-blue-500"

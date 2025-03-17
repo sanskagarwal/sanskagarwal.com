@@ -13,24 +13,24 @@
   "pluginOptions": {},
   "attributes": {
     "Title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "Content": {
-      "type": "richtext"
-    },
-    "Category": {
-      "type": "string"
-    },
-    "Summary": {
-      "type": "text"
-    },
-    "AuthorId": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "admin::user"
+      "type": "richtext",
+      "required": true
     },
     "blogUrl": {
-      "type": "uid"
+      "type": "uid",
+      "required": true
+    },
+    "category": {
+      "type": "string",
+      "required": true
+    },
+    "summary": {
+      "type": "text",
+      "required": true
     }
   }
 }
