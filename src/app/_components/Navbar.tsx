@@ -50,7 +50,6 @@ const Navbar: React.FC = () => {
     const isMobile = useMediaQuery({ maxWidth: 767 });
     const [activeMenuItem, setActiveMenuItem] = useState("");
     const [collapsed, setCollapsed] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => setCollapsed(isMobile), [isMobile]);
     useEffect(() => {
@@ -67,39 +66,13 @@ const Navbar: React.FC = () => {
         setActiveMenuItem(activeLink);
     }, [currentUrl, isMobile]);
 
-    const systemPreference = useMediaQuery({
-        query: "(prefers-color-scheme: dark)",
-    });
-
-    useEffect(() => {
-        if (systemPreference) {
-            setDarkMode(true);
-            document.body.classList.add("dark");
-        } else {
-            setDarkMode(false);
-            document.body.classList.remove("dark");
-        }
-
-        // TODO Remove
-        // document.body.classList.add("dark");
-    }, [systemPreference]);
-
-    const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
-        if (darkMode) {
-            document.body.classList.remove("dark");
-        } else {
-            document.body.classList.add("dark");
-        }
-    };
-
     return (
         <>
-            <div className="dark:!bg-neutral-800 sider top-0 self-start max-h-screen grid sticky min-h-screen">
+            <div className="sider top-0 self-start max-h-screen grid sticky min-h-screen">
                 <Menu
                     secondary
                     vertical
-                    className={`!border !border-solid !border-neutral-800/[0.15] dark:!border-neutral-200/[0.15] !shadow-xl flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
+                    className={`!border !border-solid !border-neutral-800/[0.15] !shadow-xl flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
                         collapsed ? "overflow-hidden !w-0" : ""
                     }`}
                 >
@@ -122,9 +95,9 @@ const Navbar: React.FC = () => {
                                     }
                                     key={navLink.name}
                                     href={navLink.url}
-                                    className={`dark:!text-white dark:!font-light hover:!text-blue-500 dark:hover:!text-blue-300 !mx-4 !my-1 item ${
+                                    className={`hover:!text-blue-500 !mx-4 !my-1 item ${
                                         activeMenuItem === navLink.name &&
-                                        "active !text-blue-500 dark:!text-blue-300"
+                                        "active !text-blue-500"
                                     }`}
                                 >
                                     <Icon
@@ -143,7 +116,7 @@ const Navbar: React.FC = () => {
                             {socialLinks.map((socialLink) => {
                                 return (
                                     <a
-                                        className="ui icon button hover:!text-blue-500 dark:hover:!text-blue-300 dark:!text-white"
+                                        className="ui icon button hover:!text-blue-500"
                                         href={socialLink.url}
                                         target="_blank"
                                         key={socialLink.name}
@@ -159,7 +132,7 @@ const Navbar: React.FC = () => {
             <div className="header grid">
                 <Menu
                     secondary
-                    className="dark:!bg-gray-800 dark:!text-white !mb-0 !ml-0 !shadow"
+                    className="!mb-0 !ml-0 !shadow"
                 >
                     <Menu.Item>
                         <Button
@@ -178,11 +151,6 @@ const Navbar: React.FC = () => {
                                 >
                                     <Icon name="bug" />
                                 </a>
-                                <Button
-                                    icon={darkMode ? "moon" : "sun"}
-                                    className="hover:!text-blue-500"
-                                    onClick={toggleDarkMode}
-                                />
                             </Button.Group>
                         </Menu.Item>
                     </Menu.Menu>
