@@ -11,9 +11,9 @@ const pool = new Pool({
     database: process.env.DATABASE_NAME,
     password: process.env.DATABASE_PASSWORD,
     port: Number(process.env.DATABASE_PORT),
-    ssl: { rejectUnauthorized: false }, // Adjust SSL settings as needed
-    max: 10,
-    idleTimeoutMillis: 60000,
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 
 export const getBlogs = async (): Promise<Blog[]> => {
@@ -21,9 +21,7 @@ export const getBlogs = async (): Promise<Blog[]> => {
         return await retry(
             async (bail, attempt: Number) => {
                 console.log(`Fetching list of blogs, attempt #${attempt}`);
-                const client = await pool.connect();
-                console.log("Connected to database");
-                const res = await client.query(
+                const res = await pool.query(
                     "SELECT id, title, summary, blog_url, category, published_at FROM blogs WHERE published_at IS NOT NULL"
                 );
                 console.log("Successfully fetched blogs");
