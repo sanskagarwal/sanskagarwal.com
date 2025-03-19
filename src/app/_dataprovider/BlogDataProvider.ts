@@ -22,6 +22,7 @@ export const getBlogs = async (): Promise<Blog[]> => {
             async (bail, attempt: Number) => {
                 console.log(`Fetching list of blogs, attempt #${attempt}`);
                 const client = await pool.connect();
+                console.log("Connected to database");
                 const res = await client.query(
                     "SELECT id, title, summary, blog_url, category, published_at FROM blogs WHERE published_at IS NOT NULL"
                 );
@@ -30,6 +31,7 @@ export const getBlogs = async (): Promise<Blog[]> => {
             },
             {
                 retries: 3,
+                maxTimeout: 10000,
                 onRetry: async (err: Error) => {
                     console.error(`Failed to fetch blog list, error: ${err}`);
                 },
