@@ -1,39 +1,17 @@
 import "server-only";
 
-import { Pool } from "pg";
-import retry from "async-retry";
-
 import { Blog } from "../_models/Blog";
-
-const pool = new Pool({
-    user: process.env.DATABASE_USERNAME,
-    host: process.env.DATABASE_HOST,
-    database: process.env.DATABASE_NAME,
-    password: process.env.DATABASE_PASSWORD,
-    port: Number(process.env.DATABASE_PORT),
-    ssl: {
-        rejectUnauthorized: false,
-    },
-});
+import { executeWithRetry } from "./retryQuery";
 
 export const getBlogs = async (): Promise<Blog[]> => {
+    console.log("Fetching list of blogs");
     try {
-        return await retry(
-            async (bail, attempt: Number) => {
-                console.log(`Fetching list of blogs, attempt #${attempt}`);
-                const res = await pool.query(
-                    "SELECT id, title, summary, blog_url, category, published_at FROM blogs WHERE published_at IS NOT NULL"
-                );
-                console.log("Successfully fetched blogs");
-                return res.rows;
-            },
-            {
-                retries: 3,
-                onRetry: async (err: Error) => {
-                    console.error(`Failed to fetch blog list, error: ${err}`);
-                },
-            }
-        );
+        const query = `
+            SELECT id, title, summary, blog_url, category, published_at
+            FROM blogs
+            WHERE published_at IS NOT NULL
+        `;
+        return await executeWithRetry<Blog[]>(query);
     } catch (err) {
         const msg = `Failed to fetch blogs after retries, error: ${err}`;
         console.error(msg);
@@ -42,26 +20,19 @@ export const getBlogs = async (): Promise<Blog[]> => {
 };
 
 export const getBlog = async (blogUrl: string): Promise<Blog | null> => {
+    if (!blogUrl) {
+        return null;
+    }
+
+    console.log(`Fetching blog with URL: ${blogUrl}`);
     try {
-        return await retry(
-            async (bail, attempt: Number) => {
-                console.log(`Fetching blog ${blogUrl}, attempt #${attempt}`);
-                const res = await pool.query(
-                    "SELECT * FROM blogs WHERE blog_url = $1 AND published_at IS NOT NULL",
-                    [blogUrl]
-                );
-                console.log("Successfully fetched blog");
-                return res.rows[0];
-            },
-            {
-                retries: 3,
-                onRetry: async (err: Error) => {
-                    console.error(
-                        `Failed to fetch blog ${blogUrl}, error: ${err}`
-                    );
-                },
-            }
-        );
+        const query = `
+            SELECT *
+            FROM blogs
+            WHERE blog_url = $1 AND published_at IS NOT NULL
+        `;
+        const result = await executeWithRetry<Blog[]>(query, [blogUrl]);
+        return result[0] || null;
     } catch (err) {
         const msg = `Failed to fetch blog ${blogUrl} after retries, error: ${err}`;
         console.error(msg);
