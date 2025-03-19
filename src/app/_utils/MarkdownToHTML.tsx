@@ -1,12 +1,18 @@
 import Markdown from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
+import remarkGfm from "remark-gfm";
 
-import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { atomOneLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 const getHTML = (content: string) => {
     return (
         <Markdown
+            className="blog-content"
+            remarkPlugins={[remarkGfm]}
             components={{
+                a({ node, ...props }) {
+                    return <a target="_blank" className="text-blue-600 visited:text-purple-600" {...props} />;
+                },
                 h1({ node, ...props }) {
                     return <h1 className="ui header" {...props} />;
                 },
@@ -49,6 +55,11 @@ const getHTML = (content: string) => {
                 hr({ node, ...props }) {
                     return <div className="ui divider" {...props} />;
                 },
+                table({ node, ...props }) {
+                    return (
+                        <table className="ui selectable celled table" {...props} />
+                    );
+                },
                 code(props) {
                     const { children, className, node, ...rest } = props;
                     const match = /language-(\w+)/.exec(className || "");
@@ -60,7 +71,7 @@ const getHTML = (content: string) => {
                             language={match[1]}
                             style={atomOneLight}
                         >
-                            {String(children).replace(/\n$/, '')}
+                            {String(children).replace(/\n$/, "")}
                         </SyntaxHighlighter>
                     ) : (
                         <code {...rest} className={className}>

@@ -93,7 +93,9 @@ const BlogList: React.FC = () => {
             {labelColors && createLabels()}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
                 {blogList &&
-                    blogList.map((blog: Blog) => {
+                    blogList
+                    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+                    .map((blog: Blog) => {
                         if (
                             activeLabel !== "all" &&
                             blog.category !== activeLabel
