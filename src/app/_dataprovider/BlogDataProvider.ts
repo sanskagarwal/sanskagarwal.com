@@ -29,7 +29,6 @@ export const getBlogs = async (): Promise<Blog[]> => {
             },
             {
                 retries: 3,
-                maxTimeout: 10000,
                 onRetry: async (err: Error) => {
                     console.error(`Failed to fetch blog list, error: ${err}`);
                 },
