@@ -34,7 +34,9 @@ export const executeWithRetry = async <T>(
         {
             retries,
             onRetry: async (err: Error, attempt: number) => {
-                console.error(`Query failed on attempt #${attempt}, error: ${err}`);
+                console.error(
+                    `Query failed on attempt #${attempt}, error: ${err}`
+                );
             },
         }
     );

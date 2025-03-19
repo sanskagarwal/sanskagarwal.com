@@ -1,7 +1,7 @@
 import "server-only";
 
 import { Blog } from "../_models/Blog";
-import { executeWithRetry } from "./retryQuery";
+import { executeWithRetry } from "./RetryQuery";
 
 export const getBlogs = async (): Promise<Blog[]> => {
     console.log("Fetching list of blogs");
