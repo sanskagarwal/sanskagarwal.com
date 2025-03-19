@@ -47,7 +47,6 @@ export const getBlog = async (blogUrl: string): Promise<Blog | null> => {
         return await retry(
             async (bail, attempt: Number) => {
                 console.log(`Fetching blog ${blogUrl}, attempt #${attempt}`);
-                const client = await pool.connect();
                 const res = await pool.query(
                     "SELECT * FROM blogs WHERE blog_url = $1 AND published_at IS NOT NULL",
                     [blogUrl]
