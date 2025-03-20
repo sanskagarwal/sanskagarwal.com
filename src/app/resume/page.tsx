@@ -12,7 +12,7 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
+    "pdfjs-dist/build/pdf.worker.min.js",
     import.meta.url
 ).toString();
 
@@ -26,8 +26,8 @@ const Resume: React.FC = () => {
     return (
         <div className="grid grid-cols-6">
             <div
-                className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dashed shadow-indigo-500/50
-                    shadow-md md:shadow-lg"
+                className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dotted
+                    shadow-2xl md:shadow-lg"
             >
                 <div className="flex flex-col items-center">
                     <a
