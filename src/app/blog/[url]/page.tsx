@@ -100,8 +100,8 @@ const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
     return (
         <div className="grid grid-cols-6">
             <div
-                className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dashed shadow-indigo-500/50
-                    shadow-md md:shadow-lg"
+                className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dotted
+                    shadow-2xl md:shadow-lg"
             >
                 {error && <div>Failed to load the blog.</div>}
                 {isLoading && (
