@@ -11,7 +11,13 @@ const getHTML = (content: string) => {
             remarkPlugins={[remarkGfm]}
             components={{
                 a({ node, ...props }) {
-                    return <a target="_blank" className="text-blue-600 visited:text-purple-600" {...props} />;
+                    return (
+                        <a
+                            target="_blank"
+                            className="text-blue-600 visited:text-purple-600"
+                            {...props}
+                        />
+                    );
                 },
                 h1({ node, ...props }) {
                     return <h1 className="ui header" {...props} />;
@@ -57,7 +63,10 @@ const getHTML = (content: string) => {
                 },
                 table({ node, ...props }) {
                     return (
-                        <table className="ui selectable celled table" {...props} />
+                        <table
+                            className="ui selectable celled table"
+                            {...props}
+                        />
                     );
                 },
                 code(props) {
