@@ -1,10 +1,10 @@
 import "server-only";
 
-import { getBlogs } from "@/app/_dataprovider/BlogDataProvider";
 import { NextResponse } from "next/server";
+import { getRecipes } from "@/app/_dataprovider/RecipeDataProvider";
 
 export async function GET() {
-    const data = await getBlogs();
+    const data = await getRecipes();
     return NextResponse.json(data);
 }
 

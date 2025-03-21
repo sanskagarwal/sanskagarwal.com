@@ -25,6 +25,11 @@ const navLinks: NavLinks[] = [
         url: "/resume",
         icon: "file alternate",
     },
+    {
+        name: "Recipe",
+        url: "/recipe",
+        icon: "food",
+    }
 ];
 
 const socialLinks: NavLinks[] = [

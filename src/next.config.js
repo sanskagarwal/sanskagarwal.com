@@ -5,6 +5,14 @@ const nextConfig = {
 
         return config;
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "cook.sanskagarwal.com",
+            },
+        ],
+    },
 };
 
 module.exports = nextConfig;

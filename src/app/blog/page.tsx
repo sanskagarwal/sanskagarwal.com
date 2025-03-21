@@ -11,6 +11,8 @@ import {
     Button,
     Card,
     CardContent,
+    CardDescription,
+    CardMeta,
     Label,
     SemanticCOLORS,
 } from "semantic-ui-react";
@@ -20,6 +22,9 @@ const BlogList: React.FC = () => {
     const [activeLabel, setActiveLabel] = useState("all");
     const [labelColors, setLabelColors] = useState<{
         [key: string]: SemanticCOLORS;
+    }>({});
+    const [loadingLinks, setLoadingLinks] = useState<{
+        [key: string]: boolean;
     }>({});
 
     const {
@@ -81,7 +86,6 @@ const BlogList: React.FC = () => {
 
     return (
         <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            <h2 className="ui header !m-0">Blogs</h2>
             {error && <div>Failed to load blogs</div>}
             {isLoading && (
                 <Card>
@@ -94,41 +98,42 @@ const BlogList: React.FC = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
                 {blogList &&
                     blogList
-                    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
-                    .map((blog: Blog) => {
-                        if (
-                            activeLabel !== "all" &&
-                            blog.category !== activeLabel
-                        ) {
-                            return;
-                        }
+                        .sort(
+                            (a, b) =>
+                                new Date(b.published_at).getTime() -
+                                new Date(a.published_at).getTime()
+                        )
+                        .map((blog: Blog) => {
+                            if (
+                                activeLabel !== "all" &&
+                                blog.category !== activeLabel
+                            ) {
+                                return;
+                            }
 
-                        return (
-                            <Card
-                                className="ui card !m-0"
-                                key={blog.id.toString()}
-                            >
-                                <CardContent className="!grow-0">
-                                    <Label
-                                        as="a"
-                                        ribbon
-                                        active={blog.category === activeLabel}
-                                        onClick={changeActiveLabel}
-                                        color={labelColors[blog.category]}
-                                    >
-                                        {blog.category}
-                                    </Label>
-                                    <span className="font-bold">
-                                        {blog.title}
-                                    </span>
-                                </CardContent>
-                                <CardContent description={blog.summary} />
-                                <CardContent extra>
-                                    <Link
-                                        className="grid grid-cols-2 items-center"
-                                        href={`/blog/${blog.blog_url}`}
-                                    >
-                                        <span>
+                            return (
+                                <Card
+                                    className="ui card !m-0"
+                                    key={blog.id.toString()}
+                                >
+                                    <CardContent className="!grow-0">
+                                        <Label
+                                            as="a"
+                                            ribbon
+                                            active={
+                                                blog.category === activeLabel
+                                            }
+                                            onClick={changeActiveLabel}
+                                            color={labelColors[blog.category]}
+                                        >
+                                            {blog.category}
+                                        </Label>
+                                        <span className="font-bold">
+                                            {blog.title}
+                                        </span>
+                                    </CardContent>
+                                    <CardContent>
+                                        <CardMeta>
                                             {new Date(
                                                 blog.published_at
                                             ).toLocaleDateString(undefined, {
@@ -136,15 +141,30 @@ const BlogList: React.FC = () => {
                                                 month: "short",
                                                 day: "numeric",
                                             })}
-                                        </span>
-                                        <span className="justify-self-end">
-                                            Read
-                                        </span>
+                                        </CardMeta>
+                                        <CardDescription>
+                                            {blog.summary}
+                                        </CardDescription>
+                                    </CardContent>
+                                    <Link
+                                        className="ui bottom attached button"
+                                        href={`/blog/${blog.blog_url}`}
+                                        onClick={() => {
+                                            setLoadingLinks((prev) => ({
+                                                ...prev,
+                                                [blog.id.toString()]: true,
+                                            }));
+                                        }}
+                                    >
+                                        {loadingLinks[blog.id.toString()] ? (
+                                            <i className="loading spinner icon" />
+                                        ) : (
+                                            "Read"
+                                        )}
                                     </Link>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
+                                </Card>
+                            );
+                        })}
             </div>
         </div>
     );
