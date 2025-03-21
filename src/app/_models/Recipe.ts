@@ -9,7 +9,7 @@ export interface Recipe {
     waiting_time: string;
     created_at: Date;
     servings: string;
-};
+}
 
 export interface Keyword {
     id: string;

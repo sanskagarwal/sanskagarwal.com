@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { Constants } from "../_utils/Constants";
 
 // @ts-ignore
 const insertScript = (id, parentElement) => {
@@ -16,7 +17,7 @@ const insertScript = (id, parentElement) => {
     // Now the actual config and script-fetching function:
     script.innerHTML = `
     var remark_config = {
-      host: "https://commento.sanskagarwal.com",
+      host: ${Constants.REMARK_URI},
       site_id: "remark",
       url: "${url}",
       components: ["embed"],
