@@ -37,16 +37,19 @@ const socialLinks: NavLinks[] = [
         name: "LinkedIn",
         url: "https://www.linkedin.com/in/sanskar-agarwal/",
         icon: "linkedin",
+        color: "blue",
     },
     {
         name: "GitHub",
         url: "https://github.com/sanskagarwal",
         icon: "github",
+        color: "black",
     },
     {
         name: "Instagram",
         url: "https://www.instagram.com/sansk.agarwal/",
         icon: "instagram",
+        color: "pink",
     },
 ];
 
@@ -121,12 +124,12 @@ const Navbar: React.FC = () => {
                             {socialLinks.map((socialLink) => {
                                 return (
                                     <a
-                                        className="ui icon button hover:!text-blue-500"
+                                        className="ui icon button group"
                                         href={socialLink.url}
                                         target="_blank"
                                         key={socialLink.name}
                                     >
-                                        <Icon name={socialLink.icon} />
+                                        <Icon name={socialLink.icon} color={socialLink.color} className="group-hover:!text-blue-500" />
                                     </a>
                                 );
                             })}
@@ -150,11 +153,11 @@ const Navbar: React.FC = () => {
                         <Menu.Item>
                             <Button.Group>
                                 <a
-                                    className="ui icon button hover:!text-blue-500"
+                                    className="ui icon button group"
                                     href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
                                     target="_blank"
                                 >
-                                    <Icon name="bug" />
+                                    <Icon name="bug" className="group-hover:!text-blue-500" />
                                 </a>
                             </Button.Group>
                         </Menu.Item>
