@@ -19,4 +19,5 @@ export const Constants = {
         "brown",
         "black",
     ],
+    TANDOOR_URI: "https://cook.sanskagarwal.com",
 };

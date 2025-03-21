@@ -1,14 +1,14 @@
 import "server-only";
 
-import { getBlog } from "@/app/_dataprovider/BlogDataProvider";
 import { NextResponse } from "next/server";
+import { getRecipeLink } from "@/app/_dataprovider/RecipeDataProvider";
 
 type Params = {
-    url: string;
+    link: string;
 };
 
 export async function GET(request: Request, { params }: { params: Params }) {
-    const data = await getBlog(params.url);
+    const data = await getRecipeLink(params.link);
     return NextResponse.json(data);
 }
 
