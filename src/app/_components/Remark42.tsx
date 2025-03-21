@@ -17,7 +17,7 @@ const insertScript = (id, parentElement) => {
     // Now the actual config and script-fetching function:
     script.innerHTML = `
     var remark_config = {
-      host: ${Constants.REMARK_URI},
+      host: "${Constants.REMARK_URI}",
       site_id: "remark",
       url: "${url}",
       components: ["embed"],
