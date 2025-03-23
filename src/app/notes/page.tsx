@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useSWR from "swr";
 import { BulletList } from "react-content-loader";
 import Link from "next/link";
@@ -12,14 +12,9 @@ import {
     CardContent,
     CardDescription,
     CardMeta,
-    Label,
 } from "semantic-ui-react";
 
 const NoteList: React.FC = () => {
-    const [loadingLinks, setLoadingLinks] = useState<{
-        [key: string]: boolean;
-    }>({});
-
     const {
         data: noteList,
         isLoading,
@@ -56,12 +51,36 @@ const NoteList: React.FC = () => {
                                         </span>
                                     </CardContent>
                                     <CardContent>
-                                        <Link
-                                            className="ui bottom attached button"
-                                            href={`/notes/${note.note_url}`}
-                                        >
-                                            Read
-                                        </Link>
+                                        <CardMeta>
+                                            {new Date(
+                                                note.published_at
+                                            ).toLocaleDateString(undefined, {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                            })}
+                                        </CardMeta>
+                                        <CardDescription>
+                                            {note.summary}
+                                        </CardDescription>
+                                    </CardContent>
+                                    <CardContent extra>
+                                        <div className="ui two buttons">
+                                            <Link
+                                                className="ui basic green button"
+                                                href={`/notes/${note.note_url}`}
+                                            >
+                                                Read
+                                            </Link>
+                                            <Link
+                                                className="ui basic blue button"
+                                                href={note.note_link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                View Original
+                                            </Link>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             );
