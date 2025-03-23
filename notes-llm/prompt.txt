@@ -28,4 +28,4 @@ You have OCR capabilities—ensure accurate extraction of each image before proc
 6. **Output Format:**
    - Export the final output as a **Markdown (`.md`) file**.
    - Ensure page information is also retained.
-   - Ensure proper **Markdown syntax** for headers, code blocks, LaTeX equations, and ASCII diagrams.
+   - Ensure proper **Markdown syntax** for headers, code blocks, LaTeX equations (always use block equation $$ .... $$), and ASCII diagrams.

@@ -18,7 +18,7 @@ client = AzureOpenAI(
 
 # Define limits
 total_token_limit = 4096
-input_token_limit = 1000
+input_token_limit = 1500
 
 # Read prompt from file
 with open("prompt.txt", "r") as file:
@@ -105,7 +105,7 @@ def send_images_to_openai(file_prefix, images_path):
     completion = client.chat.completions.create(
         model=deployment,
         messages=messages,
-        max_tokens=10,
+        max_tokens=total_token_limit,
         temperature=0.7,
         top_p=0.95,
         frequency_penalty=0,
