@@ -2,6 +2,7 @@ import os
 import requests
 import pymupdf
 
+
 def download_pdf(pdf_url, output_folder="input"):
     """
     Downloads a PDF from a given URL and saves it to the input folder.
@@ -15,7 +16,7 @@ def download_pdf(pdf_url, output_folder="input"):
     if response.status_code == 200:
         filename = pdf_url.split("/")[-1]
         pdf_path = os.path.join(output_folder, filename)
-        
+
         # Save the PDF to the specified path
         with open(pdf_path, "wb") as pdf_file:
             pdf_file.write(response.content)
@@ -24,13 +25,14 @@ def download_pdf(pdf_url, output_folder="input"):
         raise Exception(f"Failed to download PDF. Status code: {response.status_code}")
     return filename, pdf_path
 
+
 def pdf_to_images(pdf_path, output_folder="images"):
     """
     Converts a PDF into images, one image per page.
     """
-    
+
     print(f"Converting PDF to images: {pdf_path}...")
-    
+
     # Create the images folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
     pdf_document = pymupdf.open(pdf_path)
