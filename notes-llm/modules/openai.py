@@ -1,8 +1,9 @@
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 import tiktoken
 import os
 import base64
 
-from openai import AzureOpenAI
+from openai import APIConnectionError, APIStatusError, AzureOpenAI, RateLimitError
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -24,6 +25,28 @@ input_token_limit = 1600
 # Read prompt from file
 with open("prompt.txt", "r") as file:
     prompt_text = file.read()
+
+
+@retry(
+    stop=stop_after_attempt(2),
+    wait=wait_fixed(120),
+    retry=retry_if_exception_type(RateLimitError),
+)
+def send_request_to_openai(messages):
+    """
+    Sends a request to Azure OpenAI and retries if a 429 error occurs.
+    """
+    return client.chat.completions.create(
+        model=deployment,
+        messages=messages,
+        max_tokens=total_token_limit,
+        temperature=0.7,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None,
+        stream=False,
+    )
 
 
 def get_encoded_image(file_prefix, images_path):
@@ -116,9 +139,7 @@ def send_images_to_openai(file_prefix, images_path):
         return None
 
     while image_index < len(images_path):
-        print(
-            f"-----------------------------------\nProcessing batch {batch_num}..."
-        )
+        print(f"-----------------------------------\nProcessing batch {batch_num}...")
 
         # Create the message with the encoded images ensuring token limit
         new_image_index, messages = add_image_to_prompt(encoded_images, image_index)
@@ -128,21 +149,28 @@ def send_images_to_openai(file_prefix, images_path):
             return None
 
         print(f"Sending {images_to_send} images to OpenAI API...")
-        # completion = client.chat.completions.create(
-        #     model=deployment,
-        #     messages=messages,
-        #     max_tokens=total_token_limit,
-        #     temperature=0.7,
-        #     top_p=0.95,
-        #     frequency_penalty=0,
-        #     presence_penalty=0,
-        #     stop=None,
-        #     stream=False,
-        # )
 
-        # response = completion.choices[0].message.content
-        # print(f"Response tokens: {len(model_encoding.encode(response))}")
-        # save_response_as_md(response, file_prefix, batch_num)
+        # Use the retry-enabled function to send the request
+        try:
+            completion = send_request_to_openai(messages)
+            response = completion.choices[0].message.content
+            print(f"Response tokens: {len(model_encoding.encode(response))}")
+            save_response_as_md(response, file_prefix, batch_num)
+        except APIConnectionError as e:
+            print("The server could not be reached")
+            print(e.__cause__)  # an underlying Exception, likely raised within httpx.
+            return None
+        except RateLimitError:
+            print("A 429 status code was received; retries didn't work.")
+            return None
+        except APIStatusError as e:
+            print(e.status_code)
+            print(e.response)
+            return None
+        except Exception as e:
+            print("An unexpected error occurred.")
+            print(e)
+            return None
 
         # Wait for the next batch
         print("Waiting for the next batch...")
