@@ -1,10 +1,6 @@
-export interface Note {
-    id: Number;
+import { ReadModel } from "./ReadModel";
+
+export interface Note extends ReadModel {
     note_url: string;
     note_link: string;
-    title: string;
-    published_at: Date;
-    content: string;
-    summary: string;
-    category: string;
 };

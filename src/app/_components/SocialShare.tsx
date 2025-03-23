@@ -11,19 +11,19 @@ import {
 } from "react-share";
 import { Popup } from "semantic-ui-react";
 
-import { Blog } from "../_models/Blog";
+import { ReadModel } from "../_models/ReadModel";
 
-const SocialShare: React.FC<{ blog: Blog }> = ({ blog }) => {
+const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
     return (
         <div className="ui center aligned segment">
-            <h4 className="ui header">Share this blog</h4>
+            <h4 className="ui header">Share this</h4>
             <div className="inline">
                 <Popup
                     trigger={
                         <EmailShareButton
                             url={window.location.href}
-                            subject={`Check out this blog: ${blog.title}`}
-                            body={`I found this blog interesting and thought you might like it too! Link to the blog: ${window.location.href}`}
+                            subject={`Check out this read: ${readModel.title}`}
+                            body={`I found this read interesting and thought you might like it too! Link: ${window.location.href}`}
                             className="ui button"
                         >
                             <EmailIcon size={32} round />
@@ -36,8 +36,8 @@ const SocialShare: React.FC<{ blog: Blog }> = ({ blog }) => {
                     trigger={
                         <TwitterShareButton
                             url={window.location.href}
-                            title={blog.title}
-                            hashtags={[blog.category]}
+                            title={readModel.title}
+                            hashtags={[readModel.category]}
                             className="ui button"
                         >
                             <XIcon size={32} round />
@@ -50,9 +50,9 @@ const SocialShare: React.FC<{ blog: Blog }> = ({ blog }) => {
                     trigger={
                         <LinkedinShareButton
                             url={window.location.href}
-                            title={blog.title}
-                            summary={blog.summary}
-                            source="Sanskar Agarwal's Blog"
+                            title={readModel.title}
+                            summary={readModel.summary}
+                            source="Sanskar's Website"
                             className="ui button"
                         >
                             <LinkedinIcon size={32} round />
@@ -64,7 +64,7 @@ const SocialShare: React.FC<{ blog: Blog }> = ({ blog }) => {
                     trigger={
                         <RedditShareButton
                             url={window.location.href}
-                            title={blog.title}
+                            title={readModel.title}
                             className="ui button"
                         >
                             <RedditIcon size={32} round />
