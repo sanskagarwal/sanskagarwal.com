@@ -29,6 +29,11 @@ const navLinks: NavLinks[] = [
         name: "Recipe",
         url: "/recipe",
         icon: "food",
+    },
+    {
+        name: "Notes",
+        url: "/notes",
+        icon: "sticky note",
     }
 ];
 

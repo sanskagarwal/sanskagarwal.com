@@ -105,10 +105,7 @@ def add_image_to_prompt(encoded_images, image_index):
         base64_image = encoded_images[i]
         image_message = {
             "type": "image_url",
-            "image_url": {
-                "url": f"data:image/jpeg;base64,{base64_image}",
-                "detail": "high",
-            },
+            "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
         }
 
         input_token_count += 4  # Assuming 4 tokens for the <imuser> message
