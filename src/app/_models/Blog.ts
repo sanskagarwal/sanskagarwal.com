@@ -1,9 +1,5 @@
-export interface Blog {
-    id: Number;
+import { ReadModel } from "./ReadModel";
+
+export interface Blog extends ReadModel {
     blog_url: string;
-    title: string;
-    published_at: Date;
-    content: string;
-    summary: string;
-    category: string;
-};
+}

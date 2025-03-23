@@ -26,9 +26,14 @@ const navLinks: NavLinks[] = [
         icon: "file alternate",
     },
     {
-        name: "Recipe",
-        url: "/recipe",
+        name: "Recipes",
+        url: "/recipes",
         icon: "food",
+    },
+    {
+        name: "Notes",
+        url: "/notes",
+        icon: "sticky note",
     }
 ];
 

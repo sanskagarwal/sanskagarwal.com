@@ -4,23 +4,23 @@ import React from "react";
 import useSWR from "swr";
 
 import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
-import { Blog } from "@/app/_models/Blog";
+import { Note } from "@/app/_models/Note";
 import ReadComponent from "@/app/_components/ReadComponent";
 
 type Params = {
     url: string;
 };
 
-const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
+const NotePage: React.FC<{ params: Params }> = ({ params }) => {
     const {
-        data: blog,
+        data: note,
         isLoading,
         error,
-    } = useSWR<Blog>(`/api/blogs/${params.url}`, fetcher);
+    } = useSWR<Note>(`/api/notes/${params.url}`, fetcher);
 
     return (
-        <ReadComponent readModel={blog} isLoading={isLoading} error={error} />
+        <ReadComponent error={error} isLoading={isLoading} readModel={note} />
     );
 };
 
-export default BlogPage;
+export default NotePage;
