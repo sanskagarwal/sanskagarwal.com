@@ -7,16 +7,18 @@
     "watch": "tsc -w",
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
-    "start": "func start"
+    "start": "func start",
+    "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "applicationinsights": "^2.7.0",
-    "axios": "^1.4.0"
+    "@azure/functions": "^4.0.0",
+    "applicationinsights": "^3.6.0",
+    "axios": "^1.8.4"
   },
   "devDependencies": {
-    "@azure/functions": "^3.0.0",
-    "@types/node": "^16.x",
+    "@types/node": "^20.x",
     "rimraf": "^5.0.0",
     "typescript": "^4.0.0"
-  }
+  },
+  "main": "dist/src/{index.js,functions/*.js}"
 }

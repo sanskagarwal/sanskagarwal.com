@@ -1,2 +1,8 @@
+# Local Files
 .DS_Store
 tmp/
+
+# Azure Functions
+__azurite_db*__.json
+__blobstorage__
+__queuestorage__
