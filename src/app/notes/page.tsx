@@ -21,6 +21,10 @@ const NoteList: React.FC = () => {
         error,
     } = useSWR<Note[]>("/api/notes", fetcher);
 
+    const [loadingLinks, setLoadingLinks] = useState<{
+        [key: string]: boolean;
+    }>({});
+
     return (
         <div className="p-4 flex gap-4 flex-col justify-center items-center">
             {error && <div>Failed to load notes</div>}
@@ -64,24 +68,34 @@ const NoteList: React.FC = () => {
                                             {note.summary}
                                         </CardDescription>
                                     </CardContent>
-                                    <CardContent extra>
-                                        <div className="ui two buttons">
-                                            <Link
-                                                className="ui basic green button"
-                                                href={`/notes/${note.note_url}`}
-                                            >
-                                                Read
-                                            </Link>
-                                            <Link
-                                                className="ui basic blue button"
-                                                href={note.note_link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                View Original
-                                            </Link>
-                                        </div>
-                                    </CardContent>
+                                    <div className="ui bottom attached two buttons">
+                                        <Link
+                                            className="ui primary button"
+                                            href={`/notes/${note.note_url}`}
+                                            onClick={() => {
+                                                setLoadingLinks((prev) => ({
+                                                    ...prev,
+                                                    [note.id.toString()]: true,
+                                                }));
+                                            }}
+                                        >
+                                            {loadingLinks[
+                                                note.id.toString()
+                                            ] ? (
+                                                <i className="loading spinner icon" />
+                                            ) : (
+                                                "Read"
+                                            )}
+                                        </Link>
+                                        <Link
+                                            className="ui button"
+                                            href={note.note_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            View Original
+                                        </Link>
+                                    </div>
                                 </Card>
                             );
                         })}
