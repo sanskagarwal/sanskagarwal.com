@@ -42,7 +42,7 @@ You have OCR capabilities - ensure accurate extraction of each image before proc
 
 4. **Summary & Introduction:**
    - Generate a **brief introduction** for context.
-   - Provide a **concise summary** at the end, capturing key points.
+   - Provide a **2 line summary** at the end, capturing topic.
 
 5. **References & Related Topics:**
    - Suggest relevant references and related topics **without expanding explanations**.
