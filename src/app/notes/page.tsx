@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { BulletList } from "react-content-loader";
 import Link from "next/link";
@@ -12,18 +12,46 @@ import {
     CardContent,
     CardDescription,
     CardMeta,
+    Label,
+    SemanticCOLORS,
 } from "semantic-ui-react";
+import { Constants } from "../_utils/Constants";
 
 const NoteList: React.FC = () => {
+    const [labelColors, setLabelColors] = useState<{
+        [key: string]: SemanticCOLORS;
+    }>({});
+    const [loadingLinks, setLoadingLinks] = useState<{
+        [key: string]: boolean;
+    }>({});
     const {
         data: noteList,
         isLoading,
         error,
     } = useSWR<Note[]>("/api/notes", fetcher);
 
-    const [loadingLinks, setLoadingLinks] = useState<{
-        [key: string]: boolean;
-    }>({});
+    useEffect(() => {
+        console.log(noteList);
+        let newLabelColors: { [key: string]: SemanticCOLORS } = {};
+        let colorIndex = 1;
+        noteList?.forEach((blog: Note) => {
+            if (!newLabelColors[blog.category]) {
+                newLabelColors[blog.category] = Constants.COLORS[
+                    colorIndex
+                ] as SemanticCOLORS;
+                colorIndex++;
+            }
+        });
+
+        const sortedLabelColors: { [key: string]: SemanticCOLORS } = {};
+        Object.keys(newLabelColors)
+            .sort()
+            .forEach((key) => {
+                sortedLabelColors[key] = newLabelColors[key];
+            });
+
+        setLabelColors(sortedLabelColors);
+    }, [noteList]);
 
     return (
         <div className="p-4 flex gap-4 flex-col justify-center items-center">
@@ -50,6 +78,13 @@ const NoteList: React.FC = () => {
                                     key={note.id.toString()}
                                 >
                                     <CardContent className="!grow-0">
+                                        <Label
+                                            as="a"
+                                            ribbon
+                                            color={labelColors[note.category]}
+                                        >
+                                            {note.category}
+                                        </Label>
                                         <span className="font-bold">
                                             {note.title}
                                         </span>

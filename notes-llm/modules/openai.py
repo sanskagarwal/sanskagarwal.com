@@ -1,4 +1,4 @@
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
+import time
 import tiktoken
 import os
 import base64
@@ -19,33 +19,29 @@ client = AzureOpenAI(
 )
 
 # Define limits
-total_token_limit = 4096
-input_token_limit = 1600
+total_token_limit = 8000
+completion_token_limit = 4096
+image_limit = 4
 
 # Read prompt from file
 with open("prompt.txt", "r") as file:
     prompt_text = file.read()
 
 
-@retry(
-    stop=stop_after_attempt(2),
-    wait=wait_fixed(120),
-    retry=retry_if_exception_type(RateLimitError),
-)
-def send_request_to_openai(messages):
+def send_request_to_openai(messages, input_token_count):
     """
-    Sends a request to Azure OpenAI and retries if a 429 error occurs.
+    Sends a request to Azure OpenAI.
     """
     return client.chat.completions.create(
         model=deployment,
         messages=messages,
-        max_tokens=total_token_limit,
+        max_completion_tokens=min(total_token_limit - input_token_count - 100, completion_token_limit),
         temperature=0.7,
         top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
         stop=None,
-        stream=False,
+        stream=True,
     )
 
 
@@ -72,7 +68,7 @@ def get_encoded_image(file_prefix, images_path):
 
 def add_image_to_prompt(encoded_images, image_index):
     """
-    Adds an image to the prompt text.
+    Adds up to limit images to the prompt text.
     """
 
     chat_prompt = [
@@ -82,7 +78,7 @@ def add_image_to_prompt(encoded_images, image_index):
             "content": [
                 {
                     "type": "text",
-                    "text": f"We have converted {image_index} pages so far.",
+                    "text": f"We have converted {image_index} pages out of {len(encoded_images)} pages so far.",
                 }
             ],
         },
@@ -99,9 +95,9 @@ def add_image_to_prompt(encoded_images, image_index):
 
         input_token_count += 4  # Assuming 4 tokens for the <imuser> message
 
-    # Add the encoded images to the prompt based on the token limit
+    # Add the encoded images to the prompt based on the token limit (4 images max)
     user_content = []
-    for i in range(image_index, len(encoded_images)):
+    for i in range(image_index, min(image_index + image_limit, len(encoded_images))):
         base64_image = encoded_images[i]
         image_message = {
             "type": "image_url",
@@ -109,70 +105,69 @@ def add_image_to_prompt(encoded_images, image_index):
         }
 
         input_token_count += 4  # Assuming 4 tokens for the <imuser> message
-        input_token_count += 170  # Assuming 170 tokens for each high-detailed image URL
-        if input_token_count > input_token_limit:
-            # Remove the last image
-            i -= 1
-            input_token_count -= 4
-            input_token_count -= 170
-            break
-
+        input_token_count += 85  # 85 base tokens for each image URL
+        input_token_count += 170 * 6  # 6 tiles for scanned image
         user_content.append(image_message)
 
     chat_prompt.append({"role": "user", "content": user_content})
     print(f"Total tokens in prompt: {input_token_count}")
-    return i, chat_prompt
+    return chat_prompt, input_token_count
 
 
-def send_images_to_openai(file_prefix, images_path):
+def send_images_to_openai(file_prefix, images_path, requested_batch_number=None):
     """
     Sends a batch of images to Azure OpenAI with a prompt and retrieves the response.
     """
 
     batch_num = 1
-    image_index = 0
     encoded_images = get_encoded_image(file_prefix, images_path)
     if not encoded_images:
         return None
 
-    while image_index < len(images_path):
+    for image_index in range(0, len(encoded_images), image_limit):
         print(f"-----------------------------------\nProcessing batch {batch_num}...")
 
-        # Create the message with the encoded images ensuring token limit
-        new_image_index, messages = add_image_to_prompt(encoded_images, image_index)
-        images_to_send = new_image_index - image_index + 1
-        if images_to_send == 0:
-            print("No images to send.")
-            return None
+        # Create the message with the encoded images ensuring token limit (4 images max)
+        messages, input_token_count = add_image_to_prompt(encoded_images, image_index)
 
-        print(f"Sending {images_to_send} images to OpenAI API...")
+        if requested_batch_number is not None and batch_num != requested_batch_number:
+            print(f"Skipping batch {batch_num} as per request.")
+            batch_num += 1
+            continue
 
         # Use the retry-enabled function to send the request
+        print(f"Sending request to Azure OpenAI for batch {batch_num}...")
         try:
-            completion = send_request_to_openai(messages)
-            response = completion.choices[0].message.content
+            completion_response = send_request_to_openai(messages, input_token_count)
+            response = ""
+            for update in completion_response:
+                if update.choices:
+                    print(update.choices[0].delta.content or "", end="")
+                    response += update.choices[0].delta.content or ""
+            print("\nRequest completed.")
             print(f"Response tokens: {len(model_encoding.encode(response))}")
             save_response_as_md(response, file_prefix, batch_num)
         except APIConnectionError as e:
             print("The server could not be reached")
             print(e.__cause__)  # an underlying Exception, likely raised within httpx.
             return None
-        except RateLimitError:
+        except RateLimitError as e:
             print("A 429 status code was received; retries didn't work.")
+            print(e.response.text)
+            print(e.response.headers)
             return None
         except APIStatusError as e:
             print(e.status_code)
-            print(e.response)
+            print(e.response.text)
             return None
         except Exception as e:
             print("An unexpected error occurred.")
             print(e)
             return None
 
-        # Wait for the next batch
-        print("Waiting for the next batch...")
         batch_num += 1
-        image_index = new_image_index + 1
+        print("Sleeping for 60 seconds...\n")
+        time.sleep(60)  # Sleep for 60 seconds to avoid hitting the rate limit
 
 
 def save_response_as_md(response, filename, batch_num, output_folder="output"):
@@ -180,9 +175,7 @@ def save_response_as_md(response, filename, batch_num, output_folder="output"):
     Saves the response as a Markdown (.md) file.
     """
 
-    print(
-        f"Saving LLM response\n-----------------------------------\n{response}\n-----------------------------------"
-    )
+    print("Saving LLM response\n-----------------------------------\n")
     os.makedirs(output_folder, exist_ok=True)
     md_file_path = os.path.join(output_folder, f"{filename}_{batch_num}.md")
     with open(md_file_path, "w") as md_file:
