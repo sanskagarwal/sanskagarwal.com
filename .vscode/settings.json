@@ -5,5 +5,10 @@
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "npm prune (functions)",
-    "azureFunctions.projectLanguageModel": 4
+    "azureFunctions.projectLanguageModel": 4,
+    "files.exclude": {
+        "**azurite**": true, // Ignore Azurite files
+        "__blobstorage__": true, // Ignore Blob data folder
+        "__queuestorage__": true, // Ignore Queue data folder
+    }
 }

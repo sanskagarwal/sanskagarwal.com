@@ -56,6 +56,12 @@ const socialLinks: NavLinks[] = [
         icon: "instagram",
         color: "pink",
     },
+    {
+        name: "Goodreads",
+        url: "https://www.goodreads.com/sanskagarwal",
+        icon: "goodreads g",
+        color: "yellow"
+    }
 ];
 
 const Navbar: React.FC = () => {
@@ -89,7 +95,7 @@ const Navbar: React.FC = () => {
                         collapsed ? "overflow-hidden !w-0" : ""
                     }`}
                 >
-                    <div className="absolute w-full top-1/4">
+                    <div className="absolute w-full top-1/6">
                         <Image
                             src="/me.png"
                             className="ui image centered mt-16 mb-1"
