@@ -43,8 +43,7 @@ export const getRecipeLink = async (recipeId: string): Promise<string> => {
 
         const response = await fetch(apiUrl, {
             method: "GET",
-            headers: headers,
-            next: { revalidate: 3600 }, // 1 hour
+            headers: headers
         });
 
         if (!response.ok) {
