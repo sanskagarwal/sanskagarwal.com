@@ -16,6 +16,7 @@ export const getRecipes = async (): Promise<Recipe[]> => {
         const response = await fetch(apiUrl, {
             method: "GET",
             headers: headers,
+            next: { revalidate: 3600 }, // 1 hour
         });
 
         if (!response.ok) {
@@ -43,6 +44,7 @@ export const getRecipeLink = async (recipeId: string): Promise<string> => {
         const response = await fetch(apiUrl, {
             method: "GET",
             headers: headers,
+            next: { revalidate: 3600 }, // 1 hour
         });
 
         if (!response.ok) {
