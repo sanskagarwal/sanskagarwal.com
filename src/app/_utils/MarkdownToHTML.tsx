@@ -4,12 +4,15 @@ import remarkGfm from "remark-gfm";
 
 import Mermaid from "./Mermaid";
 import { atomOneLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 const getHTML = (content: string) => {
     return (
         <div className="blog-content">
             <Markdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
                 components={{
                     a({ node, ...props }) {
                         return (
