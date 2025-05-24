@@ -130,7 +130,7 @@ def send_images_to_openai(file_prefix, images_path, requested_batch_number=None)
         # Create the message with the encoded images ensuring token limit (4 images max)
         messages, input_token_count = add_image_to_prompt(encoded_images, image_index)
 
-        if requested_batch_number is not None and batch_num != requested_batch_number:
+        if requested_batch_number is not None and batch_num < requested_batch_number:
             print(f"Skipping batch {batch_num} as per request.")
             batch_num += 1
             continue
