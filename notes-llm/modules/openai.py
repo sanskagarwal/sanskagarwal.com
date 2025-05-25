@@ -11,7 +11,7 @@ load_dotenv()
 
 # Initialize the Azure OpenAI client
 deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
-model_encoding = tiktoken.encoding_for_model(deployment)
+model_encoding = tiktoken.encoding_for_model("gpt-4o" if deployment == "gpt-4.1" else deployment)
 client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
@@ -19,9 +19,9 @@ client = AzureOpenAI(
 )
 
 # Define limits
-total_token_limit = 8000
-completion_token_limit = 4096
-image_limit = 4
+total_token_limit = 40000
+completion_token_limit = 20000
+image_limit = 16
 
 # Read prompt from file
 with open("prompt.txt", "r") as file:
@@ -95,7 +95,7 @@ def add_image_to_prompt(encoded_images, image_index):
 
         input_token_count += 4  # Assuming 4 tokens for the <imuser> message
 
-    # Add the encoded images to the prompt based on the token limit (4 images max)
+    # Add the encoded images to the prompt based on the token limit
     user_content = []
     for i in range(image_index, min(image_index + image_limit, len(encoded_images))):
         base64_image = encoded_images[i]
