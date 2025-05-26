@@ -27,4 +27,8 @@ export const Constants = {
         url: "https://media.sanskagarwal.com",
         expectedContent: "PerFlix",
     },
+    AI_URI: {
+        url: "https://ai.sanskagarwal.com",
+        expectedContent: "Open WebUI",
+    }
 };
