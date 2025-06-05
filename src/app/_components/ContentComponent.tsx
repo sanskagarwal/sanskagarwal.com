@@ -40,7 +40,7 @@ export const ContentList: React.FC<ContentListProps> = ({
 }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 15;
+    const itemsPerPage = 9;
 
     const [activeLabel, setActiveLabel] = useState("all");
     const [labelColors, setLabelColors] = useState<{
