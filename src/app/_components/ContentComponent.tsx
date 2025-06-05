@@ -111,7 +111,6 @@ export const ContentList: React.FC<ContentListProps> = ({
 
     const handlePageChange = (_: any, data: any) => {
         setCurrentPage(data.activePage);
-        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const changeActiveLabel = (e: any) => {
@@ -139,7 +138,7 @@ export const ContentList: React.FC<ContentListProps> = ({
 
     return (
         <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            {error && <div>Failed to load {contentType}s</div>}
+            {error && <div>Failed to load {ContentType[contentType]}s</div>}
             {isLoading && (
                 <Card>
                     <CardContent>
@@ -163,15 +162,13 @@ export const ContentList: React.FC<ContentListProps> = ({
                 </div>
             )}
             {!isLoading && showBanner && (
-                <div className="mb-2">
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-sm text-sm flex items-center gap-2">
-                        <i className="info circle icon" aria-hidden="true"></i>
-                        <span>
-                            <strong>Note:</strong> The following notes are AI
-                            converted. For the most accurate and complete
-                            information, please check the original source.
-                        </span>
-                    </div>
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-sm text-sm flex items-center gap-2">
+                    <i className="info circle icon" aria-hidden="true"></i>
+                    <span>
+                        <strong>Note:</strong> The following notes are AI
+                        converted. For the most accurate and complete
+                        information, please check the original source.
+                    </span>
                 </div>
             )}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
