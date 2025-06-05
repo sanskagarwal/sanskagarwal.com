@@ -24,30 +24,37 @@ const Resume: React.FC = () => {
     const isLg = useMediaQuery({ maxWidth: 1280 });
 
     return (
-        <div className="grid grid-cols-6">
-            <div
-                className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dotted
-                    shadow-2xl md:shadow-lg"
-            >
-                <div className="flex flex-col items-center">
+        <div className="p-4">
+            <div className="w-full bg-white rounded-lg shadow-lg border border-gray-200 p-8 flex flex-col items-center gap-4">
+                {isLoading && (
+                    <div className="w-full max-w-md mb-4">
+                        <List />
+                    </div>
+                )}
+                {!isLoading && (
                     <a
-                        className="button download icon right labeled ui blue !mb-4"
+                        className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
                         href={Constants.Resume_URI}
                         target="_blank"
                         rel="noreferrer"
                     >
-                        Resume
+                        <span>Download Resume</span>
                         <Icon name="download" />
                     </a>
-                </div>
-                {isLoading && <List />}
-                <Document
-                    className="flex flex-col items-center"
-                    loading={<List />}
-                    file={encodeURI(Constants.Resume_URI)}
-                >
+                )}
+                <Document loading="" file={encodeURI(Constants.Resume_URI)}>
                     <Page
-                        scale={isXs ? 0.6 : isSm ? 0.9 : isMd ? 1 : isLg ? 1.25 : 1.5}
+                        scale={
+                            isXs
+                                ? 0.6
+                                : isSm
+                                ? 0.9
+                                : isMd
+                                ? 1
+                                : isLg
+                                ? 1.25
+                                : 1.5
+                        }
                         pageNumber={1}
                         onLoadSuccess={() => setIsLoading(false)}
                     />
