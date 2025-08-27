@@ -4,7 +4,7 @@ export const Constants = {
             ? "http://localhost:3000"
             : "https://sanskagarwal.com",
     Resume_URI:
-        "https://sansk-cdn.azureedge.net/public/assets/Sanskar_Agarwal_Resume_Nov_24.pdf",
+        "https://sansk-cdn.azureedge.net/public/assets/Sanskar_Agarwal_Resume_Aug_25.pdf",
     COLORS: [
         "red",
         "pink",
