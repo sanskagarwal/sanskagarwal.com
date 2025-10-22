@@ -11,10 +11,10 @@
     "deploy": "strapi deploy"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "4.25.17",
-    "@strapi/plugin-i18n": "4.25.17",
-    "@strapi/plugin-users-permissions": "4.25.17",
-    "@strapi/strapi": "4.25.17",
+    "@strapi/plugin-cloud": "4.25.24",
+    "@strapi/plugin-i18n": "4.25.24",
+    "@strapi/plugin-users-permissions": "4.25.24",
+    "@strapi/strapi": "4.25.24",
     "@swc/core": "^1.10.1",
     "pg": "8.8.0",
     "react": "^18.0.0",
