@@ -7,7 +7,7 @@ const apiToken = process.env.TANDOOR_TOKEN;
 export const getRecipes = async (): Promise<Recipe[]> => {
     console.log("Fetching list of recipes");
     try {
-        const apiUrl = `${Constants.TANDOOR_URI}/api/recipe`;
+        const apiUrl = `${Constants.TANDOOR_URI}/api/recipe/?format=json`;
         const headers = {
             "Content-Type": "application/json",
             Authorization: `Bearer ${apiToken}`,
