@@ -36,7 +36,7 @@ const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
         <div className="flex flex-col items-center gap-1.5 border-b border-border px-6 py-7">
             <Image
                 src="/me.png"
-                alt="Sanskar Agarwal"
+                alt="Portrait of Sanskar Agarwal"
                 width={88}
                 height={88}
                 className="rounded-full border border-border"
@@ -45,7 +45,10 @@ const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
             <p className="text-xs text-muted-foreground">Software Engineer</p>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <nav
+            className="flex-1 overflow-y-auto px-3 py-4"
+            aria-label="Primary"
+        >
             <ul className="flex flex-col gap-1">
                 {navLinks.map((link) => {
                     const Icon = link.icon;
@@ -54,6 +57,7 @@ const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
                         <li key={link.name}>
                             <Link
                                 href={link.url}
+                                aria-current={active ? "page" : undefined}
                                 className={cn(
                                     "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                     active
@@ -112,19 +116,41 @@ const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
 const Navbar: React.FC = () => {
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
+    const menuButtonRef = React.useRef<HTMLButtonElement>(null);
+    const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         setOpen(false);
     }, [pathname]);
+
+    // Close the drawer on Escape and move focus to the close button when opened.
+    useEffect(() => {
+        if (!open) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setOpen(false);
+        };
+        document.addEventListener("keydown", onKeyDown);
+        closeButtonRef.current?.focus();
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [open]);
+
+    // Restore focus to the menu trigger once the drawer is dismissed.
+    const closeDrawer = () => {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+    };
 
     return (
         <>
             {/* Mobile top bar */}
             <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
                 <button
+                    ref={menuButtonRef}
                     type="button"
                     onClick={() => setOpen(true)}
                     aria-label="Open menu"
+                    aria-expanded={open}
+                    aria-controls="mobile-nav-drawer"
                     className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                 >
                     <FaBars />
@@ -137,6 +163,7 @@ const Navbar: React.FC = () => {
 
             {/* Mobile drawer */}
             <div
+                id="mobile-nav-drawer"
                 className={cn(
                     "fixed inset-0 z-40 md:hidden",
                     open ? "pointer-events-auto" : "pointer-events-none"
@@ -148,17 +175,21 @@ const Navbar: React.FC = () => {
                         "absolute inset-0 bg-black/50 transition-opacity",
                         open ? "opacity-100" : "opacity-0"
                     )}
-                    onClick={() => setOpen(false)}
+                    onClick={closeDrawer}
                 />
                 <aside
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Site navigation"
                     className={cn(
                         "absolute left-0 top-0 h-full w-64 border-r border-border bg-card shadow-xl transition-transform duration-300",
                         open ? "translate-x-0" : "-translate-x-full"
                     )}
                 >
                     <button
+                        ref={closeButtonRef}
                         type="button"
-                        onClick={() => setOpen(false)}
+                        onClick={closeDrawer}
                         aria-label="Close menu"
                         className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                     >

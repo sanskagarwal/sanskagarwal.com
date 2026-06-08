@@ -7,9 +7,8 @@ import { FaDownload } from "react-icons/fa6";
 import { Constants } from "../_utils/Constants";
 import { Button } from "./ui/Button";
 
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
-
+// react-pdf needs a pdf.js worker; bundle it from the installed pdfjs-dist
+// (self-hosted via the bundler — no CDN, avoids version mismatch).
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     "pdfjs-dist/build/pdf.worker.min.mjs",
     import.meta.url
@@ -17,6 +16,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const ResumeViewer: React.FC = () => {
     const [isLoading, setIsLoading] = React.useState(true);
+    const [hasError, setHasError] = React.useState(false);
+    const [numPages, setNumPages] = React.useState(0);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [width, setWidth] = React.useState<number>();
 
@@ -47,28 +48,65 @@ const ResumeViewer: React.FC = () => {
                     </a>
                 </div>
 
-                <div ref={containerRef} className="w-full">
-                    {isLoading && (
+                <div
+                    ref={containerRef}
+                    className="w-full"
+                    role="region"
+                    aria-label="Resume document preview"
+                >
+                    {isLoading && !hasError && (
                         <div className="mx-auto w-full max-w-md space-y-3">
                             <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
                             <div className="h-72 w-full animate-pulse rounded bg-muted" />
+                            <span className="sr-only" role="status">
+                                Loading resume…
+                            </span>
                         </div>
                     )}
 
-                    {width && (
+                    {hasError && (
+                        <div className="mx-auto max-w-md rounded-md border border-border bg-muted/40 p-6 text-center">
+                            <p className="text-sm text-muted-foreground">
+                                The resume preview could not be loaded.
+                            </p>
+                            <a
+                                href={Constants.Resume_URI}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="mt-4 inline-flex"
+                            >
+                                <Button variant="secondary" size="sm">
+                                    Download PDF
+                                    <FaDownload />
+                                </Button>
+                            </a>
+                        </div>
+                    )}
+
+                    {width && !hasError && (
                         <Document
                             loading=""
                             file={encodeURI(Constants.Resume_URI)}
-                            className="flex justify-center"
+                            className="flex flex-col items-center gap-4"
+                            onLoadSuccess={({ numPages: n }) => {
+                                setNumPages(n);
+                                setIsLoading(false);
+                            }}
+                            onLoadError={() => {
+                                setHasError(true);
+                                setIsLoading(false);
+                            }}
                         >
-                            <Page
-                                width={width}
-                                pageNumber={1}
-                                renderTextLayer={false}
-                                renderAnnotationLayer={false}
-                                className="overflow-hidden rounded-md border border-border shadow-md"
-                                onLoadSuccess={() => setIsLoading(false)}
-                            />
+                            {Array.from({ length: numPages }, (_, i) => (
+                                <Page
+                                    key={i + 1}
+                                    width={width}
+                                    pageNumber={i + 1}
+                                    renderTextLayer={false}
+                                    renderAnnotationLayer={false}
+                                    className="overflow-hidden rounded-md border border-border shadow-md"
+                                />
+                            ))}
                         </Document>
                     )}
                 </div>

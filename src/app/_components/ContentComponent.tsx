@@ -175,7 +175,11 @@ export const ContentList: React.FC<ContentListProps> = ({
         <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-8">
             <header className="mb-6">
                 <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p
+                    className="mt-1 text-sm text-muted-foreground"
+                    role="status"
+                    aria-live="polite"
+                >
                     {filteredItems.length}{" "}
                     {filteredItems.length === 1 ? "entry" : "entries"}
                 </p>
@@ -193,7 +197,11 @@ export const ContentList: React.FC<ContentListProps> = ({
             )}
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap gap-2">
+                <div
+                    className="flex flex-wrap gap-2"
+                    role="group"
+                    aria-label="Filter by category"
+                >
                     {Object.keys(labelColors).map((label) => {
                         const color = getColor(labelColors[label]);
                         const isActive = label === activeLabel;
@@ -201,6 +209,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                             <button
                                 key={label}
                                 onClick={() => changeActiveLabel(label)}
+                                aria-pressed={isActive}
                                 className={cn(
                                     "rounded border px-3 py-1.5 text-sm font-semibold capitalize transition-colors",
                                     isActive ? color.solid : color.outline
@@ -300,7 +309,11 @@ export const ContentList: React.FC<ContentListProps> = ({
             </div>
 
             {pageCount > 1 && (
-                <nav className="mt-8 flex items-center justify-center gap-1">
+                <nav
+                    className="mt-8 flex flex-col items-center gap-2"
+                    aria-label="Pagination"
+                >
+                    <div className="flex items-center justify-center gap-1">
                     <button
                         className="rounded p-2 hover:bg-accent disabled:opacity-40"
                         onClick={() => setCurrentPage(1)}
@@ -329,6 +342,10 @@ export const ContentList: React.FC<ContentListProps> = ({
                             <button
                                 key={item}
                                 onClick={() => setCurrentPage(item)}
+                                aria-label={`Page ${item}`}
+                                aria-current={
+                                    item === currentPage ? "page" : undefined
+                                }
                                 className={cn(
                                     "min-w-9 rounded px-3 py-1.5 text-sm font-semibold",
                                     item === currentPage
@@ -358,6 +375,10 @@ export const ContentList: React.FC<ContentListProps> = ({
                     >
                         <FaAnglesRight />
                     </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        Page {currentPage} of {pageCount}
+                    </p>
                 </nav>
             )}
         </div>

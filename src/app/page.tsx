@@ -80,25 +80,6 @@ const Home = async () => {
                             </Button>
                         </Link>
                     </div>
-                    <div className="mt-6 flex justify-center gap-2 md:justify-start">
-                        {socialLinks.map((social) => {
-                            const Icon = social.icon;
-                            return (
-                                <a
-                                    key={social.name}
-                                    href={social.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-label={social.name}
-                                    className="group flex h-10 w-10 items-center justify-center rounded-md border border-border bg-card transition-colors hover:bg-accent"
-                                >
-                                    <Icon
-                                        className={`${social.colorClass ?? ""} group-hover:!text-primary`}
-                                    />
-                                </a>
-                            );
-                        })}
-                    </div>
                 </div>
                 <div className="shrink-0">
                     <Image
