@@ -28,10 +28,8 @@ export default function RootLayout({
                 <script dangerouslySetInnerHTML={{ __html: themeInit }} />
             </head>
             <body>
-                <div className="mainWrapper grid">
-                    <Navbar />
-                    <div className="content">{children}</div>
-                </div>
+                <Navbar />
+                <div className="md:pl-64">{children}</div>
             </body>
         </html>
     );

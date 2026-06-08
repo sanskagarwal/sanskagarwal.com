@@ -10,180 +10,168 @@ import {
     FaFileLines,
     FaUtensils,
     FaNoteSticky,
-    FaLinkedin,
-    FaGithub,
-    FaInstagram,
-    FaGoodreadsG,
     FaBars,
+    FaXmark,
     FaBug,
 } from "react-icons/fa6";
-import { useMediaQuery } from "react-responsive";
 
 import { NavLinks } from "../_models/NavLinks";
+import { socialLinks } from "../_utils/SocialLinks";
+import { cn } from "../_utils/cn";
+import ThemeToggle from "./ThemeToggle";
 
 const navLinks: NavLinks[] = [
-    {
-        name: "Home",
-        url: "/",
-        icon: FaHouse,
-    },
-    {
-        name: "Blog",
-        url: "/blog",
-        icon: FaPenToSquare,
-    },
-    {
-        name: "Resume",
-        url: "/resume",
-        icon: FaFileLines,
-    },
-    {
-        name: "Recipes",
-        url: "/recipes",
-        icon: FaUtensils,
-    },
-    {
-        name: "Notes",
-        url: "/notes",
-        icon: FaNoteSticky,
-    },
+    { name: "Home", url: "/", icon: FaHouse },
+    { name: "Blog", url: "/blog", icon: FaPenToSquare },
+    { name: "Resume", url: "/resume", icon: FaFileLines },
+    { name: "Recipes", url: "/recipes", icon: FaUtensils },
+    { name: "Notes", url: "/notes", icon: FaNoteSticky },
 ];
 
-const socialLinks: NavLinks[] = [
-    {
-        name: "LinkedIn",
-        url: "https://www.linkedin.com/in/sanskar-agarwal/",
-        icon: FaLinkedin,
-        colorClass: "text-blue-700",
-    },
-    {
-        name: "GitHub",
-        url: "https://github.com/sanskagarwal",
-        icon: FaGithub,
-        colorClass: "text-black",
-    },
-    {
-        name: "Instagram",
-        url: "https://www.instagram.com/sansk.agarwal/",
-        icon: FaInstagram,
-        colorClass: "text-pink-500",
-    },
-    {
-        name: "Goodreads",
-        url: "https://www.goodreads.com/sanskagarwal",
-        icon: FaGoodreadsG,
-        colorClass: "text-yellow-600",
-    },
-];
+const isActive = (pathname: string, url: string) =>
+    url === "/" ? pathname === "/" : pathname.startsWith(url);
+
+const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
+    <div className="flex h-full flex-col">
+        <div className="flex flex-col items-center gap-1.5 border-b border-border px-6 py-7">
+            <Image
+                src="/me.png"
+                alt="Sanskar Agarwal"
+                width={88}
+                height={88}
+                className="rounded-full border border-border"
+            />
+            <p className="mt-1 font-semibold">Sanskar Agarwal</p>
+            <p className="text-xs text-muted-foreground">Software Engineer</p>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+            <ul className="flex flex-col gap-1">
+                {navLinks.map((link) => {
+                    const Icon = link.icon;
+                    const active = isActive(pathname, link.url);
+                    return (
+                        <li key={link.name}>
+                            <Link
+                                href={link.url}
+                                className={cn(
+                                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                                    active
+                                        ? "bg-accent text-primary"
+                                        : "text-foreground hover:bg-accent hover:text-primary"
+                                )}
+                            >
+                                <Icon className="shrink-0" />
+                                {link.name}
+                            </Link>
+                        </li>
+                    );
+                })}
+            </ul>
+        </nav>
+
+        <div className="border-t border-border px-4 py-4">
+            <div className="flex items-center justify-center gap-1">
+                {socialLinks.map((social) => {
+                    const Icon = social.icon;
+                    return (
+                        <a
+                            key={social.name}
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={social.name}
+                            className="group flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-accent"
+                        >
+                            <Icon
+                                className={cn(
+                                    social.colorClass,
+                                    "group-hover:!text-primary"
+                                )}
+                            />
+                        </a>
+                    );
+                })}
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+                <a
+                    href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Report a bug"
+                    className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
+                >
+                    <FaBug />
+                </a>
+                <ThemeToggle />
+            </div>
+        </div>
+    </div>
+);
 
 const Navbar: React.FC = () => {
-    const currentUrl = usePathname();
-    const isMobile = useMediaQuery({ maxWidth: 767 });
-    const [activeMenuItem, setActiveMenuItem] = useState("");
-    const [collapsed, setCollapsed] = useState(false);
+    const pathname = usePathname();
+    const [open, setOpen] = useState(false);
 
-    useEffect(() => setCollapsed(isMobile), [isMobile]);
     useEffect(() => {
-        const isNavLink = navLinks.findIndex((link) => link.url === currentUrl);
-        let activeLink = "";
-        if (isNavLink !== -1) {
-            activeLink = navLinks[isNavLink].name;
-        }
-
-        if (isMobile) {
-            setCollapsed(true);
-        }
-
-        setActiveMenuItem(activeLink);
-    }, [currentUrl, isMobile]);
+        setOpen(false);
+    }, [pathname]);
 
     return (
         <>
-            <div className="sider top-0 self-start max-h-screen grid sticky min-h-screen">
-                <nav
-                    className={`bg-white border border-solid border-neutral-800/15 shadow-xl flex flex-col content-center rounded-none relative transition-all duration-300 ${
-                        collapsed ? "overflow-hidden w-0" : "w-64"
-                    }`}
+            {/* Mobile top bar */}
+            <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
+                <button
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    aria-label="Open menu"
+                    className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                 >
-                    <div className="absolute w-full top-1/6">
-                        <Image
-                            src="/me.png"
-                            className="block mx-auto mt-16 mb-1"
-                            alt="avatar"
-                            width={100}
-                            height={100}
-                        />
-                        <p className="text-center">Sanskar Agarwal</p>
-                        <hr className="my-4 border-t border-neutral-200" />
+                    <FaBars />
+                </button>
+                <Link href="/" className="font-semibold">
+                    Sanskar Agarwal
+                </Link>
+                <ThemeToggle />
+            </header>
 
-                        {navLinks.map((navLink) => {
-                            const NavIcon = navLink.icon;
-                            return (
-                                <Link
-                                    onClick={() =>
-                                        setActiveMenuItem(navLink.name)
-                                    }
-                                    key={navLink.name}
-                                    href={navLink.url}
-                                    className={`flex items-center gap-2 mx-4 my-1 px-3 py-2 rounded hover:text-blue-500 ${
-                                        activeMenuItem === navLink.name
-                                            ? "text-blue-500 font-semibold"
-                                            : ""
-                                    }`}
-                                >
-                                    <NavIcon className="shrink-0" />
-                                    {navLink.name}
-                                </Link>
-                            );
-                        })}
-                    </div>
-
-                    <div className="absolute bottom-8 text-center w-full">
-                        <hr className="my-4 border-t border-neutral-200" />
-                        <div className="inline-flex">
-                            {socialLinks.map((socialLink) => {
-                                const SocialIcon = socialLink.icon;
-                                return (
-                                    <a
-                                        className="group flex items-center justify-center p-3 bg-black/5 hover:bg-black/10 transition-colors"
-                                        href={socialLink.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        key={socialLink.name}
-                                    >
-                                        <SocialIcon
-                                            className={`${
-                                                socialLink.colorClass ?? ""
-                                            } group-hover:!text-blue-500`}
-                                        />
-                                    </a>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </nav>
-            </div>
-            <div className="header grid">
-                <div className="flex items-center justify-between mb-0 ml-0 shadow px-2 py-2 bg-white">
+            {/* Mobile drawer */}
+            <div
+                className={cn(
+                    "fixed inset-0 z-40 md:hidden",
+                    open ? "pointer-events-auto" : "pointer-events-none"
+                )}
+                aria-hidden={!open}
+            >
+                <div
+                    className={cn(
+                        "absolute inset-0 bg-black/50 transition-opacity",
+                        open ? "opacity-100" : "opacity-0"
+                    )}
+                    onClick={() => setOpen(false)}
+                />
+                <aside
+                    className={cn(
+                        "absolute left-0 top-0 h-full w-64 border-r border-border bg-card shadow-xl transition-transform duration-300",
+                        open ? "translate-x-0" : "-translate-x-full"
+                    )}
+                >
                     <button
-                        className="flex items-center justify-center p-2 rounded bg-black/5 hover:bg-black/10 hover:text-blue-500 transition-colors"
-                        onClick={() => setCollapsed(!collapsed)}
-                        aria-label="Toggle menu"
+                        type="button"
+                        onClick={() => setOpen(false)}
+                        aria-label="Close menu"
+                        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                     >
-                        <FaBars />
+                        <FaXmark />
                     </button>
-                    <a
-                        className="group flex items-center justify-center p-2 rounded bg-black/5 hover:bg-black/10 transition-colors"
-                        href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Report a bug"
-                    >
-                        <FaBug className="group-hover:!text-blue-500" />
-                    </a>
-                </div>
-                <hr className="m-0 border-t border-neutral-200" />
+                    <SidebarContent pathname={pathname} />
+                </aside>
             </div>
+
+            {/* Desktop sidebar */}
+            <aside className="fixed left-0 top-0 z-20 hidden h-screen w-64 border-r border-border bg-card md:block">
+                <SidebarContent pathname={pathname} />
+            </aside>
         </>
     );
 };
