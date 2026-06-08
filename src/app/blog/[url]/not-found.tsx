@@ -8,11 +8,17 @@ const NotFound = () => (
         <div className="text-center">
             <h1 className="text-2xl font-semibold mb-2">Blog not found</h1>
             <p className="text-muted-foreground mb-6">
-                The blog you are looking for does not exist.
+                The blog you are looking for doesn&apos;t exist or may have been
+                moved.
             </p>
-            <Link href="/blog">
-                <Button>Back to blogs</Button>
-            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+                <Link href="/blog">
+                    <Button>Browse all posts</Button>
+                </Link>
+                <Link href="/">
+                    <Button variant="outline">Go home</Button>
+                </Link>
+            </div>
         </div>
     </ReadingShell>
 );

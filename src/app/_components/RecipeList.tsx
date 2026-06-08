@@ -3,7 +3,14 @@
 import React, { useMemo, useState } from "react";
 import { Recipe } from "../_models/Recipe";
 import { fetchRecipeLink } from "../_actions/recipes";
-import { FaSpinner, FaClock, FaPause, FaUsers } from "react-icons/fa6";
+import {
+    FaSpinner,
+    FaClock,
+    FaPause,
+    FaUsers,
+    FaUtensils,
+    FaArrowUpRightFromSquare,
+} from "react-icons/fa6";
 import Image from "next/image";
 
 import { Card, CardContent, CardFooter } from "./ui/Card";
@@ -13,6 +20,7 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
         {}
     );
     const [recipeLinks, setRecipeLinks] = useState<Record<string, string>>({});
+    const [errorLinks, setErrorLinks] = useState<Record<string, boolean>>({});
 
     const sorted = useMemo(
         () =>
@@ -31,12 +39,14 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
         }
 
         setLoadingLinks((prev) => ({ ...prev, [recipeId]: true }));
+        setErrorLinks((prev) => ({ ...prev, [recipeId]: false }));
         try {
             const dataLink = await fetchRecipeLink(recipeId);
             setRecipeLinks((prev) => ({ ...prev, [recipeId]: dataLink }));
             window.open(dataLink, "_blank");
         } catch (err) {
             console.error("Failed to fetch recipe link", err);
+            setErrorLinks((prev) => ({ ...prev, [recipeId]: true }));
         } finally {
             setLoadingLinks((prev) => ({ ...prev, [recipeId]: false }));
         }
@@ -52,9 +62,14 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
             </header>
 
             {sorted.length === 0 ? (
-                <p className="py-12 text-center text-muted-foreground">
-                    No recipes available right now.
-                </p>
+                <div className="flex flex-col items-center gap-3 py-16 text-center">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                        <FaUtensils className="h-5 w-5" />
+                    </span>
+                    <p className="text-muted-foreground">
+                        No recipes available right now — check back soon.
+                    </p>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {sorted.map((recipe) => (
@@ -101,18 +116,31 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                                     <FaUsers /> {recipe.servings} servings
                                 </span>
                             </div>
-                            <CardFooter>
+                            <CardFooter className="flex-col items-stretch">
+                                {errorLinks[recipe.id] && (
+                                    <p
+                                        role="alert"
+                                        className="px-4 py-2 text-center text-xs text-red-600 dark:text-red-400"
+                                    >
+                                        Couldn&apos;t open this recipe. Please
+                                        try again.
+                                    </p>
+                                )}
                                 <button
-                                    className="flex h-11 flex-1 items-center justify-center bg-accent font-semibold text-accent-foreground transition-colors hover:bg-muted"
+                                    className="flex h-11 flex-1 items-center justify-center gap-1.5 bg-accent font-semibold text-accent-foreground transition-colors hover:bg-muted"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         handleGetLink(recipe.id);
                                     }}
+                                    aria-label={`View recipe: ${recipe.name}`}
                                 >
                                     {loadingLinks[recipe.id] ? (
                                         <FaSpinner className="animate-spin" />
                                     ) : (
-                                        "View"
+                                        <>
+                                            View recipe
+                                            <FaArrowUpRightFromSquare className="text-xs" />
+                                        </>
                                     )}
                                 </button>
                             </CardFooter>

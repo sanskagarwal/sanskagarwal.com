@@ -237,8 +237,24 @@ export const ContentList: React.FC<ContentListProps> = ({
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {paginatedItems.length === 0 && (
-                    <div className="col-span-full py-12 text-center text-muted-foreground">
-                        No results found.
+                    <div className="col-span-full flex flex-col items-center gap-3 py-16 text-center">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                            <FaMagnifyingGlass className="h-5 w-5" />
+                        </span>
+                        <p className="text-muted-foreground">
+                            No results found. Try a different search or category.
+                        </p>
+                        {(searchTerm || activeLabel !== "all") && (
+                            <button
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    changeActiveLabel("all");
+                                }}
+                                className="text-sm font-semibold text-primary hover:underline"
+                            >
+                                Clear filters
+                            </button>
+                        )}
                     </div>
                 )}
                 {paginatedItems.map((item) => {
