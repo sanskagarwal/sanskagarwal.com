@@ -1,26 +1,40 @@
-"use client";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import React from "react";
-import useSWR from "swr";
-
-import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
-import { Note } from "@/app/_models/Note";
+import { getNote } from "@/app/_dataprovider/NoteDataProvider";
 import ReadComponent from "@/app/_components/ReadComponent";
+
+export const dynamic = "force-dynamic";
 
 type Params = {
     url: string;
 };
 
-const NotePage: React.FC<{ params: Params }> = ({ params }) => {
-    const {
-        data: note,
-        isLoading,
-        error,
-    } = useSWR<Note>(`/api/notes/${params.url}`, fetcher);
+export async function generateMetadata({
+    params,
+}: {
+    params: Params;
+}): Promise<Metadata> {
+    const note = await getNote(params.url);
 
-    return (
-        <ReadComponent error={error} isLoading={isLoading} readModel={note} />
-    );
+    if (!note) {
+        return { title: "Not Found" };
+    }
+
+    return {
+        title: note.title,
+        description: note.summary,
+    };
+}
+
+const NotePage = async ({ params }: { params: Params }) => {
+    const note = await getNote(params.url);
+
+    if (!note) {
+        notFound();
+    }
+
+    return <ReadComponent readModel={note} />;
 };
 
 export default NotePage;

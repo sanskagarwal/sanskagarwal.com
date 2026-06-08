@@ -1,26 +1,40 @@
-"use client";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import React from "react";
-import useSWR from "swr";
-
-import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
-import { Blog } from "@/app/_models/Blog";
+import { getBlog } from "@/app/_dataprovider/BlogDataProvider";
 import ReadComponent from "@/app/_components/ReadComponent";
+
+export const dynamic = "force-dynamic";
 
 type Params = {
     url: string;
 };
 
-const BlogPage: React.FC<{ params: Params }> = ({ params }) => {
-    const {
-        data: blog,
-        isLoading,
-        error,
-    } = useSWR<Blog>(`/api/blogs/${params.url}`, fetcher);
+export async function generateMetadata({
+    params,
+}: {
+    params: Params;
+}): Promise<Metadata> {
+    const blog = await getBlog(params.url);
 
-    return (
-        <ReadComponent readModel={blog} isLoading={isLoading} error={error} />
-    );
+    if (!blog) {
+        return { title: "Not Found" };
+    }
+
+    return {
+        title: blog.title,
+        description: blog.summary,
+    };
+}
+
+const BlogPage = async ({ params }: { params: Params }) => {
+    const blog = await getBlog(params.url);
+
+    if (!blog) {
+        notFound();
+    }
+
+    return <ReadComponent readModel={blog} />;
 };
 
 export default BlogPage;

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import {
     EmailIcon,
     EmailShareButton,
@@ -14,6 +16,12 @@ import { Popup } from "semantic-ui-react";
 import { ReadModel } from "../_models/ReadModel";
 
 const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
+    const [url, setUrl] = useState("");
+
+    useEffect(() => {
+        setUrl(window.location.href);
+    }, []);
+
     return (
         <div className="ui center aligned segment">
             <h4 className="ui header">Share this</h4>
@@ -21,9 +29,9 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
                 <Popup
                     trigger={
                         <EmailShareButton
-                            url={window.location.href}
+                            url={url}
                             subject={`Check out this read: ${readModel.title}`}
-                            body={`I found this read interesting and thought you might like it too! Link: ${window.location.href}`}
+                            body={`I found this read interesting and thought you might like it too! Link: ${url}`}
                             className="ui button"
                         >
                             <EmailIcon size={32} round />
@@ -35,7 +43,7 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
                 <Popup
                     trigger={
                         <TwitterShareButton
-                            url={window.location.href}
+                            url={url}
                             title={readModel.title}
                             hashtags={[readModel.category]}
                             className="ui button"
@@ -49,7 +57,7 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
                 <Popup
                     trigger={
                         <LinkedinShareButton
-                            url={window.location.href}
+                            url={url}
                             title={readModel.title}
                             summary={readModel.summary}
                             source="Sanskar's Website"
@@ -63,7 +71,7 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
                 <Popup
                     trigger={
                         <RedditShareButton
-                            url={window.location.href}
+                            url={url}
                             title={readModel.title}
                             className="ui button"
                         >
