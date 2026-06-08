@@ -47,6 +47,8 @@ const Mermaid: React.FC<{ children: string }> = ({ children }) => {
     return (
         <div
             ref={ref}
+            role="img"
+            aria-label="Diagram"
             className="mermaid flex justify-center"
             dangerouslySetInnerHTML={{ __html: svg }}
         />

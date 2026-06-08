@@ -20,7 +20,7 @@ const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
 }) => (
     <span className="relative inline-flex group">
         {children}
-        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
             {content}
         </span>
     </span>
