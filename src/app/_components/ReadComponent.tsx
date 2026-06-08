@@ -11,7 +11,7 @@ const ReadComponent: React.FC<{
     return (
         <div className="grid grid-cols-6">
             <div
-                className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dotted
+                className="py-4 bg-card text-card-foreground md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dotted border-border
                     shadow-2xl md:shadow-lg"
             >
                 <div>
@@ -19,7 +19,7 @@ const ReadComponent: React.FC<{
                         <h1 className="text-3xl font-bold mb-2">
                             {readModel.title}
                         </h1>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-muted-foreground mb-4">
                             {`${new Date(
                                 readModel.published_at
                             ).toLocaleDateString(undefined, {

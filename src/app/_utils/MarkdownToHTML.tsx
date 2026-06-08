@@ -18,7 +18,7 @@ const getHTML = (content: string) => {
                         return (
                             <a
                                 target="_blank"
-                                className="text-blue-600 visited:text-purple-600"
+                                className="text-secondary underline hover:opacity-80"
                                 {...props}
                             />
                         );
@@ -82,7 +82,7 @@ const getHTML = (content: string) => {
                     blockquote({ node, ...props }) {
                         return (
                             <blockquote
-                                className="border-l-4 border-blue-300 bg-blue-50 p-3 my-3 rounded"
+                                className="border-l-4 border-primary bg-accent text-accent-foreground p-3 my-3 rounded"
                                 {...props}
                             />
                         );
@@ -106,7 +106,7 @@ const getHTML = (content: string) => {
                     hr({ node, ...props }) {
                         return (
                             <hr
-                                className="my-4 border-t border-gray-300"
+                                className="my-4 border-t border-border"
                                 {...props}
                             />
                         );

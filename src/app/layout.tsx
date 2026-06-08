@@ -1,12 +1,18 @@
 import { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Lora } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "./_components/Navbar";
 
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
     subsets: ["latin"],
     variable: "--font-sans",
+    display: "swap",
+});
+
+const lora = Lora({
+    subsets: ["latin"],
+    variable: "--font-serif",
     display: "swap",
 });
 
@@ -23,7 +29,11 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" className={inter.variable} suppressHydrationWarning>
+        <html
+            lang="en"
+            className={`${jakarta.variable} ${lora.variable}`}
+            suppressHydrationWarning
+        >
             <head>
                 <script dangerouslySetInnerHTML={{ __html: themeInit }} />
             </head>
