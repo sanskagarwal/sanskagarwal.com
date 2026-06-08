@@ -25,48 +25,48 @@ type Item = Blog & Note;
 
 const colorClasses: Record<string, { solid: string; outline: string }> = {
     red: {
-        solid: "bg-red-500 text-white border-red-500",
+        solid: "bg-red-600 text-white border-red-600",
         outline: "text-red-600 dark:text-red-400 border-red-400 hover:bg-red-500/10",
     },
     pink: {
-        solid: "bg-pink-500 text-white border-pink-500",
-        outline: "text-pink-600 dark:text-pink-400 border-pink-400 hover:bg-pink-500/10",
+        solid: "bg-pink-600 text-white border-pink-600",
+        outline: "text-pink-700 dark:text-pink-400 border-pink-400 hover:bg-pink-500/10",
     },
     blue: {
-        solid: "bg-blue-500 text-white border-blue-500",
+        solid: "bg-blue-600 text-white border-blue-600",
         outline: "text-blue-600 dark:text-blue-400 border-blue-400 hover:bg-blue-500/10",
     },
     green: {
-        solid: "bg-green-600 text-white border-green-600",
+        solid: "bg-green-700 text-white border-green-700",
         outline: "text-green-700 dark:text-green-400 border-green-400 hover:bg-green-500/10",
     },
     violet: {
-        solid: "bg-violet-500 text-white border-violet-500",
+        solid: "bg-violet-600 text-white border-violet-600",
         outline: "text-violet-600 dark:text-violet-400 border-violet-400 hover:bg-violet-500/10",
     },
     purple: {
-        solid: "bg-purple-500 text-white border-purple-500",
+        solid: "bg-purple-600 text-white border-purple-600",
         outline: "text-purple-600 dark:text-purple-400 border-purple-400 hover:bg-purple-500/10",
     },
     orange: {
-        solid: "bg-orange-500 text-white border-orange-500",
-        outline: "text-orange-600 dark:text-orange-400 border-orange-400 hover:bg-orange-500/10",
+        solid: "bg-orange-700 text-white border-orange-700",
+        outline: "text-orange-700 dark:text-orange-400 border-orange-400 hover:bg-orange-500/10",
     },
     brown: {
         solid: "bg-amber-700 text-white border-amber-700",
-        outline: "text-amber-800 dark:text-amber-500 border-amber-500 hover:bg-amber-700/10",
+        outline: "text-amber-700 dark:text-amber-400 border-amber-500 hover:bg-amber-700/10",
     },
     yellow: {
-        solid: "bg-yellow-500 text-white border-yellow-500",
+        solid: "bg-yellow-700 text-white border-yellow-700",
         outline: "text-yellow-700 dark:text-yellow-400 border-yellow-400 hover:bg-yellow-500/10",
     },
     olive: {
-        solid: "bg-lime-600 text-white border-lime-600",
+        solid: "bg-lime-700 text-white border-lime-700",
         outline: "text-lime-700 dark:text-lime-400 border-lime-400 hover:bg-lime-500/10",
     },
     teal: {
-        solid: "bg-teal-500 text-white border-teal-500",
-        outline: "text-teal-600 dark:text-teal-400 border-teal-400 hover:bg-teal-500/10",
+        solid: "bg-teal-700 text-white border-teal-700",
+        outline: "text-teal-700 dark:text-teal-400 border-teal-400 hover:bg-teal-500/10",
     },
 };
 
@@ -233,7 +233,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                                 onClick={() => changeActiveLabel(label)}
                                 aria-pressed={isActive}
                                 className={cn(
-                                    "rounded border px-3 py-1.5 text-sm font-semibold capitalize transition-colors",
+                                    "rounded-full border px-3 py-1.5 text-sm font-semibold capitalize transition-colors",
                                     isActive ? color.solid : color.outline
                                 )}
                             >
@@ -290,7 +290,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                                         changeActiveLabel(item.category)
                                     }
                                     className={cn(
-                                        "w-fit rounded px-2 py-0.5 text-xs font-semibold capitalize text-white",
+                                        "w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize text-white",
                                         ribbon.solid
                                     )}
                                 >

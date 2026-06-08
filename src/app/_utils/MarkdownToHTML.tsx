@@ -1,3 +1,4 @@
+import React from "react";
 import Markdown from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import remarkGfm from "remark-gfm";
@@ -6,6 +7,35 @@ import Mermaid from "./Mermaid";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+
+// atomOneDark ships a few token colors that fall below the WCAG AA 4.5:1
+// threshold against its own #282c34 background (comments at 2.32, and the
+// red token group at 4.38). Lighten just those so code blocks are legible.
+const accessibleCodeStyle: typeof atomOneDark = {
+    ...atomOneDark,
+    "hljs-comment": { ...atomOneDark["hljs-comment"], color: "#929cad" },
+    "hljs-quote": { ...atomOneDark["hljs-quote"], color: "#929cad" },
+    "hljs-section": { ...atomOneDark["hljs-section"], color: "#e88e96" },
+    "hljs-name": { ...atomOneDark["hljs-name"], color: "#e88e96" },
+    "hljs-selector-tag": {
+        ...atomOneDark["hljs-selector-tag"],
+        color: "#e88e96",
+    },
+    "hljs-deletion": { ...atomOneDark["hljs-deletion"], color: "#e88e96" },
+    "hljs-subst": { ...atomOneDark["hljs-subst"], color: "#e88e96" },
+};
+
+// Code blocks scroll horizontally (overflow-x: auto), so they must be reachable
+// by keyboard alone. Rendering the <pre> with tabIndex={0} lets keyboard users
+// focus and scroll the region (WCAG 2.1.1 / axe scrollable-region-focusable).
+const FocusablePre: React.FC<React.HTMLAttributes<HTMLPreElement>> = ({
+    children,
+    ...props
+}) => (
+    <pre tabIndex={0} aria-label="Code block" {...props}>
+        {children}
+    </pre>
+);
 
 const getHTML = (content: string) => {
     return (
@@ -120,6 +150,11 @@ const getHTML = (content: string) => {
                             />
                         );
                     },
+                    pre({ node, ...props }) {
+                        // Indented / unlabelled code blocks scroll too; keep
+                        // them keyboard-focusable.
+                        return <pre tabIndex={0} {...props} />;
+                    },
                     table({ node, ...props }) {
                         return (
                             <table
@@ -142,9 +177,9 @@ const getHTML = (content: string) => {
                         return match ? (
                             <SyntaxHighlighter
                                 {...rest}
-                                PreTag="pre"
+                                PreTag={FocusablePre}
                                 language={language}
-                                style={atomOneDark}
+                                style={accessibleCodeStyle}
                                 customStyle={{
                                     borderRadius: "0.5rem",
                                     padding: "1rem",

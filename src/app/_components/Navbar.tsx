@@ -39,6 +39,7 @@ const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
                 alt="Portrait of Sanskar Agarwal"
                 width={88}
                 height={88}
+                priority
                 className="rounded-full border border-border"
             />
             <p className="mt-1 font-semibold">Sanskar Agarwal</p>

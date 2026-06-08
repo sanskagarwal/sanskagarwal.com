@@ -9,7 +9,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "node_modules/next/dist/bin/next start",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "test:a11y": "playwright test"
     },
     "dependencies": {
         "@tailwindcss/postcss": "^4.3.0",
@@ -40,6 +41,8 @@
         "typescript": "^6.0.3"
     },
     "devDependencies": {
+        "@axe-core/playwright": "^4.11.3",
+        "@playwright/test": "^1.60.0",
         "@types/async-retry": "^1.4.9",
         "@types/node": "^25.9.2",
         "@types/pg": "^8.20.0",

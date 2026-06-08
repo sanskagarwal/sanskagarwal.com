@@ -26,14 +26,14 @@ Scope: `src/` Next.js 16 app only. Direction: **ground-up redesign for the homep
 
 - [x] Incrementally split & polish the content list (reusable Card/Badge/Pagination, server-side filtering instead of loading all items) — `src/app/_components/ContentComponent.tsx`.
 - [x] Refine layout shell + responsive sidebar/nav (apply new design tokens) — `src/app/layout.tsx`, `src/app/_components/Navbar.tsx`.
-- [ ] Image optimization for recipes + lazy-load heavy libs (mermaid, react-pdf) — `src/app/_components/RecipeList.tsx`, `src/app/_components/ResumeViewer.tsx`.
-- [ ] SEO: `sitemap.ts`, robots, per-page metadata, OG images, JSON-LD.
-- [ ] Set Mermaid `securityLevel` + add CSP headers — `src/app/_components/Mermaid.tsx`, `src/next.config.js`.
-- [ ] Accessibility pass: focus states, alt text, skip link, contrast.
+- [x] Image optimization for recipes + lazy-load heavy libs (mermaid, react-pdf) — `src/app/_components/RecipeList.tsx`, `src/app/_components/ResumeViewer.tsx`.
+- [x] SEO: `sitemap.ts`, robots, per-page metadata, JSON-LD. (OG images deferred.)
+- [~] Set Mermaid `securityLevel` (done: `strict`) + add CSP headers (pending) — `src/app/_components/Mermaid.tsx`, `src/next.config.js`.
+- [x] Accessibility pass: focus states, alt text, skip link, contrast.
 
 ## 🟢 Low — cleanup & tooling
 
-- [ ] Remove dead `src/app/styles.module.css`; fix `@ts-expect-error` — `src/app/_utils/MarkdownToHTML.tsx`.
+- [x] Remove dead `src/app/styles.module.css`; fix `@ts-expect-error` — `src/app/_utils/MarkdownToHTML.tsx`.
 - [ ] Align CI Node version to 24.x — `.github/workflows/publish.yml`.
 - [ ] Replace `console.*` with light structured logging.
 - [ ] (Optional) Add a minimal test setup.

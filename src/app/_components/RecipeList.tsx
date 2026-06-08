@@ -94,7 +94,7 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                                     {recipe.keywords.map((keyword) => (
                                         <span
                                             key={keyword.id}
-                                            className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                                            className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
                                         >
                                             {keyword.label}
                                         </span>
@@ -106,21 +106,21 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                             </CardContent>
                             <div className="flex flex-wrap justify-center gap-1 px-4 pb-4">
                                 <span
-                                    className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-xs text-foreground"
+                                    className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs text-foreground"
                                     aria-label={`Cooking time ${recipe.working_time} minutes`}
                                 >
                                     <FaClock aria-hidden="true" />{" "}
                                     {recipe.working_time} min
                                 </span>
                                 <span
-                                    className="inline-flex items-center gap-1 rounded bg-amber-500/15 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-400"
+                                    className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs text-amber-700 dark:text-amber-400"
                                     aria-label={`Waiting time ${recipe.waiting_time} minutes`}
                                 >
                                     <FaPause aria-hidden="true" />{" "}
                                     {recipe.waiting_time} min
                                 </span>
                                 <span
-                                    className="inline-flex items-center gap-1 rounded bg-blue-500/15 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-400"
+                                    className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2.5 py-0.5 text-xs text-blue-700 dark:text-blue-400"
                                     aria-label={`${recipe.servings} servings`}
                                 >
                                     <FaUsers aria-hidden="true" />{" "}

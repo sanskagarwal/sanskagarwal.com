@@ -6,13 +6,13 @@
     --background: #f8fafc;
     --foreground: #0f172a;
     --muted: #f1f5f9;
-    --muted-foreground: #64748b;
+    --muted-foreground: #5b6776;
     --card: #ffffff;
     --card-foreground: #0f172a;
     --border: #e2e8f0;
     --input: #e2e8f0;
-    --ring: #14b8a6;
-    --primary: #0d9488;
+    --ring: #0f766e;
+    --primary: #0f766e;
     --primary-foreground: #ffffff;
     --secondary: #2563eb;
     --secondary-foreground: #ffffff;
@@ -91,6 +91,13 @@ html {
 :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+}
+
+/* Tailwind v4 no longer sets a pointer cursor on buttons; restore it for
+   enabled buttons and elements with a button role. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
 }
 
 /* Dark-aware scrollbars. */

@@ -38,7 +38,11 @@ const Mermaid: React.FC<{ children: string }> = ({ children }) => {
 
     if (!svg) {
         return (
-            <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm">
+            <pre
+                tabIndex={0}
+                aria-label="Diagram source"
+                className="overflow-x-auto rounded-lg bg-muted p-4 text-sm"
+            >
                 {children}
             </pre>
         );
