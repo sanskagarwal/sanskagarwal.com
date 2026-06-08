@@ -67,7 +67,7 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                         <FaUtensils className="h-5 w-5" />
                     </span>
                     <p className="text-muted-foreground">
-                        No recipes available right now — check back soon.
+                        No recipes available right now - check back soon.
                     </p>
                 </div>
             ) : (

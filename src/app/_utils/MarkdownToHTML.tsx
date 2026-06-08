@@ -150,10 +150,41 @@ const getHTML = (content: string) => {
                             />
                         );
                     },
-                    pre({ node, ...props }) {
+                    pre({ node, children, ...props }) {
+                        // Fenced code blocks (```lang) and mermaid diagrams
+                        // already render their own block wrapper — the
+                        // SyntaxHighlighter's <pre> (FocusablePre) or Mermaid's
+                        // <div>. Adding another <pre> here would produce invalid
+                        // <pre><pre> / <pre><div> nesting, so pass the child
+                        // through untouched in that case.
+                        const codeChild = node?.children?.find(
+                            (child) =>
+                                child.type === "element" &&
+                                child.tagName === "code"
+                        );
+                        const codeClassName =
+                            codeChild && codeChild.type === "element"
+                                ? codeChild.properties?.className
+                                : undefined;
+                        const isFenced =
+                            Array.isArray(codeClassName) &&
+                            codeClassName.some(
+                                (name) =>
+                                    typeof name === "string" &&
+                                    name.startsWith("language-")
+                            );
+
+                        if (isFenced) {
+                            return <>{children}</>;
+                        }
+
                         // Indented / unlabelled code blocks scroll too; keep
                         // them keyboard-focusable.
-                        return <pre tabIndex={0} {...props} />;
+                        return (
+                            <pre tabIndex={0} {...props}>
+                                {children}
+                            </pre>
+                        );
                     },
                     table({ node, ...props }) {
                         return (
