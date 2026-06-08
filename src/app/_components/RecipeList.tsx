@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Recipe } from "../_models/Recipe";
+import { fetchRecipeLink } from "../_actions/recipes";
 import {
     Card,
     CardContent,
@@ -27,8 +28,7 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
 
         setLoadingLinks((prev) => ({ ...prev, [recipeId]: true }));
         try {
-            const response = await fetch(`/api/recipes/${recipeId}`);
-            const dataLink = await response.json();
+            const dataLink = await fetchRecipeLink(recipeId);
             setRecipeLinks((prev) => ({ ...prev, [recipeId]: dataLink }));
             window.open(dataLink, "_blank");
         } catch (err) {
