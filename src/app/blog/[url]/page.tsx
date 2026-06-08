@@ -25,6 +25,19 @@ export async function generateMetadata({
     return {
         title: blog.title,
         description: blog.summary,
+        alternates: { canonical: `/blog/${url}` },
+        openGraph: {
+            type: "article",
+            title: blog.title,
+            description: blog.summary,
+            url: `/blog/${url}`,
+            publishedTime: new Date(blog.published_at).toISOString(),
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: blog.title,
+            description: blog.summary,
+        },
     };
 }
 
@@ -36,7 +49,14 @@ const BlogPage = async ({ params }: { params: Promise<Params> }) => {
         notFound();
     }
 
-    return <ReadComponent readModel={blog} backHref="/blog" backLabel="All posts" />;
+    return (
+        <ReadComponent
+            readModel={blog}
+            backHref="/blog"
+            backLabel="All posts"
+            canonicalPath={`/blog/${url}`}
+        />
+    );
 };
 
 export default BlogPage;

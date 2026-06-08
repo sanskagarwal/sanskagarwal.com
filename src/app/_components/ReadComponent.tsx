@@ -8,14 +8,37 @@ import SocialShare from "./SocialShare";
 import Remark42 from "./Remark42";
 import ReadingShell from "./ReadingShell";
 import { Badge } from "./ui/Badge";
+import { Constants } from "../_utils/Constants";
 
 const ReadComponent: React.FC<{
     readModel: ReadModel;
     backHref?: string;
     backLabel?: string;
-}> = ({ readModel, backHref, backLabel }) => {
+    canonicalPath?: string;
+}> = ({ readModel, backHref, backLabel, canonicalPath }) => {
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: readModel.title,
+        description: readModel.summary,
+        datePublished: new Date(readModel.published_at).toISOString(),
+        articleSection: readModel.category || undefined,
+        author: {
+            "@type": "Person",
+            name: "Sanskar Agarwal",
+            url: Constants.SITE_URI,
+        },
+        ...(canonicalPath
+            ? { mainEntityOfPage: `${Constants.SITE_URI}${canonicalPath}` }
+            : {}),
+    };
+
     return (
         <ReadingShell>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {backHref && (
                 <Link
                     href={backHref}

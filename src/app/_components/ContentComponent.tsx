@@ -164,6 +164,28 @@ export const ContentList: React.FC<ContentListProps> = ({
         if (currentPage > pageCount && pageCount > 0) setCurrentPage(1);
     }, [currentPage, pageCount]);
 
+    // Hydrate filter/search state from the URL on mount (shareable links).
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get("q");
+        const category = params.get("category");
+        if (q) setSearchTerm(q);
+        if (category) setActiveLabel(category);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Reflect filter/search state back into the URL without a navigation.
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (searchTerm) params.set("q", searchTerm);
+        if (activeLabel !== "all") params.set("category", activeLabel);
+        const query = params.toString();
+        const next = query
+            ? `${window.location.pathname}?${query}`
+            : window.location.pathname;
+        window.history.replaceState(null, "", next);
+    }, [searchTerm, activeLabel]);
+
     const changeActiveLabel = (label: string) => {
         setActiveLabel(label);
         setCurrentPage(1);

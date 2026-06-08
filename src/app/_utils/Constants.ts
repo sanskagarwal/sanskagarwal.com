@@ -1,4 +1,6 @@
 export const Constants = {
+    SITE_URI:
+        process.env.NEXT_PUBLIC_SITE_URI ?? "https://sanskagarwal.com",
     Resume_URI:
         process.env.NEXT_PUBLIC_RESUME_URI ??
         "https://sansk-cdn.azureedge.net/public/assets/Sanskar_Agarwal_Resume_Aug_25.pdf",
