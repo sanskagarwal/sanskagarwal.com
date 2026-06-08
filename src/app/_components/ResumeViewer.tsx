@@ -2,7 +2,6 @@
 
 import React from "react";
 import { pdfjs, Document, Page } from "react-pdf";
-import { useMediaQuery } from "react-responsive";
 import { FaDownload } from "react-icons/fa6";
 
 import { Constants } from "../_utils/Constants";
@@ -18,10 +17,18 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 const ResumeViewer: React.FC = () => {
     const [isLoading, setIsLoading] = React.useState(true);
-    const isXs = useMediaQuery({ maxWidth: 550 });
-    const isSm = useMediaQuery({ maxWidth: 767 });
-    const isMd = useMediaQuery({ maxWidth: 1024 });
-    const isLg = useMediaQuery({ maxWidth: 1280 });
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [width, setWidth] = React.useState<number>();
+
+    React.useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const update = () => setWidth(el.clientWidth);
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     return (
         <div className="mx-auto w-full max-w-4xl px-5 py-8 md:px-8">
@@ -40,28 +47,31 @@ const ResumeViewer: React.FC = () => {
                     </a>
                 </div>
 
-                {isLoading && (
-                    <div className="w-full max-w-md space-y-3">
-                        <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
-                        <div className="h-72 w-full animate-pulse rounded bg-muted" />
-                    </div>
-                )}
+                <div ref={containerRef} className="w-full">
+                    {isLoading && (
+                        <div className="mx-auto w-full max-w-md space-y-3">
+                            <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
+                            <div className="h-72 w-full animate-pulse rounded bg-muted" />
+                        </div>
+                    )}
 
-                <Document
-                    loading=""
-                    file={encodeURI(Constants.Resume_URI)}
-                    className="overflow-hidden rounded-md shadow-md"
-                >
-                    <Page
-                        scale={
-                            isXs ? 0.6 : isSm ? 0.9 : isMd ? 1 : isLg ? 1.25 : 1.5
-                        }
-                        pageNumber={1}
-                        renderTextLayer={false}
-                        renderAnnotationLayer={false}
-                        onLoadSuccess={() => setIsLoading(false)}
-                    />
-                </Document>
+                    {width && (
+                        <Document
+                            loading=""
+                            file={encodeURI(Constants.Resume_URI)}
+                            className="flex justify-center"
+                        >
+                            <Page
+                                width={width}
+                                pageNumber={1}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                className="overflow-hidden rounded-md border border-border shadow-md"
+                                onLoadSuccess={() => setIsLoading(false)}
+                            />
+                        </Document>
+                    )}
+                </div>
             </div>
         </div>
     );
