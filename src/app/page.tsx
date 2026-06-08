@@ -15,6 +15,7 @@ import { getNotes } from "./_dataprovider/NoteDataProvider";
 import { Button } from "./_components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "./_components/ui/Card";
 import { Badge } from "./_components/ui/Badge";
+import { Reveal } from "./_components/ui/Reveal";
 
 const formatDate = (date: Date) =>
     new Date(date).toLocaleDateString(undefined, {
@@ -113,31 +114,35 @@ const Home = async () => {
                     </p>
                 ) : (
                     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {recentBlogs.map((blog) => (
-                            <Link
+                        {recentBlogs.map((blog, i) => (
+                            <Reveal
                                 key={blog.id.toString()}
-                                href={`/blog/${blog.blog_url}`}
-                                className="group"
+                                delay={i * 0.06}
                             >
-                                <Card className="h-full transition-shadow group-hover:shadow-md">
-                                    <CardHeader>
-                                        <Badge className="w-fit">
-                                            {blog.category}
-                                        </Badge>
-                                        <CardTitle className="group-hover:text-primary">
-                                            {blog.title}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-muted-foreground">
-                                            {formatDate(blog.published_at)}
-                                        </p>
-                                        <p className="mt-2 line-clamp-3 text-sm">
-                                            {blog.summary}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
+                                <Link
+                                    href={`/blog/${blog.blog_url}`}
+                                    className="group block h-full"
+                                >
+                                    <Card className="card-hover h-full">
+                                        <CardHeader>
+                                            <Badge className="w-fit">
+                                                {blog.category}
+                                            </Badge>
+                                            <CardTitle className="group-hover:text-primary">
+                                                {blog.title}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                {formatDate(blog.published_at)}
+                                            </p>
+                                            <p className="mt-2 line-clamp-3 text-sm">
+                                                {blog.summary}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </Reveal>
                         ))}
                     </div>
                 )}
@@ -159,34 +164,38 @@ const Home = async () => {
                         </Link>
                     </div>
                     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {recentNotes.map((note) => (
-                            <Link
+                        {recentNotes.map((note, i) => (
+                            <Reveal
                                 key={note.id.toString()}
-                                href={`/notes/${note.note_url}`}
-                                className="group"
+                                delay={i * 0.06}
                             >
-                                <Card className="h-full transition-shadow group-hover:shadow-md">
-                                    <CardHeader>
-                                        <Badge
-                                            variant="secondary"
-                                            className="w-fit"
-                                        >
-                                            {note.category}
-                                        </Badge>
-                                        <CardTitle className="group-hover:text-primary">
-                                            {note.title}
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-muted-foreground">
-                                            {formatDate(note.published_at)}
-                                        </p>
-                                        <p className="mt-2 line-clamp-3 text-sm">
-                                            {note.summary}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            </Link>
+                                <Link
+                                    href={`/notes/${note.note_url}`}
+                                    className="group block h-full"
+                                >
+                                    <Card className="card-hover h-full">
+                                        <CardHeader>
+                                            <Badge
+                                                variant="secondary"
+                                                className="w-fit"
+                                            >
+                                                {note.category}
+                                            </Badge>
+                                            <CardTitle className="group-hover:text-primary">
+                                                {note.title}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                {formatDate(note.published_at)}
+                                            </p>
+                                            <p className="mt-2 line-clamp-3 text-sm">
+                                                {note.summary}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </Reveal>
                         ))}
                     </div>
                 </section>

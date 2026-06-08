@@ -261,7 +261,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                     const ribbon = getColor(labelColors[item.category]);
                     const id = item.id.toString();
                     return (
-                        <Card key={id} className="overflow-hidden">
+                        <Card key={id} className="card-hover overflow-hidden">
                             <CardHeader>
                                 <button
                                     onClick={() =>

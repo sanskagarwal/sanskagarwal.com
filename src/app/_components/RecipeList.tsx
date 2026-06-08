@@ -73,7 +73,7 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
             ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {sorted.map((recipe) => (
-                        <Card key={recipe.id.toString()} className="overflow-hidden">
+                        <Card key={recipe.id.toString()} className="card-hover overflow-hidden">
                             <Image
                                 src={recipe.image}
                                 alt={recipe.name}

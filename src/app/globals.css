@@ -153,6 +153,32 @@ html {
     outline-offset: 2px;
 }
 
+/* Card lift on hover — paired with a transition so it eases in/out. */
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -10px rgb(0 0 0 / 0.18);
+    border-color: var(--primary);
+}
+
+/* Subtle fade-in applied to each navigated page via template.tsx. */
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.page-fade-in {
+    animation: page-fade-in 0.3s ease both;
+}
+
 /* Respect users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
     html {
