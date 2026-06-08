@@ -74,19 +74,15 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {sorted.map((recipe) => (
                         <Card key={recipe.id.toString()} className="card-hover overflow-hidden">
-                            <Image
-                                src={recipe.image}
-                                alt={recipe.name}
-                                width={0}
-                                height={0}
-                                quality={100}
-                                style={{
-                                    width: "100%",
-                                    height: "12rem",
-                                    objectFit: "cover",
-                                }}
-                                unoptimized
-                            />
+                            <div className="relative h-48 w-full">
+                                <Image
+                                    src={recipe.image}
+                                    alt={recipe.name}
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    className="object-cover"
+                                />
+                            </div>
                             <CardContent className="grow pt-4">
                                 <h2 className="mb-1 text-lg font-bold">
                                     {recipe.name}
