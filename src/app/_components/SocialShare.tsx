@@ -36,7 +36,7 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
     return (
         <div className="text-center p-4 my-6 border border-border rounded-lg">
             <h4 className="text-lg font-semibold mb-3">Share this</h4>
-            <div className="inline-flex gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
                 <Tooltip content="Share via Email">
                     <EmailShareButton
                         url={url}

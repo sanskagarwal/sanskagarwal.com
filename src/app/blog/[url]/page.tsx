@@ -36,7 +36,7 @@ const BlogPage = async ({ params }: { params: Promise<Params> }) => {
         notFound();
     }
 
-    return <ReadComponent readModel={blog} />;
+    return <ReadComponent readModel={blog} backHref="/blog" backLabel="All posts" />;
 };
 
 export default BlogPage;

@@ -88,7 +88,8 @@ const Home = async () => {
                         width={180}
                         height={180}
                         alt="Sanskar Agarwal"
-                        className="rounded-full border border-border shadow-md"
+                        sizes="(max-width: 640px) 8rem, 11rem"
+                        className="h-32 w-32 rounded-full border border-border shadow-md sm:h-44 sm:w-44"
                         priority
                     />
                 </div>

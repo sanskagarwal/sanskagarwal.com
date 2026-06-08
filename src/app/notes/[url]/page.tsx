@@ -36,7 +36,7 @@ const NotePage = async ({ params }: { params: Promise<Params> }) => {
         notFound();
     }
 
-    return <ReadComponent readModel={note} />;
+    return <ReadComponent readModel={note} backHref="/notes" backLabel="All notes" />;
 };
 
 export default NotePage;

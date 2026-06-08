@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+import { FaArrowLeft } from "react-icons/fa6";
 import { ReadModel } from "../_models/ReadModel";
 import readingTime from "reading-time";
 import getHTML from "../_utils/MarkdownToHTML";
@@ -9,9 +11,20 @@ import { Badge } from "./ui/Badge";
 
 const ReadComponent: React.FC<{
     readModel: ReadModel;
-}> = ({ readModel }) => {
+    backHref?: string;
+    backLabel?: string;
+}> = ({ readModel, backHref, backLabel }) => {
     return (
         <ReadingShell>
+            {backHref && (
+                <Link
+                    href={backHref}
+                    className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                    <FaArrowLeft className="text-xs" />
+                    {backLabel ?? "Back"}
+                </Link>
+            )}
             <header className="mb-6 border-b border-border pb-6">
                 {readModel.category && (
                     <Badge className="mb-3">{readModel.category}</Badge>

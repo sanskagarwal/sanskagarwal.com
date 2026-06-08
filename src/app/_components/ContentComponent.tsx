@@ -329,7 +329,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                     className="mt-8 flex flex-col items-center gap-2"
                     aria-label="Pagination"
                 >
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex flex-wrap items-center justify-center gap-1">
                     <button
                         className="rounded p-2 hover:bg-accent disabled:opacity-40"
                         onClick={() => setCurrentPage(1)}
