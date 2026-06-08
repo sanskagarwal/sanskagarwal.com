@@ -13,9 +13,10 @@ type Params = {
 export async function generateMetadata({
     params,
 }: {
-    params: Params;
+    params: Promise<Params>;
 }): Promise<Metadata> {
-    const blog = await getBlog(params.url);
+    const { url } = await params;
+    const blog = await getBlog(url);
 
     if (!blog) {
         return { title: "Not Found" };
@@ -27,8 +28,9 @@ export async function generateMetadata({
     };
 }
 
-const BlogPage = async ({ params }: { params: Params }) => {
-    const blog = await getBlog(params.url);
+const BlogPage = async ({ params }: { params: Promise<Params> }) => {
+    const { url } = await params;
+    const blog = await getBlog(url);
 
     if (!blog) {
         notFound();

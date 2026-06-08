@@ -110,7 +110,7 @@ export const ContentList: React.FC<ContentListProps> = ({
     const itemList = items as Item[];
 
     useEffect(() => {
-        let newLabelColors: { [key: string]: string } = {};
+        const newLabelColors: { [key: string]: string } = {};
         let colorIndex = 1;
         itemList?.forEach((item: Item) => {
             if (!newLabelColors[item.category]) {

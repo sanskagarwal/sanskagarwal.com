@@ -130,7 +130,7 @@ const getHTML = (content: string) => {
                         }
 
                         return match ? (
-                            // @ts-ignore
+                            // @ts-expect-error style prop typing mismatch with react-syntax-highlighter
                             <SyntaxHighlighter
                                 {...rest}
                                 PreTag="div"

@@ -1,5 +1,5 @@
 export interface ReadModel {
-    id: Number;
+    id: number;
     title: string;
     published_at: Date;
     content: string;

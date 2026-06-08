@@ -16,7 +16,7 @@ const pool = new Pool({
 
 export const executeWithRetry = async <T>(
     query: string,
-    params: any[] = [],
+    params: unknown[] = [],
     retries: number = 3
 ): Promise<T> => {
     return await retry(
