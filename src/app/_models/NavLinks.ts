@@ -1,8 +1,8 @@
-import { SemanticCOLORS, SemanticICONS } from "semantic-ui-react";
+import { IconType } from "react-icons";
 
 export interface NavLinks {
     name: string;
     url: string;
-    color?: SemanticCOLORS;
-    icon: SemanticICONS;
+    colorClass?: string;
+    icon: IconType;
 }
