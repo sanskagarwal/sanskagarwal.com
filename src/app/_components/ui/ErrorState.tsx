@@ -31,5 +31,3 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         {onRetry && <Button onClick={onRetry}>Try again</Button>}
     </div>
 );
-
-export default ErrorState;

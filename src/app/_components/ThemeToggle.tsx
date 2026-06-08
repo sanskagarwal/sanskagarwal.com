@@ -8,6 +8,9 @@ const ThemeToggle: React.FC = () => {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // Reads the theme the inline <head> script already applied to <html>;
+        // this is only knowable client-side, so syncing state here is intended.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDark(document.documentElement.classList.contains("dark"));
         setMounted(true);
     }, []);

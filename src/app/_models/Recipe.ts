@@ -11,7 +11,7 @@ export interface Recipe {
     servings: string;
 }
 
-export interface Keyword {
+interface Keyword {
     id: string;
     label: string;
 }

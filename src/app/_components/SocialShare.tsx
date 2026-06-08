@@ -30,6 +30,8 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
     const [url, setUrl] = useState("");
 
     useEffect(() => {
+        // window.location is only available after mount (undefined during SSR).
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setUrl(window.location.href);
     }, []);
 

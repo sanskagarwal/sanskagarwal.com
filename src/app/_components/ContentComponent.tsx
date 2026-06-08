@@ -155,23 +155,28 @@ export const ContentList: React.FC<ContentListProps> = ({
     );
 
     const pageCount = Math.ceil(filteredItems.length / itemsPerPage);
+
+    // If active filters shrink the list past the current page, snap back to the
+    // first page during render — React recommends this over a state-syncing
+    // effect (https://react.dev/learn/you-might-not-need-an-effect).
+    if (currentPage > pageCount && pageCount > 0) {
+        setCurrentPage(1);
+    }
+
     const paginatedItems = filteredItems.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
 
-    useEffect(() => {
-        if (currentPage > pageCount && pageCount > 0) setCurrentPage(1);
-    }, [currentPage, pageCount]);
-
     // Hydrate filter/search state from the URL on mount (shareable links).
+    // window.location is only readable client-side, so this effect is required.
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const q = params.get("q");
         const category = params.get("category");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (q) setSearchTerm(q);
         if (category) setActiveLabel(category);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Reflect filter/search state back into the URL without a navigation.

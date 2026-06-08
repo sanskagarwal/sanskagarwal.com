@@ -3,7 +3,7 @@ import React from "react";
 import { cn } from "../../_utils/cn";
 
 /** Animated placeholder block used while content loads. */
-export const Skeleton: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+const Skeleton: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
     className,
     ...props
 }) => (
@@ -38,5 +38,3 @@ export const CardGridSkeleton: React.FC<{ count?: number }> = ({
         <span className="sr-only">Loading…</span>
     </div>
 );
-
-export default Skeleton;

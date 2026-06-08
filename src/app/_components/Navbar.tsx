@@ -121,6 +121,8 @@ const Navbar: React.FC = () => {
     const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
+        // Close the mobile drawer whenever the route changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setOpen(false);
     }, [pathname]);
 

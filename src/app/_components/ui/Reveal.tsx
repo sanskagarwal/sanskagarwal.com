@@ -71,5 +71,3 @@ export const Reveal: React.FC<RevealProps> = ({
         </MotionTag>
     );
 };
-
-export default Reveal;

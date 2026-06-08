@@ -9,7 +9,6 @@ import {
 } from "react-icons/fa6";
 
 import { Constants } from "./_utils/Constants";
-import { socialLinks } from "./_utils/SocialLinks";
 import { getBlogs } from "./_dataprovider/BlogDataProvider";
 import { getNotes } from "./_dataprovider/NoteDataProvider";
 import { Button } from "./_components/ui/Button";
