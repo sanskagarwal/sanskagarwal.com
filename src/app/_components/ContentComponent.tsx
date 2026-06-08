@@ -3,23 +3,86 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    Button,
-    Card,
-    CardContent,
-    CardDescription,
-    CardMeta,
-    Label,
-    SemanticCOLORS,
-    Input,
-    Pagination,
-    Icon,
-} from "semantic-ui-react";
+    FaMagnifyingGlass,
+    FaCircleInfo,
+    FaSpinner,
+    FaEllipsis,
+    FaAnglesLeft,
+    FaAnglesRight,
+    FaAngleLeft,
+    FaAngleRight,
+} from "react-icons/fa6";
 import { Constants } from "../_utils/Constants";
 import { Blog } from "../_models/Blog";
 import { Note } from "../_models/Note";
 import { ContentType } from "../_models/ContentType";
 
 type Item = Blog & Note;
+
+const colorClasses: Record<string, { solid: string; outline: string }> = {
+    red: {
+        solid: "bg-red-500 text-white border-red-500",
+        outline: "text-red-600 border-red-400 hover:bg-red-50",
+    },
+    pink: {
+        solid: "bg-pink-500 text-white border-pink-500",
+        outline: "text-pink-600 border-pink-400 hover:bg-pink-50",
+    },
+    blue: {
+        solid: "bg-blue-500 text-white border-blue-500",
+        outline: "text-blue-600 border-blue-400 hover:bg-blue-50",
+    },
+    green: {
+        solid: "bg-green-600 text-white border-green-600",
+        outline: "text-green-700 border-green-400 hover:bg-green-50",
+    },
+    violet: {
+        solid: "bg-violet-500 text-white border-violet-500",
+        outline: "text-violet-600 border-violet-400 hover:bg-violet-50",
+    },
+    purple: {
+        solid: "bg-purple-500 text-white border-purple-500",
+        outline: "text-purple-600 border-purple-400 hover:bg-purple-50",
+    },
+    orange: {
+        solid: "bg-orange-500 text-white border-orange-500",
+        outline: "text-orange-600 border-orange-400 hover:bg-orange-50",
+    },
+    brown: {
+        solid: "bg-amber-700 text-white border-amber-700",
+        outline: "text-amber-800 border-amber-500 hover:bg-amber-50",
+    },
+    yellow: {
+        solid: "bg-yellow-500 text-white border-yellow-500",
+        outline: "text-yellow-700 border-yellow-400 hover:bg-yellow-50",
+    },
+    olive: {
+        solid: "bg-lime-600 text-white border-lime-600",
+        outline: "text-lime-700 border-lime-400 hover:bg-lime-50",
+    },
+    teal: {
+        solid: "bg-teal-500 text-white border-teal-500",
+        outline: "text-teal-600 border-teal-400 hover:bg-teal-50",
+    },
+};
+
+const getColor = (name?: string) => colorClasses[name ?? ""] ?? colorClasses.blue;
+
+const getPageItems = (
+    current: number,
+    total: number
+): (number | "ellipsis")[] => {
+    if (total <= 1) return total === 1 ? [1] : [];
+    const items: (number | "ellipsis")[] = [];
+    const left = Math.max(2, current - 1);
+    const right = Math.min(total - 1, current + 1);
+    items.push(1);
+    if (left > 2) items.push("ellipsis");
+    for (let p = left; p <= right; p++) items.push(p);
+    if (right < total - 1) items.push("ellipsis");
+    items.push(total);
+    return items;
+};
 
 type ContentListProps = {
     items: (Blog | Note)[];
@@ -38,7 +101,7 @@ export const ContentList: React.FC<ContentListProps> = ({
 
     const [activeLabel, setActiveLabel] = useState("all");
     const [labelColors, setLabelColors] = useState<{
-        [key: string]: SemanticCOLORS;
+        [key: string]: string;
     }>({});
     const [loadingLinks, setLoadingLinks] = useState<{
         [key: string]: boolean;
@@ -47,19 +110,17 @@ export const ContentList: React.FC<ContentListProps> = ({
     const itemList = items as Item[];
 
     useEffect(() => {
-        let newLabelColors: { [key: string]: SemanticCOLORS } = {};
+        let newLabelColors: { [key: string]: string } = {};
         let colorIndex = 1;
         itemList?.forEach((item: Item) => {
             if (!newLabelColors[item.category]) {
-                newLabelColors[item.category] = Constants.COLORS[
-                    colorIndex
-                ] as SemanticCOLORS;
+                newLabelColors[item.category] = Constants.COLORS[colorIndex];
                 colorIndex++;
             }
             newLabelColors["all"] = "red";
         });
 
-        const sortedLabelColors: { [key: string]: SemanticCOLORS } = {};
+        const sortedLabelColors: { [key: string]: string } = {};
         Object.keys(newLabelColors)
             .sort()
             .forEach((key) => {
@@ -97,51 +158,54 @@ export const ContentList: React.FC<ContentListProps> = ({
         currentPage * itemsPerPage
     );
 
-    const handlePageChange = (_: any, data: any) => {
-        setCurrentPage(data.activePage);
-    };
-
-    const changeActiveLabel = (e: any) => {
-        setActiveLabel(e.target.innerText);
+    const changeActiveLabel = (label: string) => {
+        setActiveLabel(label);
         setCurrentPage(1);
     };
 
     const createLabels = () => (
-        <div>
-            {Object.keys(labelColors).map((label: string) => (
-                <Button
-                    className="!py-1.5 !text-sm !font-semibold"
-                    key={label}
-                    as="a"
-                    active={label === activeLabel}
-                    onClick={changeActiveLabel}
-                    inverted
-                    color={labelColors[label]}
-                >
-                    {label}
-                </Button>
-            ))}
+        <div className="flex flex-wrap gap-2">
+            {Object.keys(labelColors).map((label: string) => {
+                const color = getColor(labelColors[label]);
+                const isActive = label === activeLabel;
+                return (
+                    <button
+                        className={`px-3 py-1.5 text-sm font-semibold rounded border capitalize transition-colors ${
+                            isActive ? color.solid : color.outline
+                        }`}
+                        key={label}
+                        onClick={() => changeActiveLabel(label)}
+                    >
+                        {label}
+                    </button>
+                );
+            })}
         </div>
     );
 
+    const pageItems = getPageItems(currentPage, pageCount);
+
     return (
         <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full">
                 {labelColors && createLabels()}
-                <Input
-                    icon="search"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setCurrentPage(1);
-                    }}
-                    className="sm:w-64 w-full"
-                />
+                <div className="relative sm:w-64 w-full">
+                    <FaMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                </div>
             </div>
             {showBanner && (
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-sm text-sm flex items-center gap-2">
-                    <i className="info circle icon" aria-hidden="true"></i>
+                    <FaCircleInfo aria-hidden="true" />
                     <span>
                         <strong>Note:</strong> The following notes are AI
                         converted. For the most accurate and complete
@@ -156,22 +220,25 @@ export const ContentList: React.FC<ContentListProps> = ({
                     </div>
                 )}
                 {paginatedItems.map((item: Item) => {
+                    const ribbon = getColor(labelColors[item.category]);
                     return (
-                        <Card className="ui card !m-0" key={item.id.toString()}>
-                            <CardContent className="!grow-0">
-                                <Label
-                                    as="a"
-                                    ribbon
-                                    active={item.category === activeLabel}
-                                    onClick={changeActiveLabel}
-                                    color={labelColors[item.category]}
+                        <div
+                            className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+                            key={item.id.toString()}
+                        >
+                            <div className="p-4 pb-0">
+                                <button
+                                    onClick={() =>
+                                        changeActiveLabel(item.category)
+                                    }
+                                    className={`inline-block px-2 py-0.5 text-xs font-semibold rounded text-white capitalize mb-2 ${ribbon.solid}`}
                                 >
                                     {item.category}
-                                </Label>
-                                <span className="font-bold">{item.title}</span>
-                            </CardContent>
-                            <CardContent>
-                                <CardMeta>
+                                </button>
+                                <div className="font-bold">{item.title}</div>
+                            </div>
+                            <div className="p-4 grow">
+                                <div className="text-sm text-gray-500 mb-1">
                                     {new Date(
                                         item.published_at
                                     ).toLocaleDateString(undefined, {
@@ -179,20 +246,14 @@ export const ContentList: React.FC<ContentListProps> = ({
                                         month: "short",
                                         day: "numeric",
                                     })}
-                                </CardMeta>
-                                <CardDescription>
+                                </div>
+                                <div className="text-gray-700">
                                     {item.summary}
-                                </CardDescription>
-                            </CardContent>
-                            <div
-                                className={`ui bottom attached ${
-                                    contentType === ContentType.Note
-                                        ? "two"
-                                        : ""
-                                } buttons`}
-                            >
+                                </div>
+                            </div>
+                            <div className="flex border-t border-gray-200">
                                 <Link
-                                    className="ui primary button"
+                                    className="flex-1 flex items-center justify-center py-2 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
                                     href={`/${
                                         contentType === ContentType.Note
                                             ? "notes"
@@ -210,14 +271,14 @@ export const ContentList: React.FC<ContentListProps> = ({
                                     }}
                                 >
                                     {loadingLinks[item.id.toString()] ? (
-                                        <i className="loading spinner icon" />
+                                        <FaSpinner className="animate-spin" />
                                     ) : (
                                         "Read"
                                     )}
                                 </Link>
                                 {contentType === ContentType.Note && (
                                     <Link
-                                        className="ui button"
+                                        className="flex-1 flex items-center justify-center py-2 bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition-colors border-l border-gray-200"
                                         href={item.note_link}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -226,37 +287,70 @@ export const ContentList: React.FC<ContentListProps> = ({
                                     </Link>
                                 )}
                             </div>
-                        </Card>
+                        </div>
                     );
                 })}
             </div>
-            <Pagination
-                activePage={currentPage}
-                totalPages={pageCount}
-                onPageChange={handlePageChange}
-                className="mt-6"
-                siblingRange={1}
-                ellipsisItem={{
-                    content: <Icon name="ellipsis horizontal" />,
-                    icon: true,
-                }}
-                firstItem={{
-                    content: <Icon name="angle double left" />,
-                    icon: true,
-                }}
-                lastItem={{
-                    content: <Icon name="angle double right" />,
-                    icon: true,
-                }}
-                prevItem={{
-                    content: <Icon name="angle left" />,
-                    icon: true,
-                }}
-                nextItem={{
-                    content: <Icon name="angle right" />,
-                    icon: true,
-                }}
-            />
+            {pageCount > 1 && (
+                <nav className="mt-6 flex items-center gap-1">
+                    <button
+                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                        aria-label="First page"
+                    >
+                        <FaAnglesLeft />
+                    </button>
+                    <button
+                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        aria-label="Previous page"
+                    >
+                        <FaAngleLeft />
+                    </button>
+                    {pageItems.map((item, idx) =>
+                        item === "ellipsis" ? (
+                            <span
+                                key={`e${idx}`}
+                                className="px-2 text-gray-400"
+                            >
+                                <FaEllipsis />
+                            </span>
+                        ) : (
+                            <button
+                                key={item}
+                                onClick={() => setCurrentPage(item)}
+                                className={`min-w-9 px-3 py-1.5 rounded text-sm font-semibold ${
+                                    item === currentPage
+                                        ? "bg-blue-600 text-white"
+                                        : "hover:bg-gray-100"
+                                }`}
+                            >
+                                {item}
+                            </button>
+                        )
+                    )}
+                    <button
+                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        onClick={() =>
+                            setCurrentPage((p) => Math.min(pageCount, p + 1))
+                        }
+                        disabled={currentPage === pageCount}
+                        aria-label="Next page"
+                    >
+                        <FaAngleRight />
+                    </button>
+                    <button
+                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        onClick={() => setCurrentPage(pageCount)}
+                        disabled={currentPage === pageCount}
+                        aria-label="Last page"
+                    >
+                        <FaAnglesRight />
+                    </button>
+                </nav>
+            )}
         </div>
     );
 };
