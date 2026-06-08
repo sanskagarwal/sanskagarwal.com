@@ -56,7 +56,7 @@ const getHTML = (content: string) => {
                     h1({ node, ...props }) {
                         return (
                             <h1
-                                className="text-3xl font-bold mt-6 mb-3"
+                                className="text-2xl sm:text-3xl font-bold mt-6 mb-3"
                                 {...props}
                             />
                         );
@@ -128,13 +128,16 @@ const getHTML = (content: string) => {
                     },
                     ul({ node, ...props }) {
                         return (
-                            <ul className="list-disc ml-6 my-2" {...props} />
+                            <ul
+                                className="list-disc ml-5 sm:ml-6 my-2"
+                                {...props}
+                            />
                         );
                     },
                     ol({ node, ...props }) {
                         return (
                             <ol
-                                className="list-decimal ml-6 my-2"
+                                className="list-decimal ml-5 sm:ml-6 my-2"
                                 {...props}
                             />
                         );
@@ -188,10 +191,12 @@ const getHTML = (content: string) => {
                     },
                     table({ node, ...props }) {
                         return (
-                            <table
-                                className="w-full border-collapse my-4"
-                                {...props}
-                            />
+                            <div className="table-scroll">
+                                <table
+                                    className="w-full border-collapse"
+                                    {...props}
+                                />
+                            </div>
                         );
                     },
                     code(props) {

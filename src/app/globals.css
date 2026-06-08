@@ -205,10 +205,22 @@ button:not(:disabled),
 .blog-content {
     font-size: 1.0625rem;
     line-height: 1.75;
+    /* Long URLs / unbreakable strings should wrap instead of forcing the
+       whole page to scroll horizontally on small screens. */
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .blog-content p {
     margin: 0 0 1em;
+}
+
+/* Display (block) math can be wider than a phone viewport; let it scroll
+   on its own axis rather than overflowing the page. */
+.blog-content .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-block: 0.25rem;
 }
 
 .blog-content p:last-child {
@@ -220,6 +232,13 @@ button:not(:disabled),
     border: 1px solid var(--border);
     padding: 0.5rem;
     text-align: left;
+}
+
+/* Wide tables scroll horizontally within their own container instead of
+   overflowing the viewport on mobile. */
+.blog-content .table-scroll {
+    overflow-x: auto;
+    margin: 1rem 0;
 }
 
 .blog-content :not(pre) > code {

@@ -47,7 +47,7 @@ const Home = async () => {
     return (
         <div className="mx-auto w-full max-w-5xl px-5 py-12 md:px-8 lg:px-12">
             {/* Hero */}
-            <section className="flex flex-col-reverse items-center gap-8 md:flex-row md:items-center md:justify-between">
+            <section className="flex flex-col-reverse items-center gap-6 sm:gap-8 md:flex-row md:items-center md:justify-between">
                 <div className="text-center md:text-left">
                     <p className="text-sm font-semibold uppercase tracking-widest text-primary">
                         Software Engineer
