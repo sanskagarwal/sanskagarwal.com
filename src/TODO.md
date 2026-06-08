@@ -13,8 +13,19 @@ Scope: `src/` Next.js 16 app only. Direction: **ground-up redesign for the homep
 
 ## 🟡 Medium — incremental UX, perf, consistency
 
+### Page redesigns (apply new design system/tokens)
+
+- [ ] **Blog list page** redesign — `src/app/blog/page.tsx` + `src/app/_components/ContentComponent.tsx`.
+- [ ] **Notes list page** redesign (incl. AI-conversion banner) — `src/app/notes/page.tsx`.
+- [ ] **Blog/Note read page** redesign — typography, share, comments, theme-aware code blocks — `src/app/_components/ReadComponent.tsx`, `src/app/_utils/MarkdownToHTML.tsx`.
+- [ ] **Recipes page** redesign — `src/app/recipes/page.tsx` + `src/app/_components/RecipeList.tsx`.
+- [ ] **Resume page** redesign — viewer chrome, loading/skeleton, download — `src/app/resume/page.tsx` + `src/app/_components/ResumeViewer.tsx`.
+- [ ] **Error / loading / not-found** states restyle across routes — `src/app/blog/[url]/{error,loading,not-found}.tsx`, `src/app/notes/[url]/*`.
+
+### Other
+
 - [ ] Incrementally split & polish the content list (reusable Card/Badge/Pagination, server-side filtering instead of loading all items) — `src/app/_components/ContentComponent.tsx`.
-- [ ] Refine layout shell + responsive sidebar/nav (apply new design tokens) — `src/app/layout.tsx`, `src/app/_components/Navbar.tsx`.
+- [x] Refine layout shell + responsive sidebar/nav (apply new design tokens) — `src/app/layout.tsx`, `src/app/_components/Navbar.tsx`.
 - [ ] Image optimization for recipes + lazy-load heavy libs (mermaid, react-pdf) — `src/app/_components/RecipeList.tsx`, `src/app/_components/ResumeViewer.tsx`.
 - [ ] SEO: `sitemap.ts`, robots, per-page metadata, OG images, JSON-LD.
 - [ ] Set Mermaid `securityLevel` + add CSP headers — `src/app/_components/Mermaid.tsx`, `src/next.config.js`.
