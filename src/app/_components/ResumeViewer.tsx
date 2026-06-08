@@ -47,12 +47,18 @@ const ResumeViewer: React.FC = () => {
                     </div>
                 )}
 
-                <Document loading="" file={encodeURI(Constants.Resume_URI)}>
+                <Document
+                    loading=""
+                    file={encodeURI(Constants.Resume_URI)}
+                    className="overflow-hidden rounded-md shadow-md"
+                >
                     <Page
                         scale={
                             isXs ? 0.6 : isSm ? 0.9 : isMd ? 1 : isLg ? 1.25 : 1.5
                         }
                         pageNumber={1}
+                        renderTextLayer={false}
+                        renderAnnotationLayer={false}
                         onLoadSuccess={() => setIsLoading(false)}
                     />
                 </Document>

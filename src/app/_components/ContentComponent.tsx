@@ -265,7 +265,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                             </CardContent>
                             <CardFooter>
                                 <Link
-                                    className="flex flex-1 items-center justify-center bg-primary py-2 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                                    className="flex h-11 flex-1 items-center justify-center bg-primary font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                                     href={`/${isNote ? "notes" : "blog"}/${
                                         isNote ? item.note_url : item.blog_url
                                     }`}
@@ -284,7 +284,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                                 </Link>
                                 {isNote && (
                                     <Link
-                                        className="flex flex-1 items-center justify-center gap-1.5 border-l border-border bg-accent py-2 font-semibold text-accent-foreground transition-colors hover:bg-muted"
+                                        className="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-border bg-accent font-semibold text-accent-foreground transition-colors hover:bg-muted"
                                         href={item.note_link}
                                         target="_blank"
                                         rel="noopener noreferrer"

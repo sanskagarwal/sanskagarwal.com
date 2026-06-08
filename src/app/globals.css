@@ -109,3 +109,15 @@ body {
     border-radius: 0.25rem;
     font-size: 0.9em;
 }
+
+.blog-content pre {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.blog-content pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 0.875rem;
+}

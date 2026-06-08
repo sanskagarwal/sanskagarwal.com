@@ -142,7 +142,7 @@ const getHTML = (content: string) => {
                             // @ts-expect-error style prop typing mismatch with react-syntax-highlighter
                             <SyntaxHighlighter
                                 {...rest}
-                                PreTag="div"
+                                PreTag="pre"
                                 language={language}
                                 style={atomOneDark}
                                 customStyle={{

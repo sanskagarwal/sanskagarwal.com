@@ -103,7 +103,7 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                             </div>
                             <CardFooter>
                                 <button
-                                    className="flex flex-1 items-center justify-center bg-accent py-2 font-semibold text-accent-foreground transition-colors hover:bg-muted"
+                                    className="flex h-11 flex-1 items-center justify-center bg-accent font-semibold text-accent-foreground transition-colors hover:bg-muted"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         handleGetLink(recipe.id);
