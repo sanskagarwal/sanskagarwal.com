@@ -2,7 +2,7 @@ import { getNotes } from "../_dataprovider/NoteDataProvider";
 import { ContentList } from "../_components/ContentComponent";
 import { ContentType } from "../_models/ContentType";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 const NoteList = async () => {
     const notes = await getNotes();

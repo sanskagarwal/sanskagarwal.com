@@ -7,9 +7,9 @@ Scope: `src/` Next.js 16 app only. Direction: **ground-up redesign for the homep
 - [x] Design-system foundation: add `next/font`, define design tokens (colors/spacing/typography), dark mode, and base UI primitives (Button, Card, Badge, Input) — `src/app/globals.css`, new `src/app/_components/ui/`.
 - [x] **Ground-up homepage redesign**: convert from `"use client"` to a static server component; build a cohesive hero + about + featured content/links sections; drop rigid `h-3/6 xl:h-4/6` fractional heights and the fixed-cell SVG grid — `src/app/page.tsx`.
 - [x] Introduce a shared repository/query layer; remove `SELECT *`, dedupe try/catch, add row→model mapping — `src/app/_dataprovider/`.
-- [ ] Harden DB pool: fix `ssl.rejectUnauthorized`, add env validation, use `bail` for non-transient errors, replace noisy `console.log` — `src/app/_dataprovider/RetryQuery.ts`.
-- [ ] Move hardcoded production URLs to env vars — `src/app/_utils/Constants.ts`.
-- [ ] Replace `export const dynamic = "force-dynamic"` with `revalidate`/cache tags across pages.
+- [x] Harden DB pool: fix `ssl.rejectUnauthorized`, add env validation, use `bail` for non-transient errors, replace noisy `console.log` — `src/app/_dataprovider/RetryQuery.ts`.
+- [x] Move hardcoded production URLs to env vars — `src/app/_utils/Constants.ts`.
+- [x] Replace `export const dynamic = "force-dynamic"` with `revalidate`/cache tags across pages.
 
 ## 🟡 Medium — incremental UX, perf, consistency
 

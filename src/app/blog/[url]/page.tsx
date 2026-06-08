@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getBlog } from "@/app/_dataprovider/BlogDataProvider";
 import ReadComponent from "@/app/_components/ReadComponent";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type Params = {
     url: string;
