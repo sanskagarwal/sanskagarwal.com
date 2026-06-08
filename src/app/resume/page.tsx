@@ -4,7 +4,7 @@ import React from "react";
 import { pdfjs, Document, Page } from "react-pdf";
 import { useMediaQuery } from "react-responsive";
 import { List } from "react-content-loader";
-import { Icon } from "semantic-ui-react";
+import { FaDownload } from "react-icons/fa6";
 
 import { Constants } from "../_utils/Constants";
 
@@ -39,7 +39,7 @@ const Resume: React.FC = () => {
                         rel="noreferrer"
                     >
                         <span>Download Resume</span>
-                        <Icon name="download" />
+                        <FaDownload />
                     </a>
                 )}
                 <Document loading="" file={encodeURI(Constants.Resume_URI)}>
