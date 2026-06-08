@@ -15,9 +15,11 @@ const ReadComponent: React.FC<{
                     shadow-2xl md:shadow-lg"
             >
                 <div>
-                    <div className="ui text">
-                        <h1 className="ui header">{readModel.title}</h1>
-                        <p className="ui text-gray-600">
+                    <div>
+                        <h1 className="text-3xl font-bold mb-2">
+                            {readModel.title}
+                        </h1>
+                        <p className="text-gray-600 mb-4">
                             {`${new Date(
                                 readModel.published_at
                             ).toLocaleDateString(undefined, {

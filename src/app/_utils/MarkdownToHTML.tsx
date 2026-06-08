@@ -24,22 +24,52 @@ const getHTML = (content: string) => {
                         );
                     },
                     h1({ node, ...props }) {
-                        return <h1 className="ui header" {...props} />;
+                        return (
+                            <h1
+                                className="text-3xl font-bold mt-6 mb-3"
+                                {...props}
+                            />
+                        );
                     },
                     h2({ node, ...props }) {
-                        return <h2 className="ui header" {...props} />;
+                        return (
+                            <h2
+                                className="text-2xl font-bold mt-5 mb-3"
+                                {...props}
+                            />
+                        );
                     },
                     h3({ node, ...props }) {
-                        return <h3 className="ui header" {...props} />;
+                        return (
+                            <h3
+                                className="text-xl font-semibold mt-4 mb-2"
+                                {...props}
+                            />
+                        );
                     },
                     h4({ node, ...props }) {
-                        return <h4 className="ui header" {...props} />;
+                        return (
+                            <h4
+                                className="text-lg font-semibold mt-4 mb-2"
+                                {...props}
+                            />
+                        );
                     },
                     h5({ node, ...props }) {
-                        return <h5 className="ui header" {...props} />;
+                        return (
+                            <h5
+                                className="text-base font-semibold mt-3 mb-2"
+                                {...props}
+                            />
+                        );
                     },
                     h6({ node, ...props }) {
-                        return <h6 className="ui header" {...props} />;
+                        return (
+                            <h6
+                                className="text-sm font-semibold mt-3 mb-2"
+                                {...props}
+                            />
+                        );
                     },
                     img({ node, ...props }) {
                         return (
@@ -50,25 +80,41 @@ const getHTML = (content: string) => {
                         );
                     },
                     blockquote({ node, ...props }) {
-                        // @ts-ignore
-                        return <p className="ui message" {...props} />;
+                        return (
+                            <blockquote
+                                className="border-l-4 border-blue-300 bg-blue-50 p-3 my-3 rounded"
+                                {...props}
+                            />
+                        );
                     },
                     ul({ node, ...props }) {
-                        return <ul className="ui list" {...props} />;
+                        return (
+                            <ul className="list-disc ml-6 my-2" {...props} />
+                        );
                     },
                     ol({ node, ...props }) {
-                        return <ol className="ui ordered list" {...props} />;
+                        return (
+                            <ol
+                                className="list-decimal ml-6 my-2"
+                                {...props}
+                            />
+                        );
                     },
                     li({ node, ...props }) {
-                        return <li className="ui item" {...props} />;
+                        return <li className="my-1" {...props} />;
                     },
                     hr({ node, ...props }) {
-                        return <div className="ui divider" {...props} />;
+                        return (
+                            <hr
+                                className="my-4 border-t border-gray-300"
+                                {...props}
+                            />
+                        );
                     },
                     table({ node, ...props }) {
                         return (
                             <table
-                                className="ui selectable celled table"
+                                className="w-full border-collapse my-4"
                                 {...props}
                             />
                         );
