@@ -3,13 +3,7 @@
 import React, { useState } from "react";
 import { Recipe } from "../_models/Recipe";
 import { fetchRecipeLink } from "../_actions/recipes";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardMeta,
-} from "semantic-ui-react";
+import { FaSpinner, FaClock, FaPause, FaUsers } from "react-icons/fa6";
 import Image from "next/image";
 
 const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
@@ -48,7 +42,10 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                             new Date(a.created_at).getTime()
                     )
                     .map((recipe: Recipe) => (
-                        <Card className="ui card !m-0" key={recipe.id.toString()}>
+                        <div
+                            className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+                            key={recipe.id.toString()}
+                        >
                             <Image
                                 src={recipe.image}
                                 alt={recipe.name}
@@ -62,54 +59,53 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                                 }}
                                 unoptimized
                             />
-                            <CardContent>
-                                <CardHeader>{recipe.name}</CardHeader>
-                                <CardMeta>
+                            <div className="p-4 grow">
+                                <div className="font-bold text-lg mb-1">
+                                    {recipe.name}
+                                </div>
+                                <div className="flex flex-wrap gap-1 mb-2">
                                     {recipe.keywords.map((keyword) => {
                                         return (
                                             <span
-                                                className="ui label"
+                                                className="inline-block px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700"
                                                 key={keyword.id}
                                             >
                                                 {keyword.label}
                                             </span>
                                         );
                                     })}
-                                </CardMeta>
-                                <CardDescription>
+                                </div>
+                                <div className="text-gray-700 text-sm">
                                     {recipe.description}
-                                </CardDescription>
-                            </CardContent>
-                            <CardContent extra className="self-center">
-                                <CardMeta>
-                                    <span className="ui grey label">
-                                        <i className="clock icon"></i>{" "}
-                                        {recipe.working_time} min
+                                </div>
+                            </div>
+                            <div className="px-4 pb-4 self-center">
+                                <div className="flex flex-wrap gap-1 justify-center">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">
+                                        <FaClock /> {recipe.working_time} min
                                     </span>
-                                    <span className="ui brown label">
-                                        <i className="pause icon"></i>{" "}
-                                        {recipe.waiting_time} min
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-amber-100 text-amber-800">
+                                        <FaPause /> {recipe.waiting_time} min
                                     </span>
-                                    <span className="ui blue label">
-                                        <i className="users icon"></i>{" "}
-                                        {recipe.servings} servings
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800">
+                                        <FaUsers /> {recipe.servings} servings
                                     </span>
-                                </CardMeta>
-                            </CardContent>
+                                </div>
+                            </div>
                             <button
-                                className="ui bottom attached button"
+                                className="flex items-center justify-center py-2 bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition-colors border-t border-gray-200"
                                 onClick={(e) => {
                                     e.preventDefault();
                                     handleGetLink(recipe.id);
                                 }}
                             >
                                 {loadingLinks[recipe.id] ? (
-                                    <i className="loading spinner icon" />
+                                    <FaSpinner className="animate-spin" />
                                 ) : (
                                     "View"
                                 )}
                             </button>
-                        </Card>
+                        </div>
                     ))}
             </div>
         </div>
