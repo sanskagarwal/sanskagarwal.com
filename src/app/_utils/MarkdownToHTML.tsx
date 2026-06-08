@@ -129,7 +129,8 @@ const getHTML = (content: string) => {
                         );
                     },
                     code(props) {
-                        const { children, className, node, ...rest } = props;
+                        const { children, className, node, ref, ...rest } =
+                            props;
                         const match = /language-(\w+)/.exec(className || "");
                         const language = match ? match[1] : "";
                         const content = String(children).replace(/\n$/, "");
@@ -139,7 +140,6 @@ const getHTML = (content: string) => {
                         }
 
                         return match ? (
-                            // @ts-expect-error style prop typing mismatch with react-syntax-highlighter
                             <SyntaxHighlighter
                                 {...rest}
                                 PreTag="pre"
