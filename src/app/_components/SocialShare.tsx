@@ -11,9 +11,20 @@ import {
     TwitterShareButton,
     XIcon,
 } from "react-share";
-import { Popup } from "semantic-ui-react";
 
 import { ReadModel } from "../_models/ReadModel";
+
+const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
+    content,
+    children,
+}) => (
+    <span className="relative inline-flex group">
+        {children}
+        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+            {content}
+        </span>
+    </span>
+);
 
 const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
     const [url, setUrl] = useState("");
@@ -23,63 +34,45 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
     }, []);
 
     return (
-        <div className="ui center aligned segment">
-            <h4 className="ui header">Share this</h4>
-            <div className="inline">
-                <Popup
-                    trigger={
-                        <EmailShareButton
-                            url={url}
-                            subject={`Check out this read: ${readModel.title}`}
-                            body={`I found this read interesting and thought you might like it too! Link: ${url}`}
-                            className="ui button"
-                        >
-                            <EmailIcon size={32} round />
-                        </EmailShareButton>
-                    }
-                    content="Share via Email"
-                />
+        <div className="text-center p-4 my-4 border border-gray-200 rounded-lg">
+            <h4 className="text-lg font-semibold mb-3">Share this</h4>
+            <div className="inline-flex gap-2">
+                <Tooltip content="Share via Email">
+                    <EmailShareButton
+                        url={url}
+                        subject={`Check out this read: ${readModel.title}`}
+                        body={`I found this read interesting and thought you might like it too! Link: ${url}`}
+                    >
+                        <EmailIcon size={32} round />
+                    </EmailShareButton>
+                </Tooltip>
 
-                <Popup
-                    trigger={
-                        <TwitterShareButton
-                            url={url}
-                            title={readModel.title}
-                            hashtags={[readModel.category]}
-                            className="ui button"
-                        >
-                            <XIcon size={32} round />
-                        </TwitterShareButton>
-                    }
-                    content="Share on X"
-                />
+                <Tooltip content="Share on X">
+                    <TwitterShareButton
+                        url={url}
+                        title={readModel.title}
+                        hashtags={[readModel.category]}
+                    >
+                        <XIcon size={32} round />
+                    </TwitterShareButton>
+                </Tooltip>
 
-                <Popup
-                    trigger={
-                        <LinkedinShareButton
-                            url={url}
-                            title={readModel.title}
-                            summary={readModel.summary}
-                            source="Sanskar's Website"
-                            className="ui button"
-                        >
-                            <LinkedinIcon size={32} round />
-                        </LinkedinShareButton>
-                    }
-                    content="Share on LinkedIn"
-                />
-                <Popup
-                    trigger={
-                        <RedditShareButton
-                            url={url}
-                            title={readModel.title}
-                            className="ui button"
-                        >
-                            <RedditIcon size={32} round />
-                        </RedditShareButton>
-                    }
-                    content="Share on Reddit"
-                />
+                <Tooltip content="Share on LinkedIn">
+                    <LinkedinShareButton
+                        url={url}
+                        title={readModel.title}
+                        summary={readModel.summary}
+                        source="Sanskar's Website"
+                    >
+                        <LinkedinIcon size={32} round />
+                    </LinkedinShareButton>
+                </Tooltip>
+
+                <Tooltip content="Share on Reddit">
+                    <RedditShareButton url={url} title={readModel.title}>
+                        <RedditIcon size={32} round />
+                    </RedditShareButton>
+                </Tooltip>
             </div>
         </div>
     );
