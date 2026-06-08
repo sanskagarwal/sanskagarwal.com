@@ -1,17 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Recipe } from "../_models/Recipe";
 import { fetchRecipeLink } from "../_actions/recipes";
 import { FaSpinner, FaClock, FaPause, FaUsers } from "react-icons/fa6";
 import Image from "next/image";
 
+import { Card, CardContent, CardFooter } from "./ui/Card";
+
 const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
-    const [loadingLinks, setLoadingLinks] = useState<{
-        [key: string]: boolean;
-    }>({});
-    const [recipeLinks, setRecipeLinks] = useState<{ [key: string]: string }>(
+    const [loadingLinks, setLoadingLinks] = useState<Record<string, boolean>>(
         {}
+    );
+    const [recipeLinks, setRecipeLinks] = useState<Record<string, string>>({});
+
+    const sorted = useMemo(
+        () =>
+            [...recipes].sort(
+                (a, b) =>
+                    new Date(b.created_at).getTime() -
+                    new Date(a.created_at).getTime()
+            ),
+        [recipes]
     );
 
     const handleGetLink = async (recipeId: string) => {
@@ -33,19 +43,22 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
     };
 
     return (
-        <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
-                {recipes
-                    .sort(
-                        (a, b) =>
-                            new Date(b.created_at).getTime() -
-                            new Date(a.created_at).getTime()
-                    )
-                    .map((recipe: Recipe) => (
-                        <div
-                            className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
-                            key={recipe.id.toString()}
-                        >
+        <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-8">
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold tracking-tight">Recipes</h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    {sorted.length} {sorted.length === 1 ? "recipe" : "recipes"}
+                </p>
+            </header>
+
+            {sorted.length === 0 ? (
+                <p className="py-12 text-center text-muted-foreground">
+                    No recipes available right now.
+                </p>
+            ) : (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {sorted.map((recipe) => (
+                        <Card key={recipe.id.toString()} className="overflow-hidden">
                             <Image
                                 src={recipe.image}
                                 alt={recipe.name}
@@ -54,60 +67,59 @@ const RecipeList: React.FC<{ recipes: Recipe[] }> = ({ recipes }) => {
                                 quality={100}
                                 style={{
                                     width: "100%",
-                                    height: "20vh",
+                                    height: "12rem",
                                     objectFit: "cover",
                                 }}
                                 unoptimized
                             />
-                            <div className="p-4 grow">
-                                <div className="font-bold text-lg mb-1">
+                            <CardContent className="grow pt-4">
+                                <h2 className="mb-1 text-lg font-bold">
                                     {recipe.name}
+                                </h2>
+                                <div className="mb-2 flex flex-wrap gap-1">
+                                    {recipe.keywords.map((keyword) => (
+                                        <span
+                                            key={keyword.id}
+                                            className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                                        >
+                                            {keyword.label}
+                                        </span>
+                                    ))}
                                 </div>
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                    {recipe.keywords.map((keyword) => {
-                                        return (
-                                            <span
-                                                className="inline-block px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700"
-                                                key={keyword.id}
-                                            >
-                                                {keyword.label}
-                                            </span>
-                                        );
-                                    })}
-                                </div>
-                                <div className="text-gray-700 text-sm">
+                                <p className="text-sm text-muted-foreground">
                                     {recipe.description}
-                                </div>
+                                </p>
+                            </CardContent>
+                            <div className="flex flex-wrap justify-center gap-1 px-4 pb-4">
+                                <span className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-xs text-foreground">
+                                    <FaClock /> {recipe.working_time} min
+                                </span>
+                                <span className="inline-flex items-center gap-1 rounded bg-amber-500/15 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-400">
+                                    <FaPause /> {recipe.waiting_time} min
+                                </span>
+                                <span className="inline-flex items-center gap-1 rounded bg-blue-500/15 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-400">
+                                    <FaUsers /> {recipe.servings} servings
+                                </span>
                             </div>
-                            <div className="px-4 pb-4 self-center">
-                                <div className="flex flex-wrap gap-1 justify-center">
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-700">
-                                        <FaClock /> {recipe.working_time} min
-                                    </span>
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-amber-100 text-amber-800">
-                                        <FaPause /> {recipe.waiting_time} min
-                                    </span>
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-800">
-                                        <FaUsers /> {recipe.servings} servings
-                                    </span>
-                                </div>
-                            </div>
-                            <button
-                                className="flex items-center justify-center py-2 bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition-colors border-t border-gray-200"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleGetLink(recipe.id);
-                                }}
-                            >
-                                {loadingLinks[recipe.id] ? (
-                                    <FaSpinner className="animate-spin" />
-                                ) : (
-                                    "View"
-                                )}
-                            </button>
-                        </div>
+                            <CardFooter>
+                                <button
+                                    className="flex flex-1 items-center justify-center bg-accent py-2 font-semibold text-accent-foreground transition-colors hover:bg-muted"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleGetLink(recipe.id);
+                                    }}
+                                >
+                                    {loadingLinks[recipe.id] ? (
+                                        <FaSpinner className="animate-spin" />
+                                    ) : (
+                                        "View"
+                                    )}
+                                </button>
+                            </CardFooter>
+                        </Card>
                     ))}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

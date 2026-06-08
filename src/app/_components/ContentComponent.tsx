@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
     FaMagnifyingGlass,
@@ -11,58 +11,62 @@ import {
     FaAnglesRight,
     FaAngleLeft,
     FaAngleRight,
+    FaArrowUpRightFromSquare,
 } from "react-icons/fa6";
 import { Constants } from "../_utils/Constants";
+import { cn } from "../_utils/cn";
 import { Blog } from "../_models/Blog";
 import { Note } from "../_models/Note";
 import { ContentType } from "../_models/ContentType";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/Card";
+import { Input } from "./ui/Input";
 
 type Item = Blog & Note;
 
 const colorClasses: Record<string, { solid: string; outline: string }> = {
     red: {
         solid: "bg-red-500 text-white border-red-500",
-        outline: "text-red-600 border-red-400 hover:bg-red-50",
+        outline: "text-red-600 dark:text-red-400 border-red-400 hover:bg-red-500/10",
     },
     pink: {
         solid: "bg-pink-500 text-white border-pink-500",
-        outline: "text-pink-600 border-pink-400 hover:bg-pink-50",
+        outline: "text-pink-600 dark:text-pink-400 border-pink-400 hover:bg-pink-500/10",
     },
     blue: {
         solid: "bg-blue-500 text-white border-blue-500",
-        outline: "text-blue-600 border-blue-400 hover:bg-blue-50",
+        outline: "text-blue-600 dark:text-blue-400 border-blue-400 hover:bg-blue-500/10",
     },
     green: {
         solid: "bg-green-600 text-white border-green-600",
-        outline: "text-green-700 border-green-400 hover:bg-green-50",
+        outline: "text-green-700 dark:text-green-400 border-green-400 hover:bg-green-500/10",
     },
     violet: {
         solid: "bg-violet-500 text-white border-violet-500",
-        outline: "text-violet-600 border-violet-400 hover:bg-violet-50",
+        outline: "text-violet-600 dark:text-violet-400 border-violet-400 hover:bg-violet-500/10",
     },
     purple: {
         solid: "bg-purple-500 text-white border-purple-500",
-        outline: "text-purple-600 border-purple-400 hover:bg-purple-50",
+        outline: "text-purple-600 dark:text-purple-400 border-purple-400 hover:bg-purple-500/10",
     },
     orange: {
         solid: "bg-orange-500 text-white border-orange-500",
-        outline: "text-orange-600 border-orange-400 hover:bg-orange-50",
+        outline: "text-orange-600 dark:text-orange-400 border-orange-400 hover:bg-orange-500/10",
     },
     brown: {
         solid: "bg-amber-700 text-white border-amber-700",
-        outline: "text-amber-800 border-amber-500 hover:bg-amber-50",
+        outline: "text-amber-800 dark:text-amber-500 border-amber-500 hover:bg-amber-700/10",
     },
     yellow: {
         solid: "bg-yellow-500 text-white border-yellow-500",
-        outline: "text-yellow-700 border-yellow-400 hover:bg-yellow-50",
+        outline: "text-yellow-700 dark:text-yellow-400 border-yellow-400 hover:bg-yellow-500/10",
     },
     olive: {
         solid: "bg-lime-600 text-white border-lime-600",
-        outline: "text-lime-700 border-lime-400 hover:bg-lime-50",
+        outline: "text-lime-700 dark:text-lime-400 border-lime-400 hover:bg-lime-500/10",
     },
     teal: {
         solid: "bg-teal-500 text-white border-teal-500",
-        outline: "text-teal-600 border-teal-400 hover:bg-teal-50",
+        outline: "text-teal-600 dark:text-teal-400 border-teal-400 hover:bg-teal-500/10",
     },
 };
 
@@ -100,57 +104,55 @@ export const ContentList: React.FC<ContentListProps> = ({
     const itemsPerPage = 9;
 
     const [activeLabel, setActiveLabel] = useState("all");
-    const [labelColors, setLabelColors] = useState<{
-        [key: string]: string;
-    }>({});
-    const [loadingLinks, setLoadingLinks] = useState<{
-        [key: string]: boolean;
-    }>({});
+    const [loadingLinks, setLoadingLinks] = useState<Record<string, boolean>>(
+        {}
+    );
 
     const itemList = items as Item[];
+    const isNote = contentType === ContentType.Note;
+    const heading = isNote ? "Notes" : "Blog";
 
-    useEffect(() => {
-        const newLabelColors: { [key: string]: string } = {};
+    const labelColors = useMemo(() => {
+        const colors: Record<string, string> = { all: "red" };
         let colorIndex = 1;
-        itemList?.forEach((item: Item) => {
-            if (!newLabelColors[item.category]) {
-                newLabelColors[item.category] = Constants.COLORS[colorIndex];
+        itemList?.forEach((item) => {
+            if (!colors[item.category]) {
+                colors[item.category] =
+                    Constants.COLORS[colorIndex % Constants.COLORS.length];
                 colorIndex++;
             }
-            newLabelColors["all"] = "red";
         });
-
-        const sortedLabelColors: { [key: string]: string } = {};
-        Object.keys(newLabelColors)
+        return Object.keys(colors)
             .sort()
-            .forEach((key) => {
-                sortedLabelColors[key] = newLabelColors[key];
-            });
-
-        setLabelColors(sortedLabelColors);
+            .reduce<Record<string, string>>((acc, key) => {
+                acc[key] = colors[key];
+                return acc;
+            }, {});
     }, [itemList]);
 
-    const filteredItems = itemList
-        ? itemList
-              .filter(
-                  (item) =>
-                      item.title
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase()) ||
-                      item.summary
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase())
-              )
-              .filter((item) => {
-                  if (activeLabel === "all") return true;
-                  return item.category === activeLabel;
-              })
-              .sort(
-                  (a, b) =>
-                      new Date(b.published_at).getTime() -
-                      new Date(a.published_at).getTime()
-              )
-        : [];
+    const filteredItems = useMemo(
+        () =>
+            (itemList ?? [])
+                .filter(
+                    (item) =>
+                        item.title
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase()) ||
+                        item.summary
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                )
+                .filter(
+                    (item) =>
+                        activeLabel === "all" || item.category === activeLabel
+                )
+                .sort(
+                    (a, b) =>
+                        new Date(b.published_at).getTime() -
+                        new Date(a.published_at).getTime()
+                ),
+        [itemList, searchTerm, activeLabel]
+    );
 
     const pageCount = Math.ceil(filteredItems.length / itemsPerPage);
     const paginatedItems = filteredItems.slice(
@@ -158,54 +160,30 @@ export const ContentList: React.FC<ContentListProps> = ({
         currentPage * itemsPerPage
     );
 
+    useEffect(() => {
+        if (currentPage > pageCount && pageCount > 0) setCurrentPage(1);
+    }, [currentPage, pageCount]);
+
     const changeActiveLabel = (label: string) => {
         setActiveLabel(label);
         setCurrentPage(1);
     };
 
-    const createLabels = () => (
-        <div className="flex flex-wrap gap-2">
-            {Object.keys(labelColors).map((label: string) => {
-                const color = getColor(labelColors[label]);
-                const isActive = label === activeLabel;
-                return (
-                    <button
-                        className={`px-3 py-1.5 text-sm font-semibold rounded border capitalize transition-colors ${
-                            isActive ? color.solid : color.outline
-                        }`}
-                        key={label}
-                        onClick={() => changeActiveLabel(label)}
-                    >
-                        {label}
-                    </button>
-                );
-            })}
-        </div>
-    );
-
     const pageItems = getPageItems(currentPage, pageCount);
 
     return (
-        <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 w-full">
-                {labelColors && createLabels()}
-                <div className="relative sm:w-64 w-full">
-                    <FaMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                </div>
-            </div>
+        <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-8">
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    {filteredItems.length}{" "}
+                    {filteredItems.length === 1 ? "entry" : "entries"}
+                </p>
+            </header>
+
             {showBanner && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-sm text-sm flex items-center gap-2">
-                    <FaCircleInfo aria-hidden="true" />
+                <div className="mb-6 flex items-center gap-2 rounded-md border-l-4 border-yellow-400 bg-yellow-400/10 p-4 text-sm text-yellow-700 dark:text-yellow-300">
+                    <FaCircleInfo aria-hidden="true" className="shrink-0" />
                     <span>
                         <strong>Note:</strong> The following notes are AI
                         converted. For the most accurate and complete
@@ -213,32 +191,68 @@ export const ContentList: React.FC<ContentListProps> = ({
                     </span>
                 </div>
             )}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
+
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap gap-2">
+                    {Object.keys(labelColors).map((label) => {
+                        const color = getColor(labelColors[label]);
+                        const isActive = label === activeLabel;
+                        return (
+                            <button
+                                key={label}
+                                onClick={() => changeActiveLabel(label)}
+                                className={cn(
+                                    "rounded border px-3 py-1.5 text-sm font-semibold capitalize transition-colors",
+                                    isActive ? color.solid : color.outline
+                                )}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </div>
+                <div className="relative w-full sm:w-64">
+                    <FaMagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="pl-9"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {paginatedItems.length === 0 && (
-                    <div className="col-span-full text-center text-gray-500">
+                    <div className="col-span-full py-12 text-center text-muted-foreground">
                         No results found.
                     </div>
                 )}
-                {paginatedItems.map((item: Item) => {
+                {paginatedItems.map((item) => {
                     const ribbon = getColor(labelColors[item.category]);
+                    const id = item.id.toString();
                     return (
-                        <div
-                            className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
-                            key={item.id.toString()}
-                        >
-                            <div className="p-4 pb-0">
+                        <Card key={id} className="overflow-hidden">
+                            <CardHeader>
                                 <button
                                     onClick={() =>
                                         changeActiveLabel(item.category)
                                     }
-                                    className={`inline-block px-2 py-0.5 text-xs font-semibold rounded text-white capitalize mb-2 ${ribbon.solid}`}
+                                    className={cn(
+                                        "w-fit rounded px-2 py-0.5 text-xs font-semibold capitalize text-white",
+                                        ribbon.solid
+                                    )}
                                 >
                                     {item.category}
                                 </button>
-                                <div className="font-bold">{item.title}</div>
-                            </div>
-                            <div className="p-4 grow">
-                                <div className="text-sm text-gray-500 mb-1">
+                                <CardTitle>{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grow">
+                                <p className="mb-1 text-sm text-muted-foreground">
                                     {new Date(
                                         item.published_at
                                     ).toLocaleDateString(undefined, {
@@ -246,55 +260,49 @@ export const ContentList: React.FC<ContentListProps> = ({
                                         month: "short",
                                         day: "numeric",
                                     })}
-                                </div>
-                                <div className="text-gray-700">
-                                    {item.summary}
-                                </div>
-                            </div>
-                            <div className="flex border-t border-gray-200">
+                                </p>
+                                <p className="text-sm">{item.summary}</p>
+                            </CardContent>
+                            <CardFooter>
                                 <Link
-                                    className="flex-1 flex items-center justify-center py-2 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
-                                    href={`/${
-                                        contentType === ContentType.Note
-                                            ? "notes"
-                                            : "blog"
-                                    }/${
-                                        contentType === ContentType.Note
-                                            ? item.note_url
-                                            : item.blog_url
+                                    className="flex flex-1 items-center justify-center bg-primary py-2 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                                    href={`/${isNote ? "notes" : "blog"}/${
+                                        isNote ? item.note_url : item.blog_url
                                     }`}
-                                    onClick={() => {
+                                    onClick={() =>
                                         setLoadingLinks((prev) => ({
                                             ...prev,
-                                            [item.id.toString()]: true,
-                                        }));
-                                    }}
+                                            [id]: true,
+                                        }))
+                                    }
                                 >
-                                    {loadingLinks[item.id.toString()] ? (
+                                    {loadingLinks[id] ? (
                                         <FaSpinner className="animate-spin" />
                                     ) : (
                                         "Read"
                                     )}
                                 </Link>
-                                {contentType === ContentType.Note && (
+                                {isNote && (
                                     <Link
-                                        className="flex-1 flex items-center justify-center py-2 bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition-colors border-l border-gray-200"
+                                        className="flex flex-1 items-center justify-center gap-1.5 border-l border-border bg-accent py-2 font-semibold text-accent-foreground transition-colors hover:bg-muted"
                                         href={item.note_link}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        View Original
+                                        Original
+                                        <FaArrowUpRightFromSquare className="text-xs" />
                                     </Link>
                                 )}
-                            </div>
-                        </div>
+                            </CardFooter>
+                        </Card>
                     );
                 })}
             </div>
+
             {pageCount > 1 && (
-                <nav className="mt-6 flex items-center gap-1">
+                <nav className="mt-8 flex items-center justify-center gap-1">
                     <button
-                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
                         onClick={() => setCurrentPage(1)}
                         disabled={currentPage === 1}
                         aria-label="First page"
@@ -302,7 +310,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                         <FaAnglesLeft />
                     </button>
                     <button
-                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
                         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
                         aria-label="Previous page"
@@ -313,7 +321,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                         item === "ellipsis" ? (
                             <span
                                 key={`e${idx}`}
-                                className="px-2 text-gray-400"
+                                className="px-2 text-muted-foreground"
                             >
                                 <FaEllipsis />
                             </span>
@@ -321,18 +329,19 @@ export const ContentList: React.FC<ContentListProps> = ({
                             <button
                                 key={item}
                                 onClick={() => setCurrentPage(item)}
-                                className={`min-w-9 px-3 py-1.5 rounded text-sm font-semibold ${
+                                className={cn(
+                                    "min-w-9 rounded px-3 py-1.5 text-sm font-semibold",
                                     item === currentPage
-                                        ? "bg-blue-600 text-white"
-                                        : "hover:bg-gray-100"
-                                }`}
+                                        ? "bg-primary text-primary-foreground"
+                                        : "hover:bg-accent"
+                                )}
                             >
                                 {item}
                             </button>
                         )
                     )}
                     <button
-                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
                         onClick={() =>
                             setCurrentPage((p) => Math.min(pageCount, p + 1))
                         }
@@ -342,7 +351,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                         <FaAngleRight />
                     </button>
                     <button
-                        className="p-2 rounded hover:bg-gray-100 disabled:opacity-40"
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
                         onClick={() => setCurrentPage(pageCount)}
                         disabled={currentPage === pageCount}
                         aria-label="Last page"

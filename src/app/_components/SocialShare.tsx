@@ -20,7 +20,7 @@ const Tooltip: React.FC<{ content: string; children: React.ReactNode }> = ({
 }) => (
     <span className="relative inline-flex group">
         {children}
-        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-xs text-background opacity-0 transition-opacity group-hover:opacity-100">
             {content}
         </span>
     </span>
@@ -34,7 +34,7 @@ const SocialShare: React.FC<{ readModel: ReadModel }> = ({ readModel }) => {
     }, []);
 
     return (
-        <div className="text-center p-4 my-4 border border-gray-200 rounded-lg">
+        <div className="text-center p-4 my-6 border border-border rounded-lg">
             <h4 className="text-lg font-semibold mb-3">Share this</h4>
             <div className="inline-flex gap-2">
                 <Tooltip content="Share via Email">

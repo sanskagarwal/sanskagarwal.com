@@ -3,7 +3,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import remarkGfm from "remark-gfm";
 
 import Mermaid from "./Mermaid";
-import { atomOneLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
@@ -73,10 +73,19 @@ const getHTML = (content: string) => {
                     },
                     img({ node, ...props }) {
                         return (
-                            <p className="flex flex-col items-center text-center">
-                                <img alt={props.alt} {...props} />
-                                <span>{props.title}</span>
-                            </p>
+                            <span className="flex flex-col items-center text-center my-4">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    alt={props.alt}
+                                    {...props}
+                                    className="rounded-md border border-border max-w-full"
+                                />
+                                {props.title && (
+                                    <span className="mt-2 text-sm text-muted-foreground">
+                                        {props.title}
+                                    </span>
+                                )}
+                            </span>
                         );
                     },
                     blockquote({ node, ...props }) {
@@ -135,7 +144,13 @@ const getHTML = (content: string) => {
                                 {...rest}
                                 PreTag="div"
                                 language={language}
-                                style={atomOneLight}
+                                style={atomOneDark}
+                                customStyle={{
+                                    borderRadius: "0.5rem",
+                                    padding: "1rem",
+                                    margin: "1rem 0",
+                                    fontSize: "0.875rem",
+                                }}
                             >
                                 {content}
                             </SyntaxHighlighter>

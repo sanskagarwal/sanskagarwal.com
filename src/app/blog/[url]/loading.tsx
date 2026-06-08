@@ -1,16 +1,22 @@
-import { List } from "react-content-loader";
+import ReadingShell from "@/app/_components/ReadingShell";
+
+const Bar = ({ className = "" }: { className?: string }) => (
+    <div className={`h-4 rounded bg-muted animate-pulse ${className}`} />
+);
 
 const Loading = () => (
-    <div className="grid grid-cols-6">
-        <div
-            className="py-4 bg-white md:col-start-2 md:col-span-4 col-span-6 px-5 md:px-10 lg:px-20 border-l border-r border-dotted
-                shadow-2xl md:shadow-lg"
-        >
-            <List />
-            <br />
-            <List />
+    <ReadingShell>
+        <div className="space-y-3">
+            <Bar className="h-8 w-3/4" />
+            <Bar className="w-1/3" />
+            <div className="h-px bg-border my-6" />
+            <Bar className="w-full" />
+            <Bar className="w-full" />
+            <Bar className="w-5/6" />
+            <Bar className="w-full" />
+            <Bar className="w-2/3" />
         </div>
-    </div>
+    </ReadingShell>
 );
 
 export default Loading;
