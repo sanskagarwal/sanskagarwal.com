@@ -1,5 +1,6 @@
 import { getNotes } from "../_dataprovider/NoteDataProvider";
-import { ContentList, ContentType } from "../_components/ContentComponent";
+import { ContentList } from "../_components/ContentComponent";
+import { ContentType } from "../_models/ContentType";
 
 export const dynamic = "force-dynamic";
 

@@ -17,13 +17,9 @@ import {
 import { Constants } from "../_utils/Constants";
 import { Blog } from "../_models/Blog";
 import { Note } from "../_models/Note";
+import { ContentType } from "../_models/ContentType";
 
 type Item = Blog & Note;
-
-export enum ContentType {
-    Note,
-    Blog,
-}
 
 type ContentListProps = {
     items: (Blog | Note)[];
