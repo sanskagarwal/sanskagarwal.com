@@ -1,11 +1,12 @@
-"use client";
-
-import React from "react";
-
+import { getBlogs } from "../_dataprovider/BlogDataProvider";
 import { ContentList, ContentType } from "../_components/ContentComponent";
 
-const BlogList: React.FC = () => (
-    <ContentList apiPath="/api/blogs" contentType={ContentType.Blog} />
-);
+export const dynamic = "force-dynamic";
+
+const BlogList = async () => {
+    const blogs = await getBlogs();
+
+    return <ContentList items={blogs} contentType={ContentType.Blog} />;
+};
 
 export default BlogList;

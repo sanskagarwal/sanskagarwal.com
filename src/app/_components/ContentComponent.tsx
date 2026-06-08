@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import useSWR from "swr";
-import { BulletList } from "react-content-loader";
 import Link from "next/link";
 import {
     Button,
@@ -28,13 +26,13 @@ export enum ContentType {
 }
 
 type ContentListProps = {
-    apiPath: string;
+    items: (Blog | Note)[];
     contentType: ContentType;
     showBanner?: boolean;
 };
 
 export const ContentList: React.FC<ContentListProps> = ({
-    apiPath,
+    items,
     contentType,
     showBanner = false,
 }) => {
@@ -50,13 +48,7 @@ export const ContentList: React.FC<ContentListProps> = ({
         [key: string]: boolean;
     }>({});
 
-    const {
-        data: itemList,
-        isLoading,
-        error,
-    } = useSWR<Item[]>(apiPath, (url: string) =>
-        fetch(url).then((res) => res.json())
-    );
+    const itemList = items as Item[];
 
     useEffect(() => {
         let newLabelColors: { [key: string]: SemanticCOLORS } = {};
@@ -138,30 +130,20 @@ export const ContentList: React.FC<ContentListProps> = ({
 
     return (
         <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            {error && <div>Failed to load {ContentType[contentType]}s</div>}
-            {isLoading && (
-                <Card>
-                    <CardContent>
-                        <BulletList />
-                    </CardContent>
-                </Card>
-            )}
-            {!isLoading && (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    {labelColors && createLabels()}
-                    <Input
-                        icon="search"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="sm:w-64 w-full"
-                    />
-                </div>
-            )}
-            {!isLoading && showBanner && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                {labelColors && createLabels()}
+                <Input
+                    icon="search"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                        setSearchTerm(e.target.value);
+                        setCurrentPage(1);
+                    }}
+                    className="sm:w-64 w-full"
+                />
+            </div>
+            {showBanner && (
                 <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-sm text-sm flex items-center gap-2">
                     <i className="info circle icon" aria-hidden="true"></i>
                     <span>
@@ -172,7 +154,7 @@ export const ContentList: React.FC<ContentListProps> = ({
                 </div>
             )}
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
-                {paginatedItems.length === 0 && !isLoading && (
+                {paginatedItems.length === 0 && (
                     <div className="col-span-full text-center text-gray-500">
                         No results found.
                     </div>
@@ -252,35 +234,33 @@ export const ContentList: React.FC<ContentListProps> = ({
                     );
                 })}
             </div>
-            {!isLoading && (
-                <Pagination
-                    activePage={currentPage}
-                    totalPages={pageCount}
-                    onPageChange={handlePageChange}
-                    className="mt-6"
-                    siblingRange={1}
-                    ellipsisItem={{
-                        content: <Icon name="ellipsis horizontal" />,
-                        icon: true,
-                    }}
-                    firstItem={{
-                        content: <Icon name="angle double left" />,
-                        icon: true,
-                    }}
-                    lastItem={{
-                        content: <Icon name="angle double right" />,
-                        icon: true,
-                    }}
-                    prevItem={{
-                        content: <Icon name="angle left" />,
-                        icon: true,
-                    }}
-                    nextItem={{
-                        content: <Icon name="angle right" />,
-                        icon: true,
-                    }}
-                />
-            )}
+            <Pagination
+                activePage={currentPage}
+                totalPages={pageCount}
+                onPageChange={handlePageChange}
+                className="mt-6"
+                siblingRange={1}
+                ellipsisItem={{
+                    content: <Icon name="ellipsis horizontal" />,
+                    icon: true,
+                }}
+                firstItem={{
+                    content: <Icon name="angle double left" />,
+                    icon: true,
+                }}
+                lastItem={{
+                    content: <Icon name="angle double right" />,
+                    icon: true,
+                }}
+                prevItem={{
+                    content: <Icon name="angle left" />,
+                    icon: true,
+                }}
+                nextItem={{
+                    content: <Icon name="angle right" />,
+                    icon: true,
+                }}
+            />
         </div>
     );
 };
