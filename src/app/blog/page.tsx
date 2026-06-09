@@ -1,11 +1,19 @@
-"use client";
+import { getBlogs } from "../_dataprovider/BlogDataProvider";
+import { ContentList } from "../_components/ContentComponent";
+import { ContentType } from "../_models/ContentType";
 
-import React from "react";
+export const metadata = {
+    title: "Blog",
+    description: "Articles on web, security, and engineering by Sanskar Agarwal.",
+    alternates: { canonical: "/blog" },
+};
 
-import { ContentList, ContentType } from "../_components/ContentComponent";
+export const revalidate = 3600;
 
-const BlogList: React.FC = () => (
-    <ContentList apiPath="/api/blogs" contentType={ContentType.Blog} />
-);
+const BlogList = async () => {
+    const blogs = await getBlogs();
+
+    return <ContentList items={blogs} contentType={ContentType.Blog} />;
+};
 
 export default BlogList;

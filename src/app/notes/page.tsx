@@ -1,15 +1,21 @@
-"use client";
+import { getNotes } from "../_dataprovider/NoteDataProvider";
+import { ContentList } from "../_components/ContentComponent";
+import { ContentType } from "../_models/ContentType";
 
-import React from "react";
+export const metadata = {
+    title: "Notes",
+    description: "AI-converted notes and reading highlights by Sanskar Agarwal.",
+    alternates: { canonical: "/notes" },
+};
 
-import { ContentList, ContentType } from "../_components/ContentComponent";
+export const revalidate = 3600;
 
-const NoteList: React.FC = () => (
-    <ContentList
-        apiPath="/api/notes"
-        contentType={ContentType.Note}
-        showBanner
-    />
-);
+const NoteList = async () => {
+    const notes = await getNotes();
+
+    return (
+        <ContentList items={notes} contentType={ContentType.Note} showBanner />
+    );
+};
 
 export default NoteList;

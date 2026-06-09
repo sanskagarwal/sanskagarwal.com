@@ -4,178 +4,208 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Button, Menu, Divider, Icon } from "semantic-ui-react";
-import { useMediaQuery } from "react-responsive";
+import {
+    FaHouse,
+    FaPenToSquare,
+    FaFileLines,
+    FaUtensils,
+    FaNoteSticky,
+    FaBars,
+    FaXmark,
+    FaBug,
+} from "react-icons/fa6";
 
 import { NavLinks } from "../_models/NavLinks";
+import { socialLinks } from "../_utils/SocialLinks";
+import { cn } from "../_utils/cn";
+import ThemeToggle from "./ThemeToggle";
 
 const navLinks: NavLinks[] = [
-    {
-        name: "Home",
-        url: "/",
-        icon: "home",
-    },
-    {
-        name: "Blog",
-        url: "/blog",
-        icon: "edit",
-    },
-    {
-        name: "Resume",
-        url: "/resume",
-        icon: "file alternate",
-    },
-    {
-        name: "Recipes",
-        url: "/recipes",
-        icon: "food",
-    },
-    {
-        name: "Notes",
-        url: "/notes",
-        icon: "sticky note",
-    }
+    { name: "Home", url: "/", icon: FaHouse },
+    { name: "Blog", url: "/blog", icon: FaPenToSquare },
+    { name: "Resume", url: "/resume", icon: FaFileLines },
+    { name: "Recipes", url: "/recipes", icon: FaUtensils },
+    { name: "Notes", url: "/notes", icon: FaNoteSticky },
 ];
 
-const socialLinks: NavLinks[] = [
-    {
-        name: "LinkedIn",
-        url: "https://www.linkedin.com/in/sanskar-agarwal/",
-        icon: "linkedin",
-        color: "blue",
-    },
-    {
-        name: "GitHub",
-        url: "https://github.com/sanskagarwal",
-        icon: "github",
-        color: "black",
-    },
-    {
-        name: "Instagram",
-        url: "https://www.instagram.com/sansk.agarwal/",
-        icon: "instagram",
-        color: "pink",
-    },
-    {
-        name: "Goodreads",
-        url: "https://www.goodreads.com/sanskagarwal",
-        icon: "goodreads g",
-        color: "yellow"
-    }
-];
+const isActive = (pathname: string, url: string) =>
+    url === "/" ? pathname === "/" : pathname.startsWith(url);
+
+const SidebarContent: React.FC<{ pathname: string }> = ({ pathname }) => (
+    <div className="flex h-full flex-col">
+        <div className="flex flex-col items-center gap-1.5 border-b border-border px-6 py-7">
+            <Image
+                src="/me.png"
+                alt="Portrait of Sanskar Agarwal"
+                width={88}
+                height={88}
+                priority
+                className="rounded-full border border-border"
+            />
+            <p className="mt-1 font-semibold">Sanskar Agarwal</p>
+            <p className="text-xs text-muted-foreground">Software Engineer</p>
+        </div>
+
+        <nav
+            className="flex-1 overflow-y-auto px-3 py-4"
+            aria-label="Primary"
+        >
+            <ul className="flex flex-col gap-1">
+                {navLinks.map((link) => {
+                    const Icon = link.icon;
+                    const active = isActive(pathname, link.url);
+                    return (
+                        <li key={link.name}>
+                            <Link
+                                href={link.url}
+                                aria-current={active ? "page" : undefined}
+                                className={cn(
+                                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                                    active
+                                        ? "bg-accent text-primary"
+                                        : "text-foreground hover:bg-accent hover:text-primary"
+                                )}
+                            >
+                                <Icon className="shrink-0" />
+                                {link.name}
+                            </Link>
+                        </li>
+                    );
+                })}
+            </ul>
+        </nav>
+
+        <div className="border-t border-border px-4 py-4">
+            <div className="flex items-center justify-center gap-1">
+                {socialLinks.map((social) => {
+                    const Icon = social.icon;
+                    return (
+                        <a
+                            key={social.name}
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={social.name}
+                            className="group flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-accent"
+                        >
+                            <Icon
+                                className={cn(
+                                    social.colorClass,
+                                    "group-hover:!text-primary"
+                                )}
+                            />
+                        </a>
+                    );
+                })}
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+                <a
+                    href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Report a bug"
+                    className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
+                >
+                    <FaBug />
+                </a>
+                <ThemeToggle />
+            </div>
+        </div>
+    </div>
+);
 
 const Navbar: React.FC = () => {
-    const currentUrl = usePathname();
-    const isMobile = useMediaQuery({ maxWidth: 767 });
-    const [activeMenuItem, setActiveMenuItem] = useState("");
-    const [collapsed, setCollapsed] = useState(false);
+    const pathname = usePathname();
+    const [open, setOpen] = useState(false);
+    const menuButtonRef = React.useRef<HTMLButtonElement>(null);
+    const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
-    useEffect(() => setCollapsed(isMobile), [isMobile]);
     useEffect(() => {
-        const isNavLink = navLinks.findIndex((link) => link.url === currentUrl);
-        let activeLink = "";
-        if (isNavLink !== -1) {
-            activeLink = navLinks[isNavLink].name;
-        }
+        // Close the mobile drawer whenever the route changes.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setOpen(false);
+    }, [pathname]);
 
-        if (isMobile) {
-            setCollapsed(true);
-        }
+    // Close the drawer on Escape and move focus to the close button when opened.
+    useEffect(() => {
+        if (!open) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setOpen(false);
+        };
+        document.addEventListener("keydown", onKeyDown);
+        closeButtonRef.current?.focus();
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [open]);
 
-        setActiveMenuItem(activeLink);
-    }, [currentUrl, isMobile]);
+    // Restore focus to the menu trigger once the drawer is dismissed.
+    const closeDrawer = () => {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+    };
 
     return (
         <>
-            <div className="sider top-0 self-start max-h-screen grid sticky min-h-screen">
-                <Menu
-                    secondary
-                    vertical
-                    className={`!border !border-solid !border-neutral-800/[0.15] !shadow-xl flex flex-col content-center !m-0 !rounded-none relative transition-all duration-300 ${
-                        collapsed ? "overflow-hidden !w-0" : ""
-                    }`}
+            {/* Mobile top bar */}
+            <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:hidden">
+                <button
+                    ref={menuButtonRef}
+                    type="button"
+                    onClick={() => setOpen(true)}
+                    aria-label="Open menu"
+                    aria-expanded={open}
+                    aria-controls="mobile-nav-drawer"
+                    className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                 >
-                    <div className="absolute w-full top-1/6">
-                        <Image
-                            src="/me.png"
-                            className="ui image centered mt-16 mb-1"
-                            alt="avatar"
-                            width={100}
-                            height={100}
-                        />
-                        <p className="text-center">Sanskar Agarwal</p>
-                        <Divider />
+                    <FaBars />
+                </button>
+                <Link href="/" className="font-semibold">
+                    Sanskar Agarwal
+                </Link>
+                <ThemeToggle />
+            </header>
 
-                        {navLinks.map((navLink) => {
-                            return (
-                                <Link
-                                    onClick={() =>
-                                        setActiveMenuItem(navLink.name)
-                                    }
-                                    key={navLink.name}
-                                    href={navLink.url}
-                                    className={`hover:!text-blue-500 !mx-4 !my-1 item ${
-                                        activeMenuItem === navLink.name &&
-                                        "active !text-blue-500"
-                                    }`}
-                                >
-                                    <Icon
-                                        name={navLink.icon}
-                                        className="!mr-1 !float-none"
-                                    />
-                                    {navLink.name}
-                                </Link>
-                            );
-                        })}
-                    </div>
-
-                    <div className="absolute bottom-8 text-center w-full">
-                        <Divider />
-                        <Button.Group className="bottom-buttons" size="large">
-                            {socialLinks.map((socialLink) => {
-                                return (
-                                    <a
-                                        className="ui icon button group"
-                                        href={socialLink.url}
-                                        target="_blank"
-                                        key={socialLink.name}
-                                    >
-                                        <Icon name={socialLink.icon} color={socialLink.color} className="group-hover:!text-blue-500" />
-                                    </a>
-                                );
-                            })}
-                        </Button.Group>
-                    </div>
-                </Menu>
-            </div>
-            <div className="header grid">
-                <Menu
-                    secondary
-                    className="!mb-0 !ml-0 !shadow"
+            {/* Mobile drawer */}
+            <div
+                id="mobile-nav-drawer"
+                className={cn(
+                    "fixed inset-0 z-40 md:hidden",
+                    open ? "pointer-events-auto" : "pointer-events-none"
+                )}
+                aria-hidden={!open}
+            >
+                <div
+                    className={cn(
+                        "absolute inset-0 bg-black/50 transition-opacity",
+                        open ? "opacity-100" : "opacity-0"
+                    )}
+                    onClick={closeDrawer}
+                />
+                <aside
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Site navigation"
+                    className={cn(
+                        "absolute left-0 top-0 h-full w-64 border-r border-border bg-card shadow-xl transition-transform duration-300",
+                        open ? "translate-x-0" : "-translate-x-full"
+                    )}
                 >
-                    <Menu.Item>
-                        <Button
-                            className="hover:!text-blue-500"
-                            icon="bars"
-                            onClick={() => setCollapsed(!collapsed)}
-                        />
-                    </Menu.Item>
-                    <Menu.Menu position="right">
-                        <Menu.Item>
-                            <Button.Group>
-                                <a
-                                    className="ui icon button group"
-                                    href="https://github.com/sanskagarwal/sanskagarwal.com/issues/new"
-                                    target="_blank"
-                                >
-                                    <Icon name="bug" className="group-hover:!text-blue-500" />
-                                </a>
-                            </Button.Group>
-                        </Menu.Item>
-                    </Menu.Menu>
-                </Menu>
-                <Divider className="!m-0" />
+                    <button
+                        ref={closeButtonRef}
+                        type="button"
+                        onClick={closeDrawer}
+                        aria-label="Close menu"
+                        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
+                    >
+                        <FaXmark />
+                    </button>
+                    <SidebarContent pathname={pathname} />
+                </aside>
             </div>
+
+            {/* Desktop sidebar */}
+            <aside className="fixed left-0 top-0 z-20 hidden h-screen w-64 border-r border-border bg-card md:block">
+                <SidebarContent pathname={pathname} />
+            </aside>
         </>
     );
 };

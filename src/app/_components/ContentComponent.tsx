@@ -1,40 +1,101 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import useSWR from "swr";
-import { BulletList } from "react-content-loader";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-    Button,
-    Card,
-    CardContent,
-    CardDescription,
-    CardMeta,
-    Label,
-    SemanticCOLORS,
-    Input,
-    Pagination,
-    Icon,
-} from "semantic-ui-react";
+    FaMagnifyingGlass,
+    FaCircleInfo,
+    FaSpinner,
+    FaEllipsis,
+    FaAnglesLeft,
+    FaAnglesRight,
+    FaAngleLeft,
+    FaAngleRight,
+    FaArrowUpRightFromSquare,
+} from "react-icons/fa6";
 import { Constants } from "../_utils/Constants";
+import { cn } from "../_utils/cn";
 import { Blog } from "../_models/Blog";
 import { Note } from "../_models/Note";
+import { ContentType } from "../_models/ContentType";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/Card";
+import { Input } from "./ui/Input";
 
 type Item = Blog & Note;
 
-export enum ContentType {
-    Note,
-    Blog,
-}
+const colorClasses: Record<string, { solid: string; outline: string }> = {
+    red: {
+        solid: "bg-red-600 text-white border-red-600",
+        outline: "text-red-600 dark:text-red-400 border-red-400 hover:bg-red-500/10",
+    },
+    pink: {
+        solid: "bg-pink-600 text-white border-pink-600",
+        outline: "text-pink-700 dark:text-pink-400 border-pink-400 hover:bg-pink-500/10",
+    },
+    blue: {
+        solid: "bg-blue-600 text-white border-blue-600",
+        outline: "text-blue-600 dark:text-blue-400 border-blue-400 hover:bg-blue-500/10",
+    },
+    green: {
+        solid: "bg-green-700 text-white border-green-700",
+        outline: "text-green-700 dark:text-green-400 border-green-400 hover:bg-green-500/10",
+    },
+    violet: {
+        solid: "bg-violet-600 text-white border-violet-600",
+        outline: "text-violet-600 dark:text-violet-400 border-violet-400 hover:bg-violet-500/10",
+    },
+    purple: {
+        solid: "bg-purple-600 text-white border-purple-600",
+        outline: "text-purple-600 dark:text-purple-400 border-purple-400 hover:bg-purple-500/10",
+    },
+    orange: {
+        solid: "bg-orange-700 text-white border-orange-700",
+        outline: "text-orange-700 dark:text-orange-400 border-orange-400 hover:bg-orange-500/10",
+    },
+    brown: {
+        solid: "bg-amber-700 text-white border-amber-700",
+        outline: "text-amber-700 dark:text-amber-400 border-amber-500 hover:bg-amber-700/10",
+    },
+    yellow: {
+        solid: "bg-yellow-700 text-white border-yellow-700",
+        outline: "text-yellow-700 dark:text-yellow-400 border-yellow-400 hover:bg-yellow-500/10",
+    },
+    olive: {
+        solid: "bg-lime-700 text-white border-lime-700",
+        outline: "text-lime-700 dark:text-lime-400 border-lime-400 hover:bg-lime-500/10",
+    },
+    teal: {
+        solid: "bg-teal-700 text-white border-teal-700",
+        outline: "text-teal-700 dark:text-teal-400 border-teal-400 hover:bg-teal-500/10",
+    },
+};
+
+const getColor = (name?: string) => colorClasses[name ?? ""] ?? colorClasses.blue;
+
+const getPageItems = (
+    current: number,
+    total: number
+): (number | "ellipsis")[] => {
+    if (total <= 1) return total === 1 ? [1] : [];
+    const items: (number | "ellipsis")[] = [];
+    const left = Math.max(2, current - 1);
+    const right = Math.min(total - 1, current + 1);
+    items.push(1);
+    if (left > 2) items.push("ellipsis");
+    for (let p = left; p <= right; p++) items.push(p);
+    if (right < total - 1) items.push("ellipsis");
+    items.push(total);
+    return items;
+};
 
 type ContentListProps = {
-    apiPath: string;
+    items: (Blog | Note)[];
     contentType: ContentType;
     showBanner?: boolean;
 };
 
 export const ContentList: React.FC<ContentListProps> = ({
-    apiPath,
+    items,
     contentType,
     showBanner = false,
 }) => {
@@ -43,127 +104,117 @@ export const ContentList: React.FC<ContentListProps> = ({
     const itemsPerPage = 9;
 
     const [activeLabel, setActiveLabel] = useState("all");
-    const [labelColors, setLabelColors] = useState<{
-        [key: string]: SemanticCOLORS;
-    }>({});
-    const [loadingLinks, setLoadingLinks] = useState<{
-        [key: string]: boolean;
-    }>({});
-
-    const {
-        data: itemList,
-        isLoading,
-        error,
-    } = useSWR<Item[]>(apiPath, (url: string) =>
-        fetch(url).then((res) => res.json())
+    const [loadingLinks, setLoadingLinks] = useState<Record<string, boolean>>(
+        {}
     );
 
-    useEffect(() => {
-        let newLabelColors: { [key: string]: SemanticCOLORS } = {};
+    const itemList = items as Item[];
+    const isNote = contentType === ContentType.Note;
+    const heading = isNote ? "Notes" : "Blog";
+
+    const labelColors = useMemo(() => {
+        const colors: Record<string, string> = { all: "red" };
         let colorIndex = 1;
-        itemList?.forEach((item: Item) => {
-            if (!newLabelColors[item.category]) {
-                newLabelColors[item.category] = Constants.COLORS[
-                    colorIndex
-                ] as SemanticCOLORS;
+        itemList?.forEach((item) => {
+            if (!colors[item.category]) {
+                colors[item.category] =
+                    Constants.COLORS[colorIndex % Constants.COLORS.length];
                 colorIndex++;
             }
-            newLabelColors["all"] = "red";
         });
-
-        const sortedLabelColors: { [key: string]: SemanticCOLORS } = {};
-        Object.keys(newLabelColors)
+        return Object.keys(colors)
             .sort()
-            .forEach((key) => {
-                sortedLabelColors[key] = newLabelColors[key];
-            });
-
-        setLabelColors(sortedLabelColors);
+            .reduce<Record<string, string>>((acc, key) => {
+                acc[key] = colors[key];
+                return acc;
+            }, {});
     }, [itemList]);
 
-    const filteredItems = itemList
-        ? itemList
-              .filter(
-                  (item) =>
-                      item.title
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase()) ||
-                      item.summary
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase())
-              )
-              .filter((item) => {
-                  if (activeLabel === "all") return true;
-                  return item.category === activeLabel;
-              })
-              .sort(
-                  (a, b) =>
-                      new Date(b.published_at).getTime() -
-                      new Date(a.published_at).getTime()
-              )
-        : [];
+    const filteredItems = useMemo(
+        () =>
+            (itemList ?? [])
+                .filter(
+                    (item) =>
+                        item.title
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase()) ||
+                        item.summary
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                )
+                .filter(
+                    (item) =>
+                        activeLabel === "all" || item.category === activeLabel
+                )
+                .sort(
+                    (a, b) =>
+                        new Date(b.published_at).getTime() -
+                        new Date(a.published_at).getTime()
+                ),
+        [itemList, searchTerm, activeLabel]
+    );
 
     const pageCount = Math.ceil(filteredItems.length / itemsPerPage);
+
+    // If active filters shrink the list past the current page, snap back to the
+    // first page during render — React recommends this over a state-syncing
+    // effect (https://react.dev/learn/you-might-not-need-an-effect).
+    if (currentPage > pageCount && pageCount > 0) {
+        setCurrentPage(1);
+    }
+
     const paginatedItems = filteredItems.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
 
-    const handlePageChange = (_: any, data: any) => {
-        setCurrentPage(data.activePage);
-    };
+    // Hydrate filter/search state from the URL on mount (shareable links).
+    // window.location is only readable client-side, so this effect is required.
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get("q");
+        const category = params.get("category");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (q) setSearchTerm(q);
+        if (category) setActiveLabel(category);
+    }, []);
 
-    const changeActiveLabel = (e: any) => {
-        setActiveLabel(e.target.innerText);
+    // Reflect filter/search state back into the URL without a navigation.
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (searchTerm) params.set("q", searchTerm);
+        if (activeLabel !== "all") params.set("category", activeLabel);
+        const query = params.toString();
+        const next = query
+            ? `${window.location.pathname}?${query}`
+            : window.location.pathname;
+        window.history.replaceState(null, "", next);
+    }, [searchTerm, activeLabel]);
+
+    const changeActiveLabel = (label: string) => {
+        setActiveLabel(label);
         setCurrentPage(1);
     };
 
-    const createLabels = () => (
-        <div>
-            {Object.keys(labelColors).map((label: string) => (
-                <Button
-                    className="!py-1.5 !text-sm !font-semibold"
-                    key={label}
-                    as="a"
-                    active={label === activeLabel}
-                    onClick={changeActiveLabel}
-                    inverted
-                    color={labelColors[label]}
-                >
-                    {label}
-                </Button>
-            ))}
-        </div>
-    );
+    const pageItems = getPageItems(currentPage, pageCount);
 
     return (
-        <div className="p-4 flex gap-4 flex-col justify-center items-center">
-            {error && <div>Failed to load {ContentType[contentType]}s</div>}
-            {isLoading && (
-                <Card>
-                    <CardContent>
-                        <BulletList />
-                    </CardContent>
-                </Card>
-            )}
-            {!isLoading && (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    {labelColors && createLabels()}
-                    <Input
-                        icon="search"
-                        placeholder="Search..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="sm:w-64 w-full"
-                    />
-                </div>
-            )}
-            {!isLoading && showBanner && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded shadow-sm text-sm flex items-center gap-2">
-                    <i className="info circle icon" aria-hidden="true"></i>
+        <div className="mx-auto w-full max-w-6xl px-5 py-8 md:px-8">
+            <header className="mb-6">
+                <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
+                <p
+                    className="mt-1 text-sm text-muted-foreground"
+                    role="status"
+                    aria-live="polite"
+                >
+                    {filteredItems.length}{" "}
+                    {filteredItems.length === 1 ? "entry" : "entries"}
+                </p>
+            </header>
+
+            {showBanner && (
+                <div className="mb-6 flex items-center gap-2 rounded-md border-l-4 border-yellow-400 bg-yellow-400/10 p-4 text-sm text-yellow-700 dark:text-yellow-300">
+                    <FaCircleInfo aria-hidden="true" className="shrink-0" />
                     <span>
                         <strong>Note:</strong> The following notes are AI
                         converted. For the most accurate and complete
@@ -171,29 +222,89 @@ export const ContentList: React.FC<ContentListProps> = ({
                     </span>
                 </div>
             )}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-10">
-                {paginatedItems.length === 0 && !isLoading && (
-                    <div className="col-span-full text-center text-gray-500">
-                        No results found.
+
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                    className="flex flex-wrap gap-2"
+                    role="group"
+                    aria-label="Filter by category"
+                >
+                    {Object.keys(labelColors).map((label) => {
+                        const color = getColor(labelColors[label]);
+                        const isActive = label === activeLabel;
+                        return (
+                            <button
+                                key={label}
+                                onClick={() => changeActiveLabel(label)}
+                                aria-pressed={isActive}
+                                className={cn(
+                                    "rounded-full border px-3 py-1.5 text-sm font-semibold capitalize transition-colors",
+                                    isActive ? color.solid : color.outline
+                                )}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
+                </div>
+                <div className="relative w-full sm:w-64">
+                    <FaMagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        type="text"
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(1);
+                        }}
+                        className="pl-9"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {paginatedItems.length === 0 && (
+                    <div className="col-span-full flex flex-col items-center gap-3 py-16 text-center">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                            <FaMagnifyingGlass className="h-5 w-5" />
+                        </span>
+                        <p className="text-muted-foreground">
+                            No results found. Try a different search or category.
+                        </p>
+                        {(searchTerm || activeLabel !== "all") && (
+                            <button
+                                onClick={() => {
+                                    setSearchTerm("");
+                                    changeActiveLabel("all");
+                                }}
+                                className="text-sm font-semibold text-primary hover:underline"
+                            >
+                                Clear filters
+                            </button>
+                        )}
                     </div>
                 )}
-                {paginatedItems.map((item: Item) => {
+                {paginatedItems.map((item) => {
+                    const ribbon = getColor(labelColors[item.category]);
+                    const id = item.id.toString();
                     return (
-                        <Card className="ui card !m-0" key={item.id.toString()}>
-                            <CardContent className="!grow-0">
-                                <Label
-                                    as="a"
-                                    ribbon
-                                    active={item.category === activeLabel}
-                                    onClick={changeActiveLabel}
-                                    color={labelColors[item.category]}
+                        <Card key={id} className="card-hover overflow-hidden">
+                            <CardHeader>
+                                <button
+                                    onClick={() =>
+                                        changeActiveLabel(item.category)
+                                    }
+                                    className={cn(
+                                        "w-fit rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize text-white",
+                                        ribbon.solid
+                                    )}
                                 >
                                     {item.category}
-                                </Label>
-                                <span className="font-bold">{item.title}</span>
-                            </CardContent>
-                            <CardContent>
-                                <CardMeta>
+                                </button>
+                                <CardTitle>{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grow">
+                                <p className="mb-1 text-sm text-muted-foreground">
                                     {new Date(
                                         item.published_at
                                     ).toLocaleDateString(undefined, {
@@ -201,85 +312,117 @@ export const ContentList: React.FC<ContentListProps> = ({
                                         month: "short",
                                         day: "numeric",
                                     })}
-                                </CardMeta>
-                                <CardDescription>
-                                    {item.summary}
-                                </CardDescription>
+                                </p>
+                                <p className="text-sm">{item.summary}</p>
                             </CardContent>
-                            <div
-                                className={`ui bottom attached ${
-                                    contentType === ContentType.Note
-                                        ? "two"
-                                        : ""
-                                } buttons`}
-                            >
+                            <CardFooter>
                                 <Link
-                                    className="ui primary button"
-                                    href={`/${
-                                        contentType === ContentType.Note
-                                            ? "notes"
-                                            : "blog"
-                                    }/${
-                                        contentType === ContentType.Note
-                                            ? item.note_url
-                                            : item.blog_url
+                                    className="flex h-11 flex-1 items-center justify-center bg-primary font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                                    href={`/${isNote ? "notes" : "blog"}/${
+                                        isNote ? item.note_url : item.blog_url
                                     }`}
-                                    onClick={() => {
+                                    onClick={() =>
                                         setLoadingLinks((prev) => ({
                                             ...prev,
-                                            [item.id.toString()]: true,
-                                        }));
-                                    }}
+                                            [id]: true,
+                                        }))
+                                    }
                                 >
-                                    {loadingLinks[item.id.toString()] ? (
-                                        <i className="loading spinner icon" />
+                                    {loadingLinks[id] ? (
+                                        <FaSpinner className="animate-spin" />
                                     ) : (
                                         "Read"
                                     )}
                                 </Link>
-                                {contentType === ContentType.Note && (
+                                {isNote && (
                                     <Link
-                                        className="ui button"
+                                        className="flex h-11 flex-1 items-center justify-center gap-1.5 border-l border-border bg-accent font-semibold text-accent-foreground transition-colors hover:bg-muted"
                                         href={item.note_link}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        View Original
+                                        Original
+                                        <FaArrowUpRightFromSquare className="text-xs" />
                                     </Link>
                                 )}
-                            </div>
+                            </CardFooter>
                         </Card>
                     );
                 })}
             </div>
-            {!isLoading && (
-                <Pagination
-                    activePage={currentPage}
-                    totalPages={pageCount}
-                    onPageChange={handlePageChange}
-                    className="mt-6"
-                    siblingRange={1}
-                    ellipsisItem={{
-                        content: <Icon name="ellipsis horizontal" />,
-                        icon: true,
-                    }}
-                    firstItem={{
-                        content: <Icon name="angle double left" />,
-                        icon: true,
-                    }}
-                    lastItem={{
-                        content: <Icon name="angle double right" />,
-                        icon: true,
-                    }}
-                    prevItem={{
-                        content: <Icon name="angle left" />,
-                        icon: true,
-                    }}
-                    nextItem={{
-                        content: <Icon name="angle right" />,
-                        icon: true,
-                    }}
-                />
+
+            {pageCount > 1 && (
+                <nav
+                    className="mt-8 flex flex-col items-center gap-2"
+                    aria-label="Pagination"
+                >
+                    <div className="flex flex-wrap items-center justify-center gap-1">
+                    <button
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                        aria-label="First page"
+                    >
+                        <FaAnglesLeft />
+                    </button>
+                    <button
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        aria-label="Previous page"
+                    >
+                        <FaAngleLeft />
+                    </button>
+                    {pageItems.map((item, idx) =>
+                        item === "ellipsis" ? (
+                            <span
+                                key={`e${idx}`}
+                                className="px-2 text-muted-foreground"
+                            >
+                                <FaEllipsis />
+                            </span>
+                        ) : (
+                            <button
+                                key={item}
+                                onClick={() => setCurrentPage(item)}
+                                aria-label={`Page ${item}`}
+                                aria-current={
+                                    item === currentPage ? "page" : undefined
+                                }
+                                className={cn(
+                                    "min-w-9 rounded px-3 py-1.5 text-sm font-semibold",
+                                    item === currentPage
+                                        ? "bg-primary text-primary-foreground"
+                                        : "hover:bg-accent"
+                                )}
+                            >
+                                {item}
+                            </button>
+                        )
+                    )}
+                    <button
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
+                        onClick={() =>
+                            setCurrentPage((p) => Math.min(pageCount, p + 1))
+                        }
+                        disabled={currentPage === pageCount}
+                        aria-label="Next page"
+                    >
+                        <FaAngleRight />
+                    </button>
+                    <button
+                        className="rounded p-2 hover:bg-accent disabled:opacity-40"
+                        onClick={() => setCurrentPage(pageCount)}
+                        disabled={currentPage === pageCount}
+                        aria-label="Last page"
+                    >
+                        <FaAnglesRight />
+                    </button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        Page {currentPage} of {pageCount}
+                    </p>
+                </nav>
             )}
         </div>
     );

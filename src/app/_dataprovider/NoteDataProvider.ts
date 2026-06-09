@@ -1,41 +1,43 @@
 import "server-only";
 
-import { executeWithRetry } from "./RetryQuery";
 import { Note } from "../_models/Note";
+import {
+    createContentRepository,
+    mapReadModelFields,
+} from "./ContentRepository";
 
-export const getNotes = async (): Promise<Note[]> => {
-    console.log("Fetching list of notes");
-    try {
-        const query = `
-            SELECT id, title, summary, note_url, note_link, category, published_at
-            FROM notes
-            WHERE published_at IS NOT NULL
-        `;
-        return await executeWithRetry<Note[]>(query);
-    } catch (err) {
-        const msg = `Failed to fetch notes after retries, error: ${err}`;
-        console.error(msg);
-        return [];
-    }
-};
+const mapNote = (row: Record<string, unknown>): Note => ({
+    ...mapReadModelFields(row),
+    note_url: String(row.note_url ?? ""),
+    note_link: String(row.note_link ?? ""),
+});
 
-export const getNote = async (noteUrl: string): Promise<Note | null> => {
-    if (!noteUrl) {
-        return null;
-    }
+const noteRepository = createContentRepository<Note>({
+    table: "notes",
+    urlColumn: "note_url",
+    listColumns: [
+        "id",
+        "title",
+        "summary",
+        "note_url",
+        "note_link",
+        "category",
+        "published_at",
+    ],
+    detailColumns: [
+        "id",
+        "title",
+        "summary",
+        "note_url",
+        "note_link",
+        "category",
+        "published_at",
+        "content",
+    ],
+    map: mapNote,
+});
 
-    console.log(`Fetching note with URL: ${noteUrl}`);
-    try {
-        const query = `
-            SELECT *
-            FROM notes
-            WHERE note_url = $1 AND published_at IS NOT NULL
-        `;
-        const result = await executeWithRetry<Note[]>(query, [noteUrl]);
-        return result[0] || null;
-    } catch (err) {
-        const msg = `Failed to fetch note ${noteUrl} after retries, error: ${err}`;
-        console.error(msg);
-        return null;
-    }
-};
+export const getNotes = (): Promise<Note[]> => noteRepository.findAll();
+
+export const getNote = (noteUrl: string): Promise<Note | null> =>
+    noteRepository.findByUrl(noteUrl);

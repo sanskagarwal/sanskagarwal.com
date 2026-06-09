@@ -1,0 +1,107 @@
+name: Build and Deploy App
+
+# Reusable workflow that builds a component and deploys it to Azure using OIDC.
+# Split into two stages (jobs): `build` produces an artifact, `deploy` consumes it.
+# Shared by app components (e.g. src -> Web App, functions -> Function App).
+#
+# Callers must pass `secrets: inherit` so AZURE_CLIENT_ID / AZURE_TENANT_ID /
+# AZURE_SUBSCRIPTION_ID are available for OIDC login.
+
+on:
+    workflow_call:
+        inputs:
+            package-path:
+                description: "Path to the component to build/deploy (e.g. src, functions)."
+                required: true
+                type: string
+            app-name:
+                description: "Azure app name to deploy to."
+                required: true
+                type: string
+            deploy-type:
+                description: "Target Azure resource type: webapp or functionapp."
+                required: false
+                default: "webapp"
+                type: string
+            node-version:
+                description: "Node.js version to build with."
+                required: false
+                default: "24.x"
+                type: string
+            environment:
+                description: "Optional GitHub Environment to gate the deploy stage."
+                required: false
+                default: ""
+                type: string
+            artifact-name:
+                description: "Name of the build artifact passed between stages."
+                required: false
+                default: "app-package"
+                type: string
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    build:
+        name: Build (${{ inputs.package-path }})
+        runs-on: ubuntu-latest
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v6
+
+            - name: "Setup Node ${{ inputs.node-version }}"
+              uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ inputs.node-version }}
+                  cache: "npm"
+                  cache-dependency-path: ${{ inputs.package-path }}/package-lock.json
+
+            - name: "npm install, build, and test"
+              run: |
+                  pushd './${{ inputs.package-path }}'
+                  npm install
+                  npm run build --if-present
+                  npm run test --if-present
+                  popd
+
+            - name: "Upload build artifact"
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ inputs.artifact-name }}
+                  path: ${{ inputs.package-path }}
+                  include-hidden-files: true
+
+    deploy:
+        name: Deploy (${{ inputs.app-name }})
+        needs: build
+        runs-on: ubuntu-latest
+        environment: ${{ inputs.environment }}
+        steps:
+            - name: "Download build artifact"
+              uses: actions/download-artifact@v4
+              with:
+                  name: ${{ inputs.artifact-name }}
+                  path: ${{ inputs.package-path }}
+
+            - name: "Azure login (OIDC)"
+              uses: azure/login@v2
+              with:
+                  client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                  tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                  subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+            - name: "Deploy to Azure Web App"
+              if: ${{ inputs.deploy-type == 'webapp' }}
+              uses: azure/webapps-deploy@v3
+              with:
+                  app-name: ${{ inputs.app-name }}
+                  package: ${{ inputs.package-path }}
+
+            - name: "Deploy to Azure Functions"
+              if: ${{ inputs.deploy-type == 'functionapp' }}
+              uses: azure/functions-action@v1
+              with:
+                  app-name: ${{ inputs.app-name }}
+                  package: ${{ inputs.package-path }}

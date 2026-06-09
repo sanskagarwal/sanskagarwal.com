@@ -1,10 +1,11 @@
 name: Deploy Functions
 
 on:
-    push:
-        branches: ["main"]
-        paths:
-            - functions/**
+    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
+    # push:
+    #     branches: ["main"]
+    #     paths:
+    #         - functions/**
     workflow_dispatch:
 
 env:

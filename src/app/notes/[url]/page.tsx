@@ -1,25 +1,61 @@
-"use client";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import React from "react";
-import useSWR from "swr";
-
-import { fetcher } from "@/app/_dataprovider/ClientDataProvider";
-import { Note } from "@/app/_models/Note";
+import { getNote } from "@/app/_dataprovider/NoteDataProvider";
 import ReadComponent from "@/app/_components/ReadComponent";
+
+export const revalidate = 3600;
 
 type Params = {
     url: string;
 };
 
-const NotePage: React.FC<{ params: Params }> = ({ params }) => {
-    const {
-        data: note,
-        isLoading,
-        error,
-    } = useSWR<Note>(`/api/notes/${params.url}`, fetcher);
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<Params>;
+}): Promise<Metadata> {
+    const { url } = await params;
+    const note = await getNote(url);
+
+    if (!note) {
+        return { title: "Not Found" };
+    }
+
+    return {
+        title: note.title,
+        description: note.summary,
+        alternates: { canonical: `/notes/${url}` },
+        openGraph: {
+            type: "article",
+            title: note.title,
+            description: note.summary,
+            url: `/notes/${url}`,
+            publishedTime: new Date(note.published_at).toISOString(),
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: note.title,
+            description: note.summary,
+        },
+    };
+}
+
+const NotePage = async ({ params }: { params: Promise<Params> }) => {
+    const { url } = await params;
+    const note = await getNote(url);
+
+    if (!note) {
+        notFound();
+    }
 
     return (
-        <ReadComponent error={error} isLoading={isLoading} readModel={note} />
+        <ReadComponent
+            readModel={note}
+            backHref="/notes"
+            backLabel="All notes"
+            canonicalPath={`/notes/${url}`}
+        />
     );
 };
 

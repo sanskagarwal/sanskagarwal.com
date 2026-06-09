@@ -3,8 +3,7 @@
 import React, { useEffect } from "react";
 import { Constants } from "../_utils/Constants";
 
-// @ts-ignore
-const insertScript = (id, parentElement) => {
+const insertScript = (id: string, parentElement: HTMLElement) => {
     const script = window.document.createElement("script");
     script.type = "text/javascript";
     script.async = true;
@@ -28,8 +27,7 @@ const insertScript = (id, parentElement) => {
     parentElement.appendChild(script);
 };
 
-// @ts-ignore
-const removeScript = (id, parentElement) => {
+const removeScript = (id: string, parentElement: HTMLElement) => {
     const script = window.document.getElementById(id);
     if (script) {
         parentElement.removeChild(script);
@@ -52,12 +50,12 @@ const recreateRemark42Instance = () => {
         return;
     }
 
-    // @ts-ignore
+    // @ts-expect-error REMARK42 is injected on window by the remark42 embed script
     const remark42 = window.REMARK42;
     if (remark42) {
         remark42.destroy();
 
-        // @ts-ignore
+        // @ts-expect-error remark_config is injected on window by the remark42 embed script
         remark42.createInstance(window.remark_config);
     }
 };

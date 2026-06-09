@@ -1,41 +1,33 @@
 import "server-only";
 
 import { Blog } from "../_models/Blog";
-import { executeWithRetry } from "./RetryQuery";
+import {
+    createContentRepository,
+    mapReadModelFields,
+} from "./ContentRepository";
 
-export const getBlogs = async (): Promise<Blog[]> => {
-    console.log("Fetching list of blogs");
-    try {
-        const query = `
-            SELECT id, title, summary, blog_url, category, published_at
-            FROM blogs
-            WHERE published_at IS NOT NULL
-        `;
-        return await executeWithRetry<Blog[]>(query);
-    } catch (err) {
-        const msg = `Failed to fetch blogs after retries, error: ${err}`;
-        console.error(msg);
-        return [];
-    }
-};
+const mapBlog = (row: Record<string, unknown>): Blog => ({
+    ...mapReadModelFields(row),
+    blog_url: String(row.blog_url ?? ""),
+});
 
-export const getBlog = async (blogUrl: string): Promise<Blog | null> => {
-    if (!blogUrl) {
-        return null;
-    }
+const blogRepository = createContentRepository<Blog>({
+    table: "blogs",
+    urlColumn: "blog_url",
+    listColumns: ["id", "title", "summary", "blog_url", "category", "published_at"],
+    detailColumns: [
+        "id",
+        "title",
+        "summary",
+        "blog_url",
+        "category",
+        "published_at",
+        "content",
+    ],
+    map: mapBlog,
+});
 
-    console.log(`Fetching blog with URL: ${blogUrl}`);
-    try {
-        const query = `
-            SELECT *
-            FROM blogs
-            WHERE blog_url = $1 AND published_at IS NOT NULL
-        `;
-        const result = await executeWithRetry<Blog[]>(query, [blogUrl]);
-        return result[0] || null;
-    } catch (err) {
-        const msg = `Failed to fetch blog ${blogUrl} after retries, error: ${err}`;
-        console.error(msg);
-        return null;
-    }
-};
+export const getBlogs = (): Promise<Blog[]> => blogRepository.findAll();
+
+export const getBlog = (blogUrl: string): Promise<Blog | null> =>
+    blogRepository.findByUrl(blogUrl);

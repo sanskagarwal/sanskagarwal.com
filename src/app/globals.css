@@ -1,5 +1,69 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #5b6776;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #0f766e;
+    --primary: #0f766e;
+    --primary-foreground: #ffffff;
+    --secondary: #2563eb;
+    --secondary-foreground: #ffffff;
+    --accent: #eef2f6;
+    --accent-foreground: #0f172a;
+
+    --radius: 0.5rem;
+}
+
+.dark {
+    --background: #020617;
+    --foreground: #e2e8f0;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --card: #0f172a;
+    --card-foreground: #e2e8f0;
+    --border: #233047;
+    --input: #233047;
+    --ring: #2dd4bf;
+    --primary: #2dd4bf;
+    --primary-foreground: #042f2e;
+    --secondary: #60a5fa;
+    --secondary-foreground: #0b1120;
+    --accent: #1e293b;
+    --accent-foreground: #f1f5f9;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --radius-sm: calc(var(--radius) - 2px);
+    --radius-md: var(--radius);
+    --radius-lg: calc(var(--radius) + 2px);
+
+    --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
 html,
 body {
     max-width: 100vw;
@@ -9,43 +73,189 @@ body {
     min-height: 100vh;
 }
 
+body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+}
+
 * {
     box-sizing: border-box;
 }
 
-.mainWrapper {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-        "sider header"
-        "sider content";
+html {
+    scroll-behavior: smooth;
 }
 
-.header {
-    grid-area: header;
+/* Consistent keyboard focus affordance across interactive elements. */
+:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
 }
 
-.sider {
-    grid-area: sider;
+/* Tailwind v4 no longer sets a pointer cursor on buttons; restore it for
+   enabled buttons and elements with a button role. */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
 }
 
-/*
-* UI
-*/
-.header .ui.button,
-.bottom-buttons .ui.button {
-    background: rgba(0, 0, 0, 0.05) none !important;
+/* Dark-aware scrollbars. */
+* {
+    scrollbar-color: var(--border) transparent;
 }
 
-.ui p {
-    margin: 0 0 1em !important;
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 
-.ui p:last-child {
-    margin-bottom: 0 !important;
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+    border: 2px solid var(--background);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+}
+
+/* Visually hidden, but available to screen readers. */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Skip-to-content link: hidden until focused. */
+.skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    transform: translateY(-150%);
+    transition: transform 0.2s ease;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+
+.skip-link:focus-visible {
+    transform: translateY(0);
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+/* Card lift on hover — paired with a transition so it eases in/out. */
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -10px rgb(0 0 0 / 0.18);
+    border-color: var(--primary);
+}
+
+/* Subtle fade-in applied to each navigated page via template.tsx. */
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.page-fade-in {
+    animation: page-fade-in 0.3s ease both;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 .blog-content {
-    font-size: medium;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    /* Long URLs / unbreakable strings should wrap instead of forcing the
+       whole page to scroll horizontally on small screens. */
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.blog-content p {
+    margin: 0 0 1em;
+}
+
+/* Display (block) math can be wider than a phone viewport; let it scroll
+   on its own axis rather than overflowing the page. */
+.blog-content .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-block: 0.25rem;
+}
+
+.blog-content p:last-child {
+    margin-bottom: 0;
+}
+
+.blog-content table th,
+.blog-content table td {
+    border: 1px solid var(--border);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+/* Wide tables scroll horizontally within their own container instead of
+   overflowing the viewport on mobile. */
+.blog-content .table-scroll {
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.blog-content :not(pre) > code {
+    background: var(--muted);
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+}
+
+.blog-content pre {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.blog-content pre code {
+    background: transparent;
+    padding: 0;
+    font-size: 0.875rem;
 }
