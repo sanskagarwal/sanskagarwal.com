@@ -38,9 +38,11 @@ After editing a component, build it from its directory to verify before finishin
 - Make only the changes requested; avoid drive-by refactors and new abstractions.
 - Write prose, comments, docs, and UI copy in plain ASCII. No em/en-dashes,
   curly quotes, the ellipsis glyph, non-breaking or zero-width spaces, arrows,
-  or decorative symbols/emojis. Use ASCII replacements instead: `--` or
-  `,`/`:`/`()` for dashes, straight `'`/`"` quotes, `...` for ellipsis, regular
-  spaces, `->` for arrows. Keep docs simple, subtle, and professional.
+  or decorative symbols/emojis. Use ASCII replacements instead: `--` for
+  em-dashes (or `,`/`:`/`()` to restructure), `-` for en-dashes, straight
+  `'`/`"` quotes, `...` for ellipsis, regular spaces, `->` for arrows. Keep
+  punctuation that is genuinely needed (e.g. `Loading...`), just in ASCII form.
+  Keep docs simple, subtle, and professional.
 
 ## Infrastructure & secrets
 

@@ -35,6 +35,6 @@ export const CardGridSkeleton: React.FC<{ count?: number }> = ({
                 <Skeleton className="h-4 w-5/6" />
             </div>
         ))}
-        <span className="sr-only">Loading…</span>
+        <span className="sr-only">Loading...</span>
     </div>
 );

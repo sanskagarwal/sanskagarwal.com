@@ -18,7 +18,7 @@ const Loading = () => (
             <Bar className="w-5/6" />
             <Bar className="w-full" />
             <Bar className="w-2/3" />
-            <span className="sr-only">Loading…</span>
+            <span className="sr-only">Loading...</span>
         </div>
     </ReadingShell>
 );

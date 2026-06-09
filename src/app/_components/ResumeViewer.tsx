@@ -59,7 +59,7 @@ const ResumeViewer: React.FC = () => {
                             <div className="h-6 w-1/2 animate-pulse rounded bg-muted" />
                             <div className="h-72 w-full animate-pulse rounded bg-muted" />
                             <span className="sr-only" role="status">
-                                Loading resume…
+                                Loading resume...
                             </span>
                         </div>
                     )}
