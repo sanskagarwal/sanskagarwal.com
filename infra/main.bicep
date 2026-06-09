@@ -21,6 +21,15 @@ param functionAppName string = 'sanskagarwal-functions'
 @description('Name of the storage account used by the Functions host (3-24 lowercase alphanumeric).')
 param functionStorageAccountName string
 
+@description('Name of the storage account for public static assets (3-24 lowercase alphanumeric).')
+param assetsStorageAccountName string
+
+@description('Name of the Front Door (CDN) profile for static assets.')
+param frontDoorProfileName string = 'afd-sanskagarwal'
+
+@description('Name of the Front Door endpoint for static assets.')
+param frontDoorEndpointName string = 'sanskagarwal-assets'
+
 @description('Name of the Log Analytics workspace.')
 param logAnalyticsName string = 'log-sanskagarwal'
 
@@ -72,10 +81,6 @@ param databasePassword string
 @secure()
 @description('Tandoor API token.')
 param tandoorToken string
-
-@secure()
-@description('Database CA certificate (PEM). Optional.')
-param databaseCaCert string = ''
 
 @secure()
 @description('Postgres password for the CMS (cms_user) role.')
@@ -139,26 +144,16 @@ var nonSecretAppSettings = [
   }
 ]
 
-var webAppSecretRefs = concat(
-  [
-    {
-      name: 'DATABASE_PASSWORD'
-      secretName: 'database-password'
-    }
-    {
-      name: 'TANDOOR_TOKEN'
-      secretName: 'tandoor-token'
-    }
-  ],
-  !empty(databaseCaCert)
-    ? [
-        {
-          name: 'DATABASE_CA_CERT'
-          secretName: 'database-ca-cert'
-        }
-      ]
-    : []
-)
+var webAppSecretRefs = [
+  {
+    name: 'DATABASE_PASSWORD'
+    secretName: 'database-password'
+  }
+  {
+    name: 'TANDOOR_TOKEN'
+    secretName: 'tandoor-token'
+  }
+]
 
 var cmsCustomHostnames = [
   {
@@ -236,7 +231,6 @@ module keyVault 'modules/keyVault.bicep' = {
     location: location
     databasePassword: databasePassword
     tandoorToken: tandoorToken
-    databaseCaCert: databaseCaCert
     databaseCmsPassword: databaseCmsPassword
     strapiAppKeys: strapiAppKeys
     strapiApiTokenSalt: strapiApiTokenSalt
@@ -352,6 +346,24 @@ module functionStorageRoles 'modules/storageRoleAssignment.bicep' = {
   }
 }
 
+// --- Public static assets: storage account + Azure Front Door Standard ---
+module assetsStorage 'modules/assetsStorageAccount.bicep' = {
+  name: 'assetsStorage'
+  params: {
+    name: assetsStorageAccountName
+    location: location
+  }
+}
+
+module frontDoor 'modules/frontDoor.bicep' = {
+  name: 'frontDoor'
+  params: {
+    profileName: frontDoorProfileName
+    endpointName: frontDoorEndpointName
+    originHostName: assetsStorage.outputs.blobHostName
+  }
+}
+
 // --- Alerting: email action group + scheduled-query rule over heartbeat telemetry ---
 module actionGroup 'modules/actionGroup.bicep' = {
   name: 'actionGroup'
@@ -433,3 +445,5 @@ output keyVaultUri string = keyVault.outputs.uri
 output functionAppName string = functionApp.outputs.name
 output functionAppHostName string = functionApp.outputs.defaultHostName
 output appInsightsName string = appInsights.outputs.name
+output assetsStorageAccountName string = assetsStorage.outputs.name
+output frontDoorEndpointHostName string = frontDoor.outputs.endpointHostName

@@ -144,6 +144,7 @@ target is the current Strapi line. Strapi ships an official codemod-driven updat
 3. ✅ `infra/main.bicep`: added a `cmsApp` module (`sanskagarwal-cms`) on `plan-sanskagarwal` with `NODE_ENV=production`, `DATABASE_CLIENT=postgres`, reused `DATABASE_HOST/NAME/PORT/SSL/SSL_REJECT_UNAUTHORIZED`, `DATABASE_USERNAME=cms_user`, the 6 CMS secret refs (env names `DATABASE_PASSWORD`/`APP_KEYS`/`API_TOKEN_SALT`/`ADMIN_JWT_SECRET`/`TRANSFER_TOKEN_SALT`/`JWT_SECRET` — verified against `content/config/{server,admin,database}.ts`), the `cms.sanskagarwal.com` hostname, a `cmsKeyVaultRoleAssignment`, and a `cmsCertificate` + `cmsSniBinding` (reusing the existing managed-cert/SNI modules). The frontend `webApp` call now passes `webAppSecretRefs` instead of `includeDatabaseCaCert`.
 4. ✅ Updated `infra/main.bicepparam` (new `cmsAppName`/`cmsDomain`/`databaseCmsUsername` + `readEnvironmentVariable` for `DATABASE_CMS_PASSWORD` and the 5 `STRAPI_*` secrets) and `.github/workflows/infra.yml` (the new env vars added to both the what-if and deploy steps).
 5. ✅ `main.bicep` + `main.bicepparam` compile clean (no errors/warnings).
+6. ✅ Removed the unused `DATABASE_CA_CERT` plumbing end-to-end (`databaseCaCert` param + `database-ca-cert` KV secret + the webApp secret ref, the `infra.yml` env var, the `src/.env.example` comment, and the dead `ssl.ca` read in `src/app/_dataprovider/RetryQuery.ts`). It was never set; Azure Postgres Flexible Server's root CA is already in Node's bundled CAs, so `rejectUnauthorized: true` works without a custom CA.
 
 ### Remaining manual steps
 
@@ -151,12 +152,38 @@ target is the current Strapi line. Strapi ships an official codemod-driven updat
 - 🟠 DNS: `CNAME admin → sanskagarwal-cms.azurewebsites.net` (must exist before the managed cert can be issued).
 - 🟠 Run `Deploy Infrastructure` (what-if should be clean), then `Deploy CMS Backend`.
 
-## Phase 3 — Storage account + Azure Front Door (static assets) (independent of 1–2)
+## Phase 3 — Storage account + Azure Front Door (static assets) ✅ COMPLETE (2026-06-09)
 
-1. New storage-account module (separate from the Functions host storage) with a public `public` container for `/assets/`.
-2. New `frontDoor.bicep` module: Front Door Standard profile + endpoint + origin group (blob origin) + route, using the **default Front Door endpoint hostname** (`<name>-<hash>.z01.azurefd.net`) — no custom domain / DNS work. Wire into `infra/main.bicep`/bicepparam.
-3. Update `src/app/_utils/Constants.ts` `Resume_URI` default to the new Front Door default endpoint hostname.
-4. Manual: migrate the resume PDF to the new storage; decommission the classic `sansk-cdn` (no DNS changes needed since we use the default FD hostname).
+### As-built
+
+1. ✅ New `infra/modules/assetsStorageAccount.bicep` — StorageV2 (`Standard_LRS`,
+   TLS1_2, HTTPS-only) with `allowBlobPublicAccess: true` and a `public` container at
+   `publicAccess: 'Blob'` (anonymous reads, so Front Door serves assets directly).
+   Separate from the Functions host storage (which keeps public access + shared key
+   disabled). Outputs `blobHostName` (`<name>.blob.core.windows.net`).
+2. ✅ New `infra/modules/frontDoor.bicep` — Front Door **Standard** profile +
+   `afdEndpoint` + origin group (HTTPS health probe) + blob `origin`
+   (`enforceCertificateNameCheck: true`) + `route` (`/*`, `HttpsOnly`,
+   `httpsRedirect: Enabled`, `linkToDefaultDomain: Enabled`). Uses the **default
+   endpoint hostname** — no custom domain / DNS. Outputs `endpointHostName`.
+3. ✅ Wired into `infra/main.bicep` (`assetsStorage` + `frontDoor` modules, params
+   `assetsStorageAccountName`/`frontDoorProfileName`/`frontDoorEndpointName`, outputs
+   `assetsStorageAccountName` + `frontDoorEndpointHostName`) and `infra/main.bicepparam`
+   (`stsanskagarwalassets` / `afd-sanskagarwal` / `sanskagarwal-assets`). Compiles clean.
+
+### Remaining manual steps
+
+- 🟠 Deploy infra, then read the `frontDoorEndpointHostName` output (the
+  `<endpoint>-<hash>.z01.azurefd.net` hostname is only known post-deploy — it cannot be
+  hardcoded ahead of time).
+- 🟠 Upload the resume PDF to the new `public` container under `assets/` (same path
+  layout as today: `/public/assets/Sanskar_Agarwal_Resume_Aug_25.pdf`).
+- 🟠 Point the frontend at the new host — set `NEXT_PUBLIC_RESUME_URI`
+  (`https://<fd-host>/public/assets/Sanskar_Agarwal_Resume_Aug_25.pdf`) and/or update the
+  `Resume_URI` default in `src/app/_utils/Constants.ts`. Left unchanged in code for now
+  because the working classic-CDN default must stay live until the FD host exists.
+- 🟠 Decommission the classic `sansk-cdn` once the FD URL is verified (no DNS changes —
+  default FD hostname).
 
 ## Verification
 
@@ -165,7 +192,7 @@ target is the current Strapi line. Strapi ships an official codemod-driven updat
    as itself; `web_user` reads only `blogs`+`notes` via `app_readonly`, with no direct
    grants. (Applied to prod 2026-06-09.)
 2. Phase 1: `cd content && npm install && npm run build` passes; `Deploy CMS Backend` runs green via OIDC.
-3. Phase 2: `az deployment group what-if` is clean; CMS admin reachable at `cms.sanskagarwal.com` over HTTPS.
+3. Phase 2: `az deployment group what-if` is clean; CMS admin reachable at `admin.sanskagarwal.com` over HTTPS.
 4. Phase 3: resume PDF loads via the Front Door URL on the live frontend.
 
 ## Decisions

@@ -16,10 +16,6 @@ param databasePassword string
 param tandoorToken string
 
 @secure()
-@description('Database CA certificate (PEM contents). Optional; pass empty string to skip.')
-param databaseCaCert string = ''
-
-@secure()
 @description('Postgres password for the CMS (cms_user) role.')
 param databaseCmsPassword string = ''
 
@@ -72,14 +68,6 @@ resource tandoorTokenSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
   name: 'tandoor-token'
   properties: {
     value: tandoorToken
-  }
-}
-
-resource databaseCaCertSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = if (!empty(databaseCaCert)) {
-  parent: vault
-  name: 'database-ca-cert'
-  properties: {
-    value: databaseCaCert
   }
 }
 

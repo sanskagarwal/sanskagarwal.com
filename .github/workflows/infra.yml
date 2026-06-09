@@ -39,7 +39,6 @@ jobs:
               env:
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
-                  DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
                   ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
                   DATABASE_CMS_PASSWORD: ${{ secrets.DATABASE_CMS_PASSWORD }}
                   STRAPI_APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}
@@ -60,7 +59,6 @@ jobs:
               env:
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
-                  DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
                   ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
                   DATABASE_CMS_PASSWORD: ${{ secrets.DATABASE_CMS_PASSWORD }}
                   STRAPI_APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}

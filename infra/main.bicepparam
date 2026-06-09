@@ -14,6 +14,11 @@ param logAnalyticsName = 'log-sanskagarwal'
 param appInsightsName = 'appi-sanskagarwal'
 param alertEmailAddress = readEnvironmentVariable('ALERT_EMAIL', '')
 
+// Public static assets (resume PDF) + Azure Front Door
+param assetsStorageAccountName = 'stsanskagarwalassets'
+param frontDoorProfileName = 'afd-sanskagarwal'
+param frontDoorEndpointName = 'sanskagarwal-assets'
+
 // Custom domains
 param apexDomain = 'sanskagarwal.com'
 param wwwDomain = 'www.sanskagarwal.com'
@@ -34,7 +39,6 @@ param databaseSslRejectUnauthorized = 'true'
 // Secrets sourced from environment variables at deploy time (never commit values)
 param databasePassword = readEnvironmentVariable('DATABASE_PASSWORD', '')
 param tandoorToken = readEnvironmentVariable('TANDOOR_TOKEN', '')
-param databaseCaCert = readEnvironmentVariable('DATABASE_CA_CERT', '')
 param databaseCmsPassword = readEnvironmentVariable('DATABASE_CMS_PASSWORD', '')
 param strapiAppKeys = readEnvironmentVariable('STRAPI_APP_KEYS', '')
 param strapiApiTokenSalt = readEnvironmentVariable('STRAPI_API_TOKEN_SALT', '')
