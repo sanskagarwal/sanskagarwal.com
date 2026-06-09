@@ -1,63 +1,63 @@
 import { app, InvocationContext, Timer } from "@azure/functions";
-import axios, { HttpStatusCode } from "axios";
 
 import { Constants } from "../constants";
-import { trackEvent, trackException } from "../telemetry";
+import { recordEndpointHealth } from "../telemetry";
+
+// Per-request timeout for endpoint probes.
+const REQUEST_TIMEOUT_MS = 10_000;
 
 export async function heartbeat(
     myTimer: Timer,
     context: InvocationContext
 ): Promise<void> {
-    const timeStamp = new Date().toISOString();
     if (myTimer.isPastDue) {
-        context.log("Heartbeat function is running late!");
+        context.warn("Heartbeat function is running late!");
     }
 
-    context.log("Heartbeat function ran!", timeStamp);
+    context.log("Heartbeat function ran!", new Date().toISOString());
 
-    // Dynamically get all URLs from Constants
-    const urls = Object.entries(Constants);
-
-    for (const [name, { url, expectedContent }] of urls) {
-        context.log(`Checking ${name} (${url})...`);
-        try {
-            const res = await axios.get(url, {
-                validateStatus: (status) => {
-                    return status == HttpStatusCode.Ok;
-                },
-            });
-
-            context.log(`${name} responded with status: ${res.status}`);
-
-            // Validate response content
-            if (res.data && res.data.includes(expectedContent)) {
-                context.log(`${name} is healthy. Content validated.`);
-                trackEvent(`${name}_Healthy`, { status: res.status });
-            } else {
-                throw new Error(`${name} returned unexpected content.`);
-            }
-        } catch (error) {
-            handleError(context, error, name);
-        }
-    }
+    await Promise.all(
+        Object.entries(Constants).map(([name, check]) =>
+            checkEndpoint(context, name, check.url, check.expectedContent)
+        )
+    );
 }
 
-function handleError(context: InvocationContext, error: any, name: string) {
-    if (error.response) {
-        // The request was made and the server responded with a status code
-        context.log(`${name} responded with status: ${error.response.status}`);
-        context.log(error.response.data);
-        context.log(error.response.headers);
-    } else if (error.request) {
-        // The request was made but no response was received
-        context.log(`${name} did not respond.`);
-        context.log(error.request);
-    } else {
-        // Something happened in setting up the request
-        context.log(`Error with ${name}: ${error.message}`);
-    }
+async function checkEndpoint(
+    context: InvocationContext,
+    name: string,
+    url: string,
+    expectedContent: string
+): Promise<void> {
+    context.log(`Checking ${name} (${url})...`);
 
-    trackException(new Error(`${name}: ${error.message}`));
+    try {
+        const res = await fetch(url, {
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+            redirect: "follow",
+        });
+
+        if (!res.ok) {
+            recordEndpointHealth(context, name, false, {
+                status: res.status,
+                reason: `Unexpected status ${res.status}`,
+            });
+            return;
+        }
+
+        const body = await res.text();
+        if (body.includes(expectedContent)) {
+            recordEndpointHealth(context, name, true, { status: res.status });
+        } else {
+            recordEndpointHealth(context, name, false, {
+                status: res.status,
+                reason: "Response did not contain expected content",
+            });
+        }
+    } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        recordEndpointHealth(context, name, false, { reason });
+    }
 }
 
 app.timer("heartbeat", {

@@ -1,4 +1,9 @@
-export const Constants = {
+export interface EndpointCheck {
+    url: string;
+    expectedContent: string;
+}
+
+export const Constants: Record<string, EndpointCheck> = {
     MAIN_URI: {
         url: "https://sanskagarwal.com",
         expectedContent: "Personal Website",
