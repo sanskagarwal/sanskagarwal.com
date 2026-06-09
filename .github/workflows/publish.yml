@@ -20,4 +20,5 @@ jobs:
             app-name: "sanskagarwal"
             deploy-type: "webapp"
             node-version: "24.x"
+            standalone: true
         secrets: inherit

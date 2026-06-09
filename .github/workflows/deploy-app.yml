@@ -38,6 +38,11 @@ on:
                 required: false
                 default: "app-package"
                 type: string
+            standalone:
+                description: "Assemble Next.js standalone output (.next/standalone) for deployment."
+                required: false
+                default: false
+                type: boolean
 
 permissions:
     contents: read
@@ -66,11 +71,22 @@ jobs:
                   npm run test --if-present
                   popd
 
+            # Next.js standalone output ships a self-contained server with its own
+            # minimal node_modules. Static assets and public/ are not copied by
+            # `next build`, so fold them into the bundle before packaging.
+            - name: "Assemble Next.js standalone bundle"
+              if: ${{ inputs.standalone }}
+              run: |
+                  pushd './${{ inputs.package-path }}'
+                  cp -r .next/static .next/standalone/.next/static
+                  if [ -d public ]; then cp -r public .next/standalone/public; fi
+                  popd
+
             - name: "Upload build artifact"
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: ${{ inputs.artifact-name }}
-                  path: ${{ inputs.package-path }}
+                  path: ${{ inputs.standalone && format('{0}/.next/standalone', inputs.package-path) || inputs.package-path }}
                   include-hidden-files: true
 
     deploy:
@@ -80,13 +96,13 @@ jobs:
         environment: ${{ inputs.environment }}
         steps:
             - name: "Download build artifact"
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v6
               with:
                   name: ${{ inputs.artifact-name }}
                   path: ${{ inputs.package-path }}
 
             - name: "Azure login (OIDC)"
-              uses: azure/login@v2
+              uses: azure/login@v3
               with:
                   client-id: ${{ secrets.AZURE_CLIENT_ID }}
                   tenant-id: ${{ secrets.AZURE_TENANT_ID }}

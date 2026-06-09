@@ -269,6 +269,9 @@ module webApp 'modules/webApp.bicep' = {
     appSettings: nonSecretAppSettings
     customHostnames: customHostnames
     keyVaultSecretRefs: webAppSecretRefs
+    // Next.js standalone output produces a self-contained server.js at the
+    // deployment root; start it directly instead of `npm run start`.
+    appCommandLine: 'node server.js'
   }
 }
 
