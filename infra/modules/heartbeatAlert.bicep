@@ -23,10 +23,12 @@ param severity int = 1
 
 // The heartbeat function logs an Error-severity trace ("heartbeat: <endpoint>
 // unhealthy") for every failed endpoint check. Any such trace in the window
-// fires the alert.
+// fires the alert. The rule is scoped directly to the Application Insights
+// component, so it uses the classic AI schema (table "traces", column
+// "message") rather than the Log Analytics workspace schema (AppTraces/Message).
 var query = '''
-AppTraces
-| where Message startswith "heartbeat:" and Message has "unhealthy"
+traces
+| where message startswith "heartbeat:" and message has "unhealthy"
 '''
 
 resource rule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-preview' = {

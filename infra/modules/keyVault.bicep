@@ -50,7 +50,6 @@ resource vault 'Microsoft.KeyVault/vaults@2024-11-01' = {
     }
     enableRbacAuthorization: true
     enableSoftDelete: true
-    softDeleteRetentionInDays: 7
     publicNetworkAccess: 'Enabled'
   }
 }
