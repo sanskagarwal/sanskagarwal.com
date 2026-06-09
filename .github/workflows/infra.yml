@@ -48,16 +48,18 @@ jobs:
                         --template-file infra/main.bicep \
                         --parameters infra/main.bicepparam
 
-            - name: "Deploy Bicep"
-              uses: azure/cli@v2
-              env:
-                  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-                  TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
-                  DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
-              with:
-                  azcliversion: latest
-                  inlineScript: |
-                      az deployment group create \
-                        --resource-group "$RESOURCE_GROUP" \
-                        --template-file infra/main.bicep \
-                        --parameters infra/main.bicepparam
+            # Actual deployment disabled during testing; what-if above previews changes only.
+            # Uncomment to apply the infrastructure changes.
+            # - name: "Deploy Bicep"
+            #   uses: azure/cli@v2
+            #   env:
+            #       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+            #       TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
+            #       DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
+            #   with:
+            #       azcliversion: latest
+            #       inlineScript: |
+            #           az deployment group create \
+            #             --resource-group "$RESOURCE_GROUP" \
+            #             --template-file infra/main.bicep \
+            #             --parameters infra/main.bicepparam

@@ -26,9 +26,9 @@ set -euo pipefail
 
 APP_NAME="gh-sanskagarwal-deploy"
 BRANCH="main"
-SUBSCRIPTION=""
-RESOURCE_GROUP=""
-REPO=""
+SUBSCRIPTION="eb270aad-4b3b-4ac4-b9f6-30da6e7fa49e"
+RESOURCE_GROUP="website"
+REPO="sanskagarwal/sanskagarwal.com"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in

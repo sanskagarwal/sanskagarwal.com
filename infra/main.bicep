@@ -120,6 +120,7 @@ module webApp 'modules/webApp.bicep' = {
     keyVaultName: keyVault.outputs.name
     appSettings: nonSecretAppSettings
     customHostnames: customHostnames
+    includeDatabaseCaCert: !empty(databaseCaCert)
   }
 }
 

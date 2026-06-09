@@ -22,20 +22,29 @@ param appSettings array = []
 @description('Custom hostnames to register. Each item: { name: string, dnsRecordType: \'A\' | \'CName\' }.')
 param customHostnames array = []
 
-var keyVaultSecretSettings = [
-  {
-    name: 'DATABASE_PASSWORD'
-    value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-password)'
-  }
-  {
-    name: 'TANDOOR_TOKEN'
-    value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=tandoor-token)'
-  }
-  {
-    name: 'DATABASE_CA_CERT'
-    value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-ca-cert)'
-  }
-]
+@description('Whether the optional DATABASE_CA_CERT secret exists in Key Vault.')
+param includeDatabaseCaCert bool = false
+
+var keyVaultSecretSettings = concat(
+  [
+    {
+      name: 'DATABASE_PASSWORD'
+      value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-password)'
+    }
+    {
+      name: 'TANDOOR_TOKEN'
+      value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=tandoor-token)'
+    }
+  ],
+  includeDatabaseCaCert
+    ? [
+        {
+          name: 'DATABASE_CA_CERT'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-ca-cert)'
+        }
+      ]
+    : []
+)
 
 resource site 'Microsoft.Web/sites@2024-04-01' = {
   name: name
@@ -68,6 +77,24 @@ resource site 'Microsoft.Web/sites@2024-04-01' = {
         keyVaultSecretSettings
       )
     }
+  }
+}
+
+// Disable basic (local) auth for SCM/Kudu and FTP so deployments must use
+// Entra ID (OIDC). This removes publish-profile / username+password access.
+resource scmBasicAuth 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
+  parent: site
+  name: 'scm'
+  properties: {
+    allow: false
+  }
+}
+
+resource ftpBasicAuth 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2024-04-01' = {
+  parent: site
+  name: 'ftp'
+  properties: {
+    allow: false
   }
 }
 
