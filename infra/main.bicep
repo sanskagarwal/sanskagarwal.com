@@ -111,11 +111,13 @@ var customHostnames = [
     name: apexDomain
     dnsRecordType: 'A'
     webAppName: webAppName
+    certificateResourceName: '${apexDomain}-${webAppName}-undefined'
   }
   {
     name: wwwDomain
     dnsRecordType: 'CName'
     webAppName: webAppName
+    certificateResourceName: '${wwwDomain}-${webAppName}-undefined'
   }
 ]
 
@@ -162,6 +164,7 @@ var cmsCustomHostnames = [
     name: cmsDomain
     dnsRecordType: 'CName'
     webAppName: cmsAppName
+    certificateResourceName: '${cmsDomain}-${cmsAppName}'
   }
 ]
 
@@ -389,39 +392,25 @@ module heartbeatAlert 'modules/heartbeatAlert.bicep' = {
   }
 }
 
-// Issue a managed certificate per hostname (after the hostname bindings exist).
-// @batchSize(1) serializes issuance because http-token validation touches the
-// bound site and parallel runs can race on the same web app.
-@batchSize(1)
-module certificates 'modules/managedCertificate.bicep' = [
-  for host in allCustomHostnames: {
-    name: 'cert-${replace(host.name, '.', '-')}'
-    params: {
-      name: 'cert-${replace(host.name, '.', '-')}'
-      location: location
-      serverFarmId: appServicePlan.outputs.id
-      canonicalName: host.name
-    }
-    dependsOn: [
-      webApp
-      cmsApp
-    ]
-  }
-]
-
-// Bind each managed certificate to its hostname via SNI (final pass).
+// Bind each App Service managed certificate to its hostname via SNI (final
+// pass). The certificate already exists (App Service issues it when the custom
+// hostname is added); sniBinding references it by name to read the thumbprint.
 // @batchSize(1) serializes the bindings: apex and www target the same site, and
 // App Service only allows one site mutation at a time.
 @batchSize(1)
 module sniBindings 'modules/sniBinding.bicep' = [
-  for (host, i) in allCustomHostnames: {
+  for host in allCustomHostnames: {
     name: 'sni-${replace(host.name, '.', '-')}'
     params: {
       webAppName: host.webAppName
       hostname: host.name
       dnsRecordType: host.dnsRecordType
-      thumbprint: certificates[i].outputs.thumbprint
+      certificateResourceName: host.certificateResourceName
     }
+    dependsOn: [
+      webApp
+      cmsApp
+    ]
   }
 ]
 
