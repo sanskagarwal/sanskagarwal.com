@@ -110,10 +110,12 @@ var customHostnames = [
   {
     name: apexDomain
     dnsRecordType: 'A'
+    webAppName: webAppName
   }
   {
     name: wwwDomain
     dnsRecordType: 'CName'
+    webAppName: webAppName
   }
 ]
 
@@ -159,8 +161,13 @@ var cmsCustomHostnames = [
   {
     name: cmsDomain
     dnsRecordType: 'CName'
+    webAppName: cmsAppName
   }
 ]
+
+// All custom hostnames across both apps, used to drive the managed-certificate
+// and SNI-binding passes in a single loop.
+var allCustomHostnames = concat(customHostnames, cmsCustomHostnames)
 
 var cmsNonSecretAppSettings = [
   {
@@ -262,15 +269,6 @@ module webApp 'modules/webApp.bicep' = {
   }
 }
 
-// Grant the web app's managed identity read access to the Key Vault secrets.
-module keyVaultRoleAssignment 'modules/keyVaultRoleAssignment.bicep' = {
-  name: 'keyVaultRoleAssignment'
-  params: {
-    keyVaultName: keyVault.outputs.name
-    principalId: webApp.outputs.principalId
-  }
-}
-
 // --- Strapi CMS web app (shares the existing App Service Plan) ---
 module cmsApp 'modules/webApp.bicep' = {
   name: 'cmsApp'
@@ -285,14 +283,21 @@ module cmsApp 'modules/webApp.bicep' = {
   }
 }
 
-// Grant the CMS app's managed identity read access to the Key Vault secrets.
-module cmsKeyVaultRoleAssignment 'modules/keyVaultRoleAssignment.bicep' = {
-  name: 'cmsKeyVaultRoleAssignment'
-  params: {
-    keyVaultName: keyVault.outputs.name
-    principalId: cmsApp.outputs.principalId
+// Grant each app's managed identity read access to the Key Vault secrets.
+var keyVaultReaderNames = [
+  'keyVaultRoleAssignment'
+  'cmsKeyVaultRoleAssignment'
+]
+
+module keyVaultRoleAssignments 'modules/keyVaultRoleAssignment.bicep' = [
+  for (readerName, i) in keyVaultReaderNames: {
+    name: readerName
+    params: {
+      keyVaultName: keyVault.outputs.name
+      principalId: i == 0 ? webApp.outputs.principalId : cmsApp.outputs.principalId
+    }
   }
-}
+]
 
 // --- Observability: Log Analytics + workspace-based Application Insights ---
 module logAnalytics 'modules/logAnalytics.bicep' = {
@@ -386,7 +391,7 @@ module heartbeatAlert 'modules/heartbeatAlert.bicep' = {
 
 // Issue a managed certificate per hostname (after the hostname bindings exist).
 module certificates 'modules/managedCertificate.bicep' = [
-  for host in customHostnames: {
+  for host in allCustomHostnames: {
     name: 'cert-${replace(host.name, '.', '-')}'
     params: {
       name: 'cert-${replace(host.name, '.', '-')}'
@@ -396,46 +401,23 @@ module certificates 'modules/managedCertificate.bicep' = [
     }
     dependsOn: [
       webApp
+      cmsApp
     ]
   }
 ]
 
 // Bind each managed certificate to its hostname via SNI (final pass).
 module sniBindings 'modules/sniBinding.bicep' = [
-  for (host, i) in customHostnames: {
+  for (host, i) in allCustomHostnames: {
     name: 'sni-${replace(host.name, '.', '-')}'
     params: {
-      webAppName: webAppName
+      webAppName: host.webAppName
       hostname: host.name
       dnsRecordType: host.dnsRecordType
       thumbprint: certificates[i].outputs.thumbprint
     }
   }
 ]
-
-// Managed certificate + SNI binding for the CMS hostname.
-module cmsCertificate 'modules/managedCertificate.bicep' = {
-  name: 'cert-${replace(cmsDomain, '.', '-')}'
-  params: {
-    name: 'cert-${replace(cmsDomain, '.', '-')}'
-    location: location
-    serverFarmId: appServicePlan.outputs.id
-    canonicalName: cmsDomain
-  }
-  dependsOn: [
-    cmsApp
-  ]
-}
-
-module cmsSniBinding 'modules/sniBinding.bicep' = {
-  name: 'sni-${replace(cmsDomain, '.', '-')}'
-  params: {
-    webAppName: cmsAppName
-    hostname: cmsDomain
-    dnsRecordType: 'CName'
-    thumbprint: cmsCertificate.outputs.thumbprint
-  }
-}
 
 output webAppName string = webApp.outputs.name
 output defaultHostName string = webApp.outputs.defaultHostName

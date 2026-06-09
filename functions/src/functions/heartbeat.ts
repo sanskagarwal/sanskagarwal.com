@@ -6,6 +6,9 @@ import { recordEndpointHealth, FailureReason } from "../telemetry";
 // Per-request timeout for endpoint probes.
 const REQUEST_TIMEOUT_MS = 10_000;
 
+// error.name set by AbortSignal.timeout() when the request exceeds REQUEST_TIMEOUT_MS.
+const TIMEOUT_ERROR_NAME = "TimeoutError";
+
 export async function heartbeat(
     myTimer: Timer,
     context: InvocationContext
@@ -78,7 +81,7 @@ async function runCheck(
     } catch (error) {
         const durationMs = Math.round(performance.now() - start);
         const reason: FailureReason =
-            error instanceof Error && error.name === "TimeoutError"
+            error instanceof Error && error.name === TIMEOUT_ERROR_NAME
                 ? "timeout"
                 : "network";
         const detail = error instanceof Error ? error.message : String(error);

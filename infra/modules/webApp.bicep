@@ -25,6 +25,10 @@ param customHostnames array = []
 @description('Key Vault secret references exposed as app settings. Each item: { name: string, secretName: string }.')
 param keyVaultSecretRefs array = []
 
+// Major Node version derived from linuxFxVersion (e.g. 'NODE|24-lts' -> '~24') so
+// WEBSITE_NODE_DEFAULT_VERSION cannot drift from the configured runtime.
+var nodeDefaultVersion = '~${split(split(linuxFxVersion, '|')[1], '-')[0]}'
+
 var keyVaultSecretSettings = [
   for ref in keyVaultSecretRefs: {
     name: ref.name
@@ -56,7 +60,7 @@ resource site 'Microsoft.Web/sites@2024-04-01' = {
           }
           {
             name: 'WEBSITE_NODE_DEFAULT_VERSION'
-            value: '~24'
+            value: nodeDefaultVersion
           }
         ],
         appSettings,
