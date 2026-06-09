@@ -1,6 +1,7 @@
 name: Deploy Infrastructure
 
 on:
+    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
     # push:
     #     branches: ["main"]
     #     paths:
@@ -38,7 +39,13 @@ jobs:
               env:
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
-                  DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
+                  ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+                  DATABASE_CMS_PASSWORD: ${{ secrets.DATABASE_CMS_PASSWORD }}
+                  STRAPI_APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}
+                  STRAPI_API_TOKEN_SALT: ${{ secrets.STRAPI_API_TOKEN_SALT }}
+                  STRAPI_ADMIN_JWT_SECRET: ${{ secrets.STRAPI_ADMIN_JWT_SECRET }}
+                  STRAPI_TRANSFER_TOKEN_SALT: ${{ secrets.STRAPI_TRANSFER_TOKEN_SALT }}
+                  STRAPI_JWT_SECRET: ${{ secrets.STRAPI_JWT_SECRET }}
               with:
                   azcliversion: latest
                   inlineScript: |
@@ -52,7 +59,13 @@ jobs:
               env:
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
-                  DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
+                  ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+                  DATABASE_CMS_PASSWORD: ${{ secrets.DATABASE_CMS_PASSWORD }}
+                  STRAPI_APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}
+                  STRAPI_API_TOKEN_SALT: ${{ secrets.STRAPI_API_TOKEN_SALT }}
+                  STRAPI_ADMIN_JWT_SECRET: ${{ secrets.STRAPI_ADMIN_JWT_SECRET }}
+                  STRAPI_TRANSFER_TOKEN_SALT: ${{ secrets.STRAPI_TRANSFER_TOKEN_SALT }}
+                  STRAPI_JWT_SECRET: ${{ secrets.STRAPI_JWT_SECRET }}
               with:
                   azcliversion: latest
                   inlineScript: |

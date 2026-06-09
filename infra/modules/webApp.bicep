@@ -22,29 +22,19 @@ param appSettings array = []
 @description('Custom hostnames to register. Each item: { name: string, dnsRecordType: \'A\' | \'CName\' }.')
 param customHostnames array = []
 
-@description('Whether the optional DATABASE_CA_CERT secret exists in Key Vault.')
-param includeDatabaseCaCert bool = false
+@description('Key Vault secret references exposed as app settings. Each item: { name: string, secretName: string }.')
+param keyVaultSecretRefs array = []
 
-var keyVaultSecretSettings = concat(
-  [
-    {
-      name: 'DATABASE_PASSWORD'
-      value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-password)'
-    }
-    {
-      name: 'TANDOOR_TOKEN'
-      value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=tandoor-token)'
-    }
-  ],
-  includeDatabaseCaCert
-    ? [
-        {
-          name: 'DATABASE_CA_CERT'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-ca-cert)'
-        }
-      ]
-    : []
-)
+// Major Node version derived from linuxFxVersion (e.g. 'NODE|24-lts' -> '~24') so
+// WEBSITE_NODE_DEFAULT_VERSION cannot drift from the configured runtime.
+var nodeDefaultVersion = '~${split(split(linuxFxVersion, '|')[1], '-')[0]}'
+
+var keyVaultSecretSettings = [
+  for ref in keyVaultSecretRefs: {
+    name: ref.name
+    value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${ref.secretName})'
+  }
+]
 
 resource site 'Microsoft.Web/sites@2024-04-01' = {
   name: name
@@ -70,7 +60,7 @@ resource site 'Microsoft.Web/sites@2024-04-01' = {
           }
           {
             name: 'WEBSITE_NODE_DEFAULT_VERSION'
-            value: '~24'
+            value: nodeDefaultVersion
           }
         ],
         appSettings,

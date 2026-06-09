@@ -33,7 +33,6 @@ const buildPoolConfig = (): PoolConfig => {
             ? false
             : {
                   rejectUnauthorized,
-                  ca: process.env.DATABASE_CA_CERT,
               },
     };
 };

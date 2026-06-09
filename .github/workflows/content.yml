@@ -8,43 +8,16 @@ on:
     #         - content/**
     workflow_dispatch:
 
-env:
-    AZURE_WEBAPP_NAME: sanskagarwal-cms
-    PACKAGE_PATH: "content"
-    NODE_VERSION: "22.x"
-
 permissions:
     contents: read
+    id-token: write
 
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-
-        steps:
-            - name: "Checkout GitHub Action"
-              uses: actions/checkout@v4
-
-            - name: "Setup Node ${{ env.NODE_VERSION }} Environment"
-              uses: actions/setup-node@v3
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "npm"
-                  cache-dependency-path: ${{ env.PACKAGE_PATH }}/package-lock.json
-
-            - name: npm install, build, and test
-              run: |
-                  pushd './${{ env.PACKAGE_PATH }}'
-                  npm install
-                  npm run build
-                  npm run test --if-present
-                  popd
-
-            - name: "Deploy to Azure WebApp"
-              id: deploy-to-webapp
-              uses: azure/webapps-deploy@v3
-              with:
-                  app-name: ${{ env.AZURE_WEBAPP_NAME }}
-                  publish-profile: ${{ secrets.AZURE_CONTENTAPP_PUBLISH_PROFILE }}
-                  package: ${{ env.PACKAGE_PATH }}
+    build-and-deploy:
+        uses: ./.github/workflows/deploy-app.yml
+        with:
+            package-path: "content"
+            app-name: "sanskagarwal-cms"
+            deploy-type: "webapp"
+            node-version: "24.x"
+        secrets: inherit
