@@ -1,49 +1,23 @@
 name: Deploy Next App
 
 on:
-    push:
-        branches: ["main"]
-        paths:
-            - src/**
+    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
+    # push:
+    #     branches: ["main"]
+    #     paths:
+    #         - src/**
     workflow_dispatch:
-
-env:
-    AZURE_WEBAPP_NAME: sanskagarwal
-    PACKAGE_PATH: "src"
-    NODE_VERSION: "22.x"
 
 permissions:
     contents: read
+    id-token: write
 
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: read
-
-        steps:
-            - name: "Checkout GitHub Action"
-              uses: actions/checkout@v4
-
-            - name: "Setup Node ${{ env.NODE_VERSION }} Environment"
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "npm"
-                  cache-dependency-path: ${{ env.PACKAGE_PATH }}/package-lock.json
-
-            - name: npm install, build, and test
-              run: |
-                  pushd './${{ env.PACKAGE_PATH }}'
-                  npm install
-                  npm run build
-                  npm run test --if-present
-                  popd
-
-            - name: "Deploy to Azure WebApp"
-              id: deploy-to-webapp
-              uses: azure/webapps-deploy@v3
-              with:
-                  app-name: ${{ env.AZURE_WEBAPP_NAME }}
-                  publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-                  package: ${{ env.PACKAGE_PATH }}
+    build-and-deploy:
+        uses: ./.github/workflows/deploy-app.yml
+        with:
+            package-path: "src"
+            app-name: "sanskagarwal"
+            deploy-type: "webapp"
+            node-version: "24.x"
+        secrets: inherit
