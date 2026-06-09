@@ -157,7 +157,7 @@ export const ContentList: React.FC<ContentListProps> = ({
     const pageCount = Math.ceil(filteredItems.length / itemsPerPage);
 
     // If active filters shrink the list past the current page, snap back to the
-    // first page during render — React recommends this over a state-syncing
+    // first page during render. React recommends this over a state-syncing
     // effect (https://react.dev/learn/you-might-not-need-an-effect).
     if (currentPage > pageCount && pageCount > 0) {
         setCurrentPage(1);

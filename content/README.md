@@ -1,61 +1,40 @@
-# 🚀 Getting started with Strapi
+# content/
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+Headless CMS for sanskagarwal.com, built on [Strapi](https://strapi.io) and
+backed by PostgreSQL. It serves blog and note content to the public website in
+[`src/`](../src). See the root [README.md](../README.md) and
+[AGENTS.md](../AGENTS.md) for the monorepo overview and conventions.
 
-### `develop`
+## Requirements
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+- Node 24
+- A PostgreSQL database (connection configured via environment variables)
 
-```
-npm run develop
-# or
-yarn develop
-```
+## Getting started
 
-### `start`
-
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
-
-```
-npm run start
-# or
-yarn start
+```bash
+cd content
+npm install
+npm run dev      # Strapi admin at http://localhost:1337/admin
 ```
 
-### `build`
+## Scripts
 
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
+- `npm run dev` - start Strapi in develop mode with autoReload.
+- `npm run build` - build the admin panel.
+- `npm run start` - start Strapi with autoReload disabled (production).
+- `npm run db` - run the database management script in [`scripts/`](scripts/README.md).
 
-```
-npm run build
-# or
-yarn build
-```
+## Configuration
 
-## ⚙️ Deployment
+Runtime config lives in [`config/`](config) and reads from environment
+variables (database connection, app keys, JWT secrets). Never commit secret
+values. In Azure these are supplied at deploy time and sourced from Key Vault.
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+## Deployment
 
-```
-yarn strapi deploy
-```
-
-## 📚 Learn more
-
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+Deployed to an Azure Web App via the
+[`content.yml`](../.github/workflows/content.yml) GitHub Actions workflow, which
+uses the shared [`deploy-app.yml`](../.github/workflows/deploy-app.yml) and Azure
+OIDC. It runs on pushes to `main` that touch `content/**`, or manually via
+workflow_dispatch.

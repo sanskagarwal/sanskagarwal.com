@@ -1,11 +1,10 @@
 name: Deploy CMS Backend
 
 on:
-    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
-    # push:
-    #     branches: ["main"]
-    #     paths:
-    #         - content/**
+    push:
+        branches: ["main"]
+        paths:
+            - content/**
     workflow_dispatch:
 
 permissions:

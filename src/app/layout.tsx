@@ -16,11 +16,11 @@ export const metadata: Metadata = {
         default: "Sanskar Agarwal",
         template: "%s · Sanskar Agarwal",
     },
-    description: "Personal website of Sanskar Agarwal — blog, notes, and recipes.",
+    description: "Personal website of Sanskar Agarwal: blog, notes, and recipes.",
     openGraph: {
         title: "Sanskar Agarwal",
         description:
-            "Personal website of Sanskar Agarwal — blog, notes, and recipes.",
+            "Personal website of Sanskar Agarwal: blog, notes, and recipes.",
         url: "https://sanskagarwal.com",
         siteName: "Sanskar Agarwal",
         type: "website",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "Sanskar Agarwal",
         description:
-            "Personal website of Sanskar Agarwal — blog, notes, and recipes.",
+            "Personal website of Sanskar Agarwal: blog, notes, and recipes.",
     },
 };
 

@@ -155,7 +155,7 @@ const getHTML = (content: string) => {
                     },
                     pre({ node, children, ...props }) {
                         // Fenced code blocks (```lang) and mermaid diagrams
-                        // already render their own block wrapper — the
+                        // already render their own block wrapper: the
                         // SyntaxHighlighter's <pre> (FocusablePre) or Mermaid's
                         // <div>. Adding another <pre> here would produce invalid
                         // <pre><pre> / <pre><div> nesting, so pass the child

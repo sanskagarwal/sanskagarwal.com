@@ -160,7 +160,7 @@ button:not(:disabled),
     outline-offset: 2px;
 }
 
-/* Card lift on hover — paired with a transition so it eases in/out. */
+/* Card lift on hover, paired with a transition so it eases in/out. */
 .card-hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease,
         border-color 0.2s ease;

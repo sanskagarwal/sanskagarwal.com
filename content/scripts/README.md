@@ -36,9 +36,9 @@ graph TD
 ## Key rules
 
 - **Allow-list, not blanket access**: `app_readonly` gets `SELECT` on exactly the
-  tables the frontend needs. **No default privileges** — new Strapi tables stay
+  tables the frontend needs. **No default privileges**: new Strapi tables stay
   unreadable until added via `npm run db -- apply --read-tables "..."`.
 - **Least privilege**: `web_user` holds no direct grants and cannot write anything.
 - **Admin without role-switching**: `sanskar` manages every table via `cms_user`
-  membership — no `SET ROLE`, no logging in as `cms_user`.
+  membership, no `SET ROLE`, no logging in as `cms_user`.
 - Azure defaults (`public` owned by `azure_pg_admin`, `PUBLIC` usage) are untouched.

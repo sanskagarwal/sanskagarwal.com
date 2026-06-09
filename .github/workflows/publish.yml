@@ -1,11 +1,10 @@
 name: Deploy Next App
 
 on:
-    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
-    # push:
-    #     branches: ["main"]
-    #     paths:
-    #         - src/**
+    push:
+        branches: ["main"]
+        paths:
+            - src/**
     workflow_dispatch:
 
 permissions:

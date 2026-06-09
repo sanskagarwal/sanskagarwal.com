@@ -1,11 +1,10 @@
 name: Deploy Infrastructure
 
 on:
-    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
-    # push:
-    #     branches: ["main"]
-    #     paths:
-    #         - infra/**
+    push:
+        branches: ["main"]
+        paths:
+            - infra/**
     workflow_dispatch:
 
 env:

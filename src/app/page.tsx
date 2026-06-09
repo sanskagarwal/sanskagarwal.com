@@ -110,7 +110,7 @@ const Home = async () => {
                 </div>
                 {recentBlogs.length === 0 ? (
                     <p className="mt-4 text-muted-foreground">
-                        No posts yet — check back soon.
+                        No posts yet. Check back soon.
                     </p>
                 ) : (
                     <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

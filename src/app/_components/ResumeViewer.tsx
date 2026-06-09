@@ -8,7 +8,7 @@ import { Constants } from "../_utils/Constants";
 import { Button } from "./ui/Button";
 
 // react-pdf needs a pdf.js worker; bundle it from the installed pdfjs-dist
-// (self-hosted via the bundler — no CDN, avoids version mismatch).
+// (self-hosted via the bundler, no CDN, avoids version mismatch).
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     "pdfjs-dist/build/pdf.worker.min.mjs",
     import.meta.url
