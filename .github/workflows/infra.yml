@@ -1,6 +1,7 @@
 name: Deploy Infrastructure
 
 on:
+    # Auto-deploy on push disabled during testing; run manually from the Actions tab.
     # push:
     #     branches: ["main"]
     #     paths:
@@ -39,6 +40,7 @@ jobs:
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
                   DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
+                  ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
               with:
                   azcliversion: latest
                   inlineScript: |
@@ -53,6 +55,7 @@ jobs:
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
                   DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
+                  ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
               with:
                   azcliversion: latest
                   inlineScript: |
