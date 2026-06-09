@@ -4,7 +4,7 @@ import { Constants } from "./_utils/Constants";
 import { getBlogs } from "./_dataprovider/BlogDataProvider";
 import { getNotes } from "./_dataprovider/NoteDataProvider";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const sitemap = async (): Promise<MetadataRoute.Sitemap> => {
     const base = Constants.SITE_URI;

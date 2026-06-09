@@ -36,14 +36,19 @@ After editing a component, build it from its directory to verify before finishin
   use the formatting already present in each file; don't reformat unrelated lines).
 - Don't add comments, docstrings, or type annotations to code you didn't change.
 - Make only the changes requested; avoid drive-by refactors and new abstractions.
-- Write prose, comments, docs, and UI copy in plain ASCII. No em/en-dashes,
-  curly quotes, the ellipsis glyph, non-breaking or zero-width spaces, arrows,
-  or decorative symbols/emojis. Use ASCII replacements instead: `--` for
-  em-dashes (or `,`/`:`/`()` to restructure), `-` for en-dashes, straight
-  `'`/`"` quotes, `...` for ellipsis, regular spaces, `->` for arrows. Keep
-  punctuation that is genuinely needed (e.g. `Loading...`), just in ASCII form.
-  Keep docs simple, subtle, and professional.
-
+- Avoid "AI-looking" special characters in code, comments, docs, and
+  user-facing strings. Use plain ASCII instead. Keep writing simple, subtle, and
+  professional. Specifically avoid:
+  - Dashes: em-dash (U+2014), en-dash (U+2013), horizontal bar (U+2015),
+    math minus (U+2212), soft hyphen (U+00AD). Use a plain hyphen `-`.
+  - Quotes/punctuation: curly quotes (U+2018/2019/201C/201D), ellipsis (U+2026),
+    low quotes, prime marks. Use straight quotes and `...`.
+  - Invisible/spacing: non-breaking space (U+00A0), narrow/thin spaces, zero-width
+    characters (U+200B/200C/200D), BOM (U+FEFF). Use a normal space.
+  - Symbols/arrows: arrows (`->` etc.), legal marks (TM/(C)/(R)), and decorative
+    math operators. Spell them out or use ASCII.
+  - Emojis and decorative glyphs (check/cross/warning/star) in code, comments,
+    and docs.
 ## Infrastructure & secrets
 
 - Azure resources live in [`infra/main.bicep`](infra/main.bicep); values in

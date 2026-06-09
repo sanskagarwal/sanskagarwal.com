@@ -8,7 +8,7 @@ export const metadata = {
     alternates: { canonical: "/notes" },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const NoteList = async () => {
     const notes = await getNotes();

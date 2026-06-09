@@ -7,7 +7,7 @@ export const metadata = {
     alternates: { canonical: "/recipes" },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const RecipePage = async () => {
     const recipes = await getRecipes();

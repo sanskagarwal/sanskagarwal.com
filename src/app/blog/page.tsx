@@ -8,7 +8,7 @@ export const metadata = {
     alternates: { canonical: "/blog" },
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const BlogList = async () => {
     const blogs = await getBlogs();

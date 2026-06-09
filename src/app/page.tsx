@@ -23,7 +23,7 @@ const formatDate = (date: Date) =>
         day: "numeric",
     });
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const Home = async () => {
     const [blogs, notes] = await Promise.all([getBlogs(), getNotes()]);
