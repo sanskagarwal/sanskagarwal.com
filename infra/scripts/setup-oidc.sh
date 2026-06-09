@@ -93,8 +93,6 @@ add_federated_credential() {
 
 # Credential for pushes / workflow_dispatch on the target branch.
 add_federated_credential "github-${BRANCH}" "repo:${REPO}:ref:refs/heads/${BRANCH}"
-# Credential for the "dev" GitHub Environment (used by other workflows in this repo).
-add_federated_credential "github-env-dev" "repo:${REPO}:environment:dev"
 
 RG_SCOPE="/subscriptions/${SUBSCRIPTION}/resourceGroups/${RESOURCE_GROUP}"
 
