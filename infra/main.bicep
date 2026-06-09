@@ -15,6 +15,21 @@ param appServicePlanSku string = 'P0v3'
 @description('Name of the Key Vault for secret app settings.')
 param keyVaultName string
 
+@description('Name of the Function App that runs the heartbeat health checks.')
+param functionAppName string = 'sanskagarwal-functions'
+
+@description('Name of the storage account used by the Functions host (3-24 lowercase alphanumeric).')
+param functionStorageAccountName string
+
+@description('Name of the Log Analytics workspace.')
+param logAnalyticsName string = 'log-sanskagarwal'
+
+@description('Name of the Application Insights component.')
+param appInsightsName string = 'appi-sanskagarwal'
+
+@description('Email address notified when a heartbeat alert fires.')
+param alertEmailAddress string
+
 @description('Apex custom domain (e.g. sanskagarwal.com).')
 param apexDomain string = 'sanskagarwal.com'
 
@@ -133,6 +148,78 @@ module keyVaultRoleAssignment 'modules/keyVaultRoleAssignment.bicep' = {
   }
 }
 
+// --- Observability: Log Analytics + workspace-based Application Insights ---
+module logAnalytics 'modules/logAnalytics.bicep' = {
+  name: 'logAnalytics'
+  params: {
+    name: logAnalyticsName
+    location: location
+  }
+}
+
+module appInsights 'modules/appInsights.bicep' = {
+  name: 'appInsights'
+  params: {
+    name: appInsightsName
+    location: location
+    workspaceId: logAnalytics.outputs.id
+  }
+}
+
+// --- Heartbeat Function App (shares the existing App Service Plan) ---
+module functionStorage 'modules/storageAccount.bicep' = {
+  name: 'functionStorage'
+  params: {
+    name: functionStorageAccountName
+    location: location
+  }
+}
+
+module functionApp 'modules/functionApp.bicep' = {
+  name: 'functionApp'
+  params: {
+    name: functionAppName
+    location: location
+    serverFarmId: appServicePlan.outputs.id
+    storageAccountName: functionStorage.outputs.name
+    appInsightsConnectionString: appInsights.outputs.connectionString
+  }
+}
+
+// Identity-based access to the Functions host storage (keyless): Blob Data
+// Owner + Queue Data Contributor cover the host's runtime storage needs.
+module functionStorageRoles 'modules/storageRoleAssignment.bicep' = {
+  name: 'functionStorageRoles'
+  params: {
+    storageAccountName: functionStorage.outputs.name
+    principalId: functionApp.outputs.principalId
+    roleDefinitionIds: [
+      'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' // Storage Blob Data Owner
+      '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
+    ]
+  }
+}
+
+// --- Alerting: email action group + scheduled-query rule over heartbeat telemetry ---
+module actionGroup 'modules/actionGroup.bicep' = {
+  name: 'actionGroup'
+  params: {
+    name: 'ag-sanskagarwal-heartbeat'
+    shortName: 'heartbeat'
+    emailAddress: alertEmailAddress
+  }
+}
+
+module heartbeatAlert 'modules/heartbeatAlert.bicep' = {
+  name: 'heartbeatAlert'
+  params: {
+    name: 'alert-sanskagarwal-heartbeat'
+    location: location
+    appInsightsId: appInsights.outputs.id
+    actionGroupId: actionGroup.outputs.id
+  }
+}
+
 // Issue a managed certificate per hostname (after the hostname bindings exist).
 module certificates 'modules/managedCertificate.bicep' = [
   for host in customHostnames: {
@@ -165,3 +252,6 @@ module sniBindings 'modules/sniBinding.bicep' = [
 output webAppName string = webApp.outputs.name
 output defaultHostName string = webApp.outputs.defaultHostName
 output keyVaultUri string = keyVault.outputs.uri
+output functionAppName string = functionApp.outputs.name
+output functionAppHostName string = functionApp.outputs.defaultHostName
+output appInsightsName string = appInsights.outputs.name

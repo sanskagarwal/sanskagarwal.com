@@ -7,6 +7,13 @@ param appServicePlanName = 'plan-sanskagarwal'
 param appServicePlanSku = 'P0v3'
 param keyVaultName = 'kv-sanskagarwal'
 
+// Heartbeat Function App + observability
+param functionAppName = 'sanskagarwal-functions'
+param functionStorageAccountName = 'stsanskagarwalfunc'
+param logAnalyticsName = 'log-sanskagarwal'
+param appInsightsName = 'appi-sanskagarwal'
+param alertEmailAddress = readEnvironmentVariable('ALERT_EMAIL', '')
+
 // Custom domains
 param apexDomain = 'sanskagarwal.com'
 param wwwDomain = 'www.sanskagarwal.com'

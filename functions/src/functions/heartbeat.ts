@@ -1,7 +1,7 @@
 import { app, InvocationContext, Timer } from "@azure/functions";
 
-import { Constants } from "../constants";
-import { recordEndpointHealth } from "../telemetry";
+import { HealthChecks, EndpointCheck } from "../constants";
+import { recordEndpointHealth, FailureReason } from "../telemetry";
 
 // Per-request timeout for endpoint probes.
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -16,47 +16,81 @@ export async function heartbeat(
 
     context.log("Heartbeat function ran!", new Date().toISOString());
 
-    await Promise.all(
-        Object.entries(Constants).map(([name, check]) =>
-            checkEndpoint(context, name, check.url, check.expectedContent)
-        )
-    );
+    await Promise.all(HealthChecks.map((check) => runCheck(context, check)));
 }
 
-async function checkEndpoint(
+async function runCheck(
     context: InvocationContext,
-    name: string,
-    url: string,
-    expectedContent: string
+    check: EndpointCheck
 ): Promise<void> {
-    context.log(`Checking ${name} (${url})...`);
+    const { name, url } = check;
+    const method = check.method ?? "GET";
+    const expectedStatus = check.expectedStatus ?? 200;
+    const severity = check.severity ?? "critical";
+    const start = performance.now();
+
+    context.log(`Checking ${name} (${method} ${url})...`);
 
     try {
         const res = await fetch(url, {
+            method,
             signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
             redirect: "follow",
         });
+        const durationMs = Math.round(performance.now() - start);
 
-        if (!res.ok) {
-            recordEndpointHealth(context, name, false, {
+        if (res.status !== expectedStatus) {
+            recordEndpointHealth(context, {
+                endpoint: name,
+                healthy: false,
+                severity,
+                durationMs,
                 status: res.status,
-                reason: `Unexpected status ${res.status}`,
+                reason: "status",
+                detail: `Expected ${expectedStatus}, got ${res.status}`,
             });
             return;
         }
 
-        const body = await res.text();
-        if (body.includes(expectedContent)) {
-            recordEndpointHealth(context, name, true, { status: res.status });
-        } else {
-            recordEndpointHealth(context, name, false, {
-                status: res.status,
-                reason: "Response did not contain expected content",
-            });
+        if (check.expectedContent && method !== "HEAD") {
+            const body = await res.text();
+            if (!body.includes(check.expectedContent)) {
+                recordEndpointHealth(context, {
+                    endpoint: name,
+                    healthy: false,
+                    severity,
+                    durationMs,
+                    status: res.status,
+                    reason: "content",
+                    detail: "Response did not contain expected content",
+                });
+                return;
+            }
         }
+
+        recordEndpointHealth(context, {
+            endpoint: name,
+            healthy: true,
+            severity,
+            durationMs,
+            status: res.status,
+        });
     } catch (error) {
-        const reason = error instanceof Error ? error.message : String(error);
-        recordEndpointHealth(context, name, false, { reason });
+        const durationMs = Math.round(performance.now() - start);
+        const reason: FailureReason =
+            error instanceof Error && error.name === "TimeoutError"
+                ? "timeout"
+                : "network";
+        const detail = error instanceof Error ? error.message : String(error);
+
+        recordEndpointHealth(context, {
+            endpoint: name,
+            healthy: false,
+            severity,
+            durationMs,
+            reason,
+            detail,
+        });
     }
 }
 
