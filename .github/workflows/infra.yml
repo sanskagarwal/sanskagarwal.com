@@ -37,6 +37,11 @@ jobs:
             - name: "Validate (what-if)"
               uses: azure/cli@v3
               env:
+                  DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+                  DATABASE_NAME: ${{ vars.DATABASE_NAME }}
+                  DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+                  DATABASE_CMS_USERNAME: ${{ vars.DATABASE_CMS_USERNAME }}
+                  DATABASE_PORT: ${{ vars.DATABASE_PORT }}
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
                   ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
@@ -57,6 +62,11 @@ jobs:
             - name: "Deploy Bicep"
               uses: azure/cli@v3
               env:
+                  DATABASE_HOST: ${{ vars.DATABASE_HOST }}
+                  DATABASE_NAME: ${{ vars.DATABASE_NAME }}
+                  DATABASE_USERNAME: ${{ vars.DATABASE_USERNAME }}
+                  DATABASE_CMS_USERNAME: ${{ vars.DATABASE_CMS_USERNAME }}
+                  DATABASE_PORT: ${{ vars.DATABASE_PORT }}
                   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
                   ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}

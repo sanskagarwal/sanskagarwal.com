@@ -26,13 +26,13 @@ param wwwDomain = 'www.sanskagarwal.com'
 // Strapi CMS web app
 param cmsAppName = 'sanskagarwal-cms'
 param cmsDomain = 'admin.sanskagarwal.com'
-param databaseCmsUsername = 'cms_user'
+param databaseCmsUsername = readEnvironmentVariable('DATABASE_CMS_USERNAME', '')
 
-// Non-secret database config (edit to match your environment)
-param databaseHost = ''
-param databaseName = ''
-param databaseUsername = ''
-param databasePort = '5432'
+// Non-secret database config (supplied at deploy time via environment variables)
+param databaseHost = readEnvironmentVariable('DATABASE_HOST', '')
+param databaseName = readEnvironmentVariable('DATABASE_NAME', '')
+param databaseUsername = readEnvironmentVariable('DATABASE_USERNAME', '')
+param databasePort = readEnvironmentVariable('DATABASE_PORT', '5432')
 param databaseSsl = 'true'
 param databaseSslRejectUnauthorized = 'true'
 
