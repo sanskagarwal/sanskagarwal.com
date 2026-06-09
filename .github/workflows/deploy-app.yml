@@ -83,7 +83,7 @@ jobs:
                   popd
 
             - name: "Upload build artifact"
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: ${{ inputs.artifact-name }}
                   path: ${{ inputs.standalone && format('{0}/.next/standalone', inputs.package-path) || inputs.package-path }}
