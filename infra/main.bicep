@@ -390,6 +390,9 @@ module heartbeatAlert 'modules/heartbeatAlert.bicep' = {
 }
 
 // Issue a managed certificate per hostname (after the hostname bindings exist).
+// @batchSize(1) serializes issuance because http-token validation touches the
+// bound site and parallel runs can race on the same web app.
+@batchSize(1)
 module certificates 'modules/managedCertificate.bicep' = [
   for host in allCustomHostnames: {
     name: 'cert-${replace(host.name, '.', '-')}'
@@ -407,6 +410,9 @@ module certificates 'modules/managedCertificate.bicep' = [
 ]
 
 // Bind each managed certificate to its hostname via SNI (final pass).
+// @batchSize(1) serializes the bindings: apex and www target the same site, and
+// App Service only allows one site mutation at a time.
+@batchSize(1)
 module sniBindings 'modules/sniBinding.bicep' = [
   for (host, i) in allCustomHostnames: {
     name: 'sni-${replace(host.name, '.', '-')}'

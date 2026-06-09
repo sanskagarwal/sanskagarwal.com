@@ -86,10 +86,16 @@ resource ftpBasicAuth 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@20
   properties: {
     allow: false
   }
+  dependsOn: [
+    scmBasicAuth
+  ]
 }
 
 // Register custom hostnames without SSL first. SNI binding is applied in a later
 // pass (sniBinding module) once the managed certificate exists.
+// @batchSize(1) plus the dependency on the basic-auth policies serializes every
+// write against this site, preventing concurrent-operation conflicts.
+@batchSize(1)
 resource hostnameBindings 'Microsoft.Web/sites/hostNameBindings@2024-04-01' = [
   for host in customHostnames: {
     parent: site
@@ -100,6 +106,10 @@ resource hostnameBindings 'Microsoft.Web/sites/hostNameBindings@2024-04-01' = [
       customHostNameDnsRecordType: host.dnsRecordType
       sslState: 'Disabled'
     }
+    dependsOn: [
+      scmBasicAuth
+      ftpBasicAuth
+    ]
   }
 ]
 
