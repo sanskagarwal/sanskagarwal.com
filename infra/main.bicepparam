@@ -5,7 +5,7 @@ param location = 'centralindia'
 param webAppName = 'sanskagarwal'
 param appServicePlanName = 'plan-sanskagarwal'
 param appServicePlanSku = 'P0v3'
-param keyVaultName = 'kv-sanskagarwal'
+param keyVaultName = 'sanskagarwal-kv'
 
 // Heartbeat Function App + observability
 param functionAppName = 'sanskagarwal-functions'
@@ -17,6 +17,11 @@ param alertEmailAddress = readEnvironmentVariable('ALERT_EMAIL', '')
 // Custom domains
 param apexDomain = 'sanskagarwal.com'
 param wwwDomain = 'www.sanskagarwal.com'
+
+// Strapi CMS web app
+param cmsAppName = 'sanskagarwal-cms'
+param cmsDomain = 'admin.sanskagarwal.com'
+param databaseCmsUsername = 'cms_user'
 
 // Non-secret database config (edit to match your environment)
 param databaseHost = ''
@@ -30,3 +35,9 @@ param databaseSslRejectUnauthorized = 'true'
 param databasePassword = readEnvironmentVariable('DATABASE_PASSWORD', '')
 param tandoorToken = readEnvironmentVariable('TANDOOR_TOKEN', '')
 param databaseCaCert = readEnvironmentVariable('DATABASE_CA_CERT', '')
+param databaseCmsPassword = readEnvironmentVariable('DATABASE_CMS_PASSWORD', '')
+param strapiAppKeys = readEnvironmentVariable('STRAPI_APP_KEYS', '')
+param strapiApiTokenSalt = readEnvironmentVariable('STRAPI_API_TOKEN_SALT', '')
+param strapiAdminJwtSecret = readEnvironmentVariable('STRAPI_ADMIN_JWT_SECRET', '')
+param strapiTransferTokenSalt = readEnvironmentVariable('STRAPI_TRANSFER_TOKEN_SALT', '')
+param strapiJwtSecret = readEnvironmentVariable('STRAPI_JWT_SECRET', '')

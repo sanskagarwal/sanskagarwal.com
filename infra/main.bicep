@@ -36,6 +36,15 @@ param apexDomain string = 'sanskagarwal.com'
 @description('www custom domain (e.g. www.sanskagarwal.com).')
 param wwwDomain string = 'www.sanskagarwal.com'
 
+@description('Name of the Strapi CMS web app.')
+param cmsAppName string = 'sanskagarwal-cms'
+
+@description('CMS custom domain (e.g. admin.sanskagarwal.com).')
+param cmsDomain string = 'admin.sanskagarwal.com'
+
+@description('Postgres username for the CMS (Strapi) role.')
+param databaseCmsUsername string = 'cms_user'
+
 // --- Non-secret app settings ---
 @description('Postgres host.')
 param databaseHost string
@@ -67,6 +76,30 @@ param tandoorToken string
 @secure()
 @description('Database CA certificate (PEM). Optional.')
 param databaseCaCert string = ''
+
+@secure()
+@description('Postgres password for the CMS (cms_user) role.')
+param databaseCmsPassword string = ''
+
+@secure()
+@description('Strapi APP_KEYS (comma-separated list).')
+param strapiAppKeys string = ''
+
+@secure()
+@description('Strapi API_TOKEN_SALT.')
+param strapiApiTokenSalt string = ''
+
+@secure()
+@description('Strapi ADMIN_JWT_SECRET.')
+param strapiAdminJwtSecret string = ''
+
+@secure()
+@description('Strapi TRANSFER_TOKEN_SALT.')
+param strapiTransferTokenSalt string = ''
+
+@secure()
+@description('Strapi users-permissions JWT_SECRET.')
+param strapiJwtSecret string = ''
 
 var customHostnames = [
   {
@@ -106,6 +139,96 @@ var nonSecretAppSettings = [
   }
 ]
 
+var webAppSecretRefs = concat(
+  [
+    {
+      name: 'DATABASE_PASSWORD'
+      secretName: 'database-password'
+    }
+    {
+      name: 'TANDOOR_TOKEN'
+      secretName: 'tandoor-token'
+    }
+  ],
+  !empty(databaseCaCert)
+    ? [
+        {
+          name: 'DATABASE_CA_CERT'
+          secretName: 'database-ca-cert'
+        }
+      ]
+    : []
+)
+
+var cmsCustomHostnames = [
+  {
+    name: cmsDomain
+    dnsRecordType: 'CName'
+  }
+]
+
+var cmsNonSecretAppSettings = [
+  {
+    name: 'NODE_ENV'
+    value: 'production'
+  }
+  {
+    name: 'DATABASE_CLIENT'
+    value: 'postgres'
+  }
+  {
+    name: 'DATABASE_HOST'
+    value: databaseHost
+  }
+  {
+    name: 'DATABASE_NAME'
+    value: databaseName
+  }
+  {
+    name: 'DATABASE_USERNAME'
+    value: databaseCmsUsername
+  }
+  {
+    name: 'DATABASE_PORT'
+    value: databasePort
+  }
+  {
+    name: 'DATABASE_SSL'
+    value: databaseSsl
+  }
+  {
+    name: 'DATABASE_SSL_REJECT_UNAUTHORIZED'
+    value: databaseSslRejectUnauthorized
+  }
+]
+
+var cmsSecretRefs = [
+  {
+    name: 'DATABASE_PASSWORD'
+    secretName: 'database-cms-password'
+  }
+  {
+    name: 'APP_KEYS'
+    secretName: 'strapi-app-keys'
+  }
+  {
+    name: 'API_TOKEN_SALT'
+    secretName: 'strapi-api-token-salt'
+  }
+  {
+    name: 'ADMIN_JWT_SECRET'
+    secretName: 'strapi-admin-jwt-secret'
+  }
+  {
+    name: 'TRANSFER_TOKEN_SALT'
+    secretName: 'strapi-transfer-token-salt'
+  }
+  {
+    name: 'JWT_SECRET'
+    secretName: 'strapi-jwt-secret'
+  }
+]
+
 module keyVault 'modules/keyVault.bicep' = {
   name: 'keyVault'
   params: {
@@ -114,6 +237,12 @@ module keyVault 'modules/keyVault.bicep' = {
     databasePassword: databasePassword
     tandoorToken: tandoorToken
     databaseCaCert: databaseCaCert
+    databaseCmsPassword: databaseCmsPassword
+    strapiAppKeys: strapiAppKeys
+    strapiApiTokenSalt: strapiApiTokenSalt
+    strapiAdminJwtSecret: strapiAdminJwtSecret
+    strapiTransferTokenSalt: strapiTransferTokenSalt
+    strapiJwtSecret: strapiJwtSecret
   }
 }
 
@@ -135,7 +264,7 @@ module webApp 'modules/webApp.bicep' = {
     keyVaultName: keyVault.outputs.name
     appSettings: nonSecretAppSettings
     customHostnames: customHostnames
-    includeDatabaseCaCert: !empty(databaseCaCert)
+    keyVaultSecretRefs: webAppSecretRefs
   }
 }
 
@@ -145,6 +274,29 @@ module keyVaultRoleAssignment 'modules/keyVaultRoleAssignment.bicep' = {
   params: {
     keyVaultName: keyVault.outputs.name
     principalId: webApp.outputs.principalId
+  }
+}
+
+// --- Strapi CMS web app (shares the existing App Service Plan) ---
+module cmsApp 'modules/webApp.bicep' = {
+  name: 'cmsApp'
+  params: {
+    name: cmsAppName
+    location: location
+    serverFarmId: appServicePlan.outputs.id
+    keyVaultName: keyVault.outputs.name
+    appSettings: cmsNonSecretAppSettings
+    customHostnames: cmsCustomHostnames
+    keyVaultSecretRefs: cmsSecretRefs
+  }
+}
+
+// Grant the CMS app's managed identity read access to the Key Vault secrets.
+module cmsKeyVaultRoleAssignment 'modules/keyVaultRoleAssignment.bicep' = {
+  name: 'cmsKeyVaultRoleAssignment'
+  params: {
+    keyVaultName: keyVault.outputs.name
+    principalId: cmsApp.outputs.principalId
   }
 }
 
@@ -249,8 +401,34 @@ module sniBindings 'modules/sniBinding.bicep' = [
   }
 ]
 
+// Managed certificate + SNI binding for the CMS hostname.
+module cmsCertificate 'modules/managedCertificate.bicep' = {
+  name: 'cert-${replace(cmsDomain, '.', '-')}'
+  params: {
+    name: 'cert-${replace(cmsDomain, '.', '-')}'
+    location: location
+    serverFarmId: appServicePlan.outputs.id
+    canonicalName: cmsDomain
+  }
+  dependsOn: [
+    cmsApp
+  ]
+}
+
+module cmsSniBinding 'modules/sniBinding.bicep' = {
+  name: 'sni-${replace(cmsDomain, '.', '-')}'
+  params: {
+    webAppName: cmsAppName
+    hostname: cmsDomain
+    dnsRecordType: 'CName'
+    thumbprint: cmsCertificate.outputs.thumbprint
+  }
+}
+
 output webAppName string = webApp.outputs.name
 output defaultHostName string = webApp.outputs.defaultHostName
+output cmsAppName string = cmsApp.outputs.name
+output cmsDefaultHostName string = cmsApp.outputs.defaultHostName
 output keyVaultUri string = keyVault.outputs.uri
 output functionAppName string = functionApp.outputs.name
 output functionAppHostName string = functionApp.outputs.defaultHostName

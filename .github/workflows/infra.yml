@@ -41,6 +41,12 @@ jobs:
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
                   DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
                   ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+                  DATABASE_CMS_PASSWORD: ${{ secrets.DATABASE_CMS_PASSWORD }}
+                  STRAPI_APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}
+                  STRAPI_API_TOKEN_SALT: ${{ secrets.STRAPI_API_TOKEN_SALT }}
+                  STRAPI_ADMIN_JWT_SECRET: ${{ secrets.STRAPI_ADMIN_JWT_SECRET }}
+                  STRAPI_TRANSFER_TOKEN_SALT: ${{ secrets.STRAPI_TRANSFER_TOKEN_SALT }}
+                  STRAPI_JWT_SECRET: ${{ secrets.STRAPI_JWT_SECRET }}
               with:
                   azcliversion: latest
                   inlineScript: |
@@ -56,6 +62,12 @@ jobs:
                   TANDOOR_TOKEN: ${{ secrets.TANDOOR_TOKEN }}
                   DATABASE_CA_CERT: ${{ secrets.DATABASE_CA_CERT }}
                   ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+                  DATABASE_CMS_PASSWORD: ${{ secrets.DATABASE_CMS_PASSWORD }}
+                  STRAPI_APP_KEYS: ${{ secrets.STRAPI_APP_KEYS }}
+                  STRAPI_API_TOKEN_SALT: ${{ secrets.STRAPI_API_TOKEN_SALT }}
+                  STRAPI_ADMIN_JWT_SECRET: ${{ secrets.STRAPI_ADMIN_JWT_SECRET }}
+                  STRAPI_TRANSFER_TOKEN_SALT: ${{ secrets.STRAPI_TRANSFER_TOKEN_SALT }}
+                  STRAPI_JWT_SECRET: ${{ secrets.STRAPI_JWT_SECRET }}
               with:
                   azcliversion: latest
                   inlineScript: |

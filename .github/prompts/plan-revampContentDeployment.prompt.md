@@ -91,18 +91,65 @@ no direct `web_user` grants, and no default privileges. `apply` is idempotent.
 - 🟠 **Firewall**: server has an `AllowAll 0.0.0.0–255.255.255.255` rule — tighten later.
 - ◻ Optional future hardening (deferred): dedicated `cms` schema, group-owner role.
 
-## Phase 1 — Modernize the CMS pipeline (OIDC)
+## Phase 0.5 — Upgrade Strapi & dependencies ✅ COMPLETE (2026-06-09)
 
-1. Rewrite `.github/workflows/content.yml` to call the reusable `.github/workflows/deploy-app.yml` with `package-path: content`, `app-name: sanskagarwal-cms`, `deploy-type: webapp`, `node-version: 22.x`, `secrets: inherit`, and `id-token: write` — matching `publish.yml`/`functions.yml`.
-2. Drops the old `AZURE_CONTENTAPP_PUBLISH_PROFILE` flow (manual GH secret cleanup afterward).
+Refresh the CMS dependencies before modernizing the pipeline/IaC so the deployment
+target is the current Strapi line. Strapi ships an official codemod-driven updater
+(`@strapi/upgrade`) — used rather than hand-bumping versions.
 
-## Phase 2 — Bring the CMS web app into IaC (depends on Phase 1 app name)
+### As-built
 
-1. Generalize `infra/modules/webApp.bicep` — replace the hardcoded `keyVaultSecretSettings` (DATABASE_PASSWORD/TANDOOR_TOKEN) with a `keyVaultSecretRefs` array param so it serves both the frontend and the CMS; allow `NODE|22-lts`.
-2. Add Strapi secrets to `infra/modules/keyVault.bicep`: `strapi-app-keys`, `strapi-api-token-salt`, `strapi-admin-jwt-secret`, `strapi-transfer-token-salt`, `strapi-jwt-secret`, plus `database-cms-password` (the `cms_user` password, distinct from the frontend's `database-password`).
-3. In `infra/main.bicep`: add a `cmsApp` module (`sanskagarwal-cms`) on the existing `plan-sanskagarwal`, with `DATABASE_CLIENT=postgres` + reused `DATABASE_*` host/name/port settings, `DATABASE_USERNAME=cms_user`, the Strapi secret refs + `database-cms-password`, `cms.sanskagarwal.com` hostname, a Key Vault role assignment, and managed-cert + SNI entries (reusing existing modules).
-4. Update `infra/main.bicepparam` + `.github/workflows/infra.yml` to pass the new `STRAPI_*` secrets via env vars.
-5. Manual: DNS `CNAME cms → sanskagarwal-cms.azurewebsites.net`; create the `STRAPI_*` GitHub secrets.
+1. **Strapi 5.29.0 → 5.47.1** via `npx @strapi/upgrade minor` from `content/` (bumped
+   `@strapi/strapi`, `@strapi/plugin-cloud`, `@strapi/plugin-users-permissions`; no
+   source codemods were needed — only `package.json` + lockfile changed).
+2. **Non-Strapi deps** refreshed to current floors within their majors: `@swc/core`
+   `^1.15.40`, `pg` `^8.21.0`, `react`/`react-dom` `^18.3.1` (kept on 18.x — Strapi 5
+   peer), `react-router-dom` `^6.30.4`, `styled-components` `^6.1.19` (held at 6.1.x —
+   6.4.x drags in a `react-native` optional peer that demands `@types/react@19` and
+   breaks install against Strapi's React 18).
+3. **Node engine** `22.x` → `24.x` — matches the rest of the repo (`src` = 24.x,
+   `functions` = >=24, `webApp.bicep` default `NODE|24-lts`) and is within Strapi
+   5.47's supported range (`>=20.0.0 <=24.x.x`); also clears the EBADENGINE warning on
+   the local Node 24 toolchain.
+4. **devDependencies** — left empty (none added). The stock Strapi TS scaffold can
+   ship `typescript` + `@types/*`, but they are redundant here: `@strapi/strapi` pulls
+   `typescript@5.4.5` transitively and `strapi build` uses it, so the build compiles TS
+   without them. Keeping `package.json` minimal avoids a second TS/types version to
+   maintain. (TS 6 is intentionally avoided regardless — Strapi 5.47 is pinned to TS
+   5.4.5, unlike the Next.js frontend in `src`.)
+5. **tsconfig** — left as-is by design: `content/tsconfig.json` and
+   `src/admin/tsconfig.json` only `extends` Strapi's managed base configs
+   (`@strapi/typescript-utils/tsconfigs/{server,admin}`), which were upgraded
+   transitively to 5.47.1 by the package bump. Hand-editing them would diverge from
+   boilerplate.
+6. **eslint** — N/A: the Strapi 5 scaffold does not ship an eslint config and none
+   exists in `content/`, so there is nothing to upgrade. Adding linting here would be
+   net-new tooling (a separate decision), not part of this dependency refresh.
+7. Verify: `npm install && npm run build` passes (TS compile + admin panel build).
+   `npm run db` (status, zero-drift) and a `strapi develop` boot remain a manual local
+   check (require prod DB creds).
+
+## Phase 1 — Modernize the CMS pipeline (OIDC) ✅ COMPLETE (2026-06-09)
+
+1. ✅ Rewrote `.github/workflows/content.yml` to call the reusable `.github/workflows/deploy-app.yml` with `package-path: content`, `app-name: sanskagarwal-cms`, `deploy-type: webapp`, `node-version: 24.x`, `secrets: inherit`, and `id-token: write` — now identical in shape to `publish.yml`/`functions.yml`.
+2. ✅ Dropped the old `AZURE_CONTENTAPP_PUBLISH_PROFILE` flow.
+3. 🟠 Manual follow-up: delete the now-unused `AZURE_CONTENTAPP_PUBLISH_PROFILE` GitHub secret.
+
+## Phase 2 — Bring the CMS web app into IaC ✅ COMPLETE (2026-06-09)
+
+### As-built
+
+1. ✅ Generalized `infra/modules/webApp.bicep` — the hardcoded `keyVaultSecretSettings` (DATABASE_PASSWORD/TANDOOR_TOKEN/optional DATABASE_CA_CERT) and the `includeDatabaseCaCert` param were replaced by a single `keyVaultSecretRefs` array param (`{ name, secretName }[]`); the module builds the `@Microsoft.KeyVault(...)` references. Serves both the frontend and the CMS. Runtime stays on the module's existing `NODE|24-lts` default.
+2. ✅ Added secrets to `infra/modules/keyVault.bicep` (each conditional on a non-empty value): `database-cms-password`, `strapi-app-keys`, `strapi-api-token-salt`, `strapi-admin-jwt-secret`, `strapi-transfer-token-salt`, `strapi-jwt-secret`.
+3. ✅ `infra/main.bicep`: added a `cmsApp` module (`sanskagarwal-cms`) on `plan-sanskagarwal` with `NODE_ENV=production`, `DATABASE_CLIENT=postgres`, reused `DATABASE_HOST/NAME/PORT/SSL/SSL_REJECT_UNAUTHORIZED`, `DATABASE_USERNAME=cms_user`, the 6 CMS secret refs (env names `DATABASE_PASSWORD`/`APP_KEYS`/`API_TOKEN_SALT`/`ADMIN_JWT_SECRET`/`TRANSFER_TOKEN_SALT`/`JWT_SECRET` — verified against `content/config/{server,admin,database}.ts`), the `cms.sanskagarwal.com` hostname, a `cmsKeyVaultRoleAssignment`, and a `cmsCertificate` + `cmsSniBinding` (reusing the existing managed-cert/SNI modules). The frontend `webApp` call now passes `webAppSecretRefs` instead of `includeDatabaseCaCert`.
+4. ✅ Updated `infra/main.bicepparam` (new `cmsAppName`/`cmsDomain`/`databaseCmsUsername` + `readEnvironmentVariable` for `DATABASE_CMS_PASSWORD` and the 5 `STRAPI_*` secrets) and `.github/workflows/infra.yml` (the new env vars added to both the what-if and deploy steps).
+5. ✅ `main.bicep` + `main.bicepparam` compile clean (no errors/warnings).
+
+### Remaining manual steps
+
+- 🟠 Create the GitHub secrets: `DATABASE_CMS_PASSWORD`, `STRAPI_APP_KEYS`, `STRAPI_API_TOKEN_SALT`, `STRAPI_ADMIN_JWT_SECRET`, `STRAPI_TRANSFER_TOKEN_SALT`, `STRAPI_JWT_SECRET` (reuse the live values from `content/.env`, or rotate per the Phase 0 follow-up).
+- 🟠 DNS: `CNAME admin → sanskagarwal-cms.azurewebsites.net` (must exist before the managed cert can be issued).
+- 🟠 Run `Deploy Infrastructure` (what-if should be clean), then `Deploy CMS Backend`.
 
 ## Phase 3 — Storage account + Azure Front Door (static assets) (independent of 1–2)
 

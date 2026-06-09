@@ -22,29 +22,15 @@ param appSettings array = []
 @description('Custom hostnames to register. Each item: { name: string, dnsRecordType: \'A\' | \'CName\' }.')
 param customHostnames array = []
 
-@description('Whether the optional DATABASE_CA_CERT secret exists in Key Vault.')
-param includeDatabaseCaCert bool = false
+@description('Key Vault secret references exposed as app settings. Each item: { name: string, secretName: string }.')
+param keyVaultSecretRefs array = []
 
-var keyVaultSecretSettings = concat(
-  [
-    {
-      name: 'DATABASE_PASSWORD'
-      value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-password)'
-    }
-    {
-      name: 'TANDOOR_TOKEN'
-      value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=tandoor-token)'
-    }
-  ],
-  includeDatabaseCaCert
-    ? [
-        {
-          name: 'DATABASE_CA_CERT'
-          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=database-ca-cert)'
-        }
-      ]
-    : []
-)
+var keyVaultSecretSettings = [
+  for ref in keyVaultSecretRefs: {
+    name: ref.name
+    value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${ref.secretName})'
+  }
+]
 
 resource site 'Microsoft.Web/sites@2024-04-01' = {
   name: name
