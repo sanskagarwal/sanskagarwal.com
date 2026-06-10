@@ -1,11 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: "standalone",
-    turbopack: {
-        resolveAlias: {
-            canvas: "./empty-module.js",
-        },
-    },
     images: {
         remotePatterns: [
             {
