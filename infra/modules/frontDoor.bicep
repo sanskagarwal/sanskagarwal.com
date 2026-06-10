@@ -10,6 +10,11 @@ param originHostName string
 @description('Name of the origin group.')
 param originGroupName string = 'assets-origin-group'
 
+@description('Custom domain hostname served by Front Door (e.g. assets.sanskagarwal.com).')
+param customDomain string
+
+var customDomainResourceName = replace(customDomain, '.', '-')
+
 // Azure Front Door Standard. Front Door is a global service, so the profile and
 // endpoint live in the 'Global' location regardless of the resource group region.
 resource profile 'Microsoft.Cdn/profiles@2024-02-01' = {
@@ -26,6 +31,21 @@ resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-02-01' = {
   location: 'Global'
   properties: {
     enabledState: 'Enabled'
+  }
+}
+
+// Custom domain with an AFD-managed TLS certificate. Domain ownership is proven
+// out-of-band by a DNS TXT record (_dnsauth.<subdomain>) holding the validation
+// token, and traffic is routed once a CNAME points the subdomain at the endpoint.
+resource customDomainResource 'Microsoft.Cdn/profiles/customDomains@2024-02-01' = {
+  parent: profile
+  name: customDomainResourceName
+  properties: {
+    hostName: customDomain
+    tlsSettings: {
+      certificateType: 'ManagedCertificate'
+      minimumTlsVersion: 'TLS12'
+    }
   }
 }
 
@@ -69,6 +89,11 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
     origin
   ]
   properties: {
+    customDomains: [
+      {
+        id: customDomainResource.id
+      }
+    ]
     originGroup: {
       id: originGroup.id
     }
@@ -88,3 +113,5 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
 
 output profileName string = profile.name
 output endpointHostName string = endpoint.properties.hostName
+output customDomainHostName string = customDomainResource.properties.hostName
+output customDomainValidationToken string = customDomainResource.properties.validationProperties.validationToken

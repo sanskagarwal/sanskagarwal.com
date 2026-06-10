@@ -30,6 +30,9 @@ param frontDoorProfileName string = 'afd-sanskagarwal'
 @description('Name of the Front Door endpoint for static assets.')
 param frontDoorEndpointName string = 'sanskagarwal-assets'
 
+@description('Custom domain served by Front Door for static assets (e.g. assets.sanskagarwal.com).')
+param assetsCustomDomain string = 'assets.sanskagarwal.com'
+
 @description('Name of the Log Analytics workspace.')
 param logAnalyticsName string = 'log-sanskagarwal'
 
@@ -372,6 +375,7 @@ module frontDoor 'modules/frontDoor.bicep' = {
     profileName: frontDoorProfileName
     endpointName: frontDoorEndpointName
     originHostName: assetsStorage.outputs.blobHostName
+    customDomain: assetsCustomDomain
   }
 }
 
@@ -427,3 +431,5 @@ output functionAppHostName string = functionApp.outputs.defaultHostName
 output appInsightsName string = appInsights.outputs.name
 output assetsStorageAccountName string = assetsStorage.outputs.name
 output frontDoorEndpointHostName string = frontDoor.outputs.endpointHostName
+output assetsCustomDomainHostName string = frontDoor.outputs.customDomainHostName
+output assetsCustomDomainValidationToken string = frontDoor.outputs.customDomainValidationToken

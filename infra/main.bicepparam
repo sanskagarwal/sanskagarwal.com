@@ -18,6 +18,7 @@ param alertEmailAddress = readEnvironmentVariable('ALERT_EMAIL', '')
 param assetsStorageAccountName = 'stsanskagarwalassets'
 param frontDoorProfileName = 'afd-sanskagarwal'
 param frontDoorEndpointName = 'sanskagarwal-assets'
+param assetsCustomDomain = 'assets.sanskagarwal.com'
 
 // Custom domains
 param apexDomain = 'sanskagarwal.com'
