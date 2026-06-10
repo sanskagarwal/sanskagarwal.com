@@ -59,6 +59,7 @@ resource databasePasswordSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' =
   name: 'database-password'
   properties: {
     value: databasePassword
+    contentType: 'Postgres password for the website app DB role (DATABASE_PASSWORD).'
   }
 }
 
@@ -67,6 +68,7 @@ resource tandoorTokenSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = {
   name: 'tandoor-token'
   properties: {
     value: tandoorToken
+    contentType: 'Tandoor recipes API token used by the website (TANDOOR_TOKEN).'
   }
 }
 
@@ -75,6 +77,7 @@ resource databaseCmsPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01
   name: 'database-cms-password'
   properties: {
     value: databaseCmsPassword
+    contentType: 'Postgres password for the Strapi CMS (cms_user) role (DATABASE_PASSWORD).'
   }
 }
 
@@ -83,6 +86,7 @@ resource strapiAppKeysSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = if
   name: 'strapi-app-keys'
   properties: {
     value: strapiAppKeys
+    contentType: 'Strapi APP_KEYS (comma-separated session signing keys).'
   }
 }
 
@@ -91,6 +95,7 @@ resource strapiApiTokenSaltSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01'
   name: 'strapi-api-token-salt'
   properties: {
     value: strapiApiTokenSalt
+    contentType: 'Strapi API_TOKEN_SALT (hashes API tokens).'
   }
 }
 
@@ -99,6 +104,7 @@ resource strapiAdminJwtSecretSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-0
   name: 'strapi-admin-jwt-secret'
   properties: {
     value: strapiAdminJwtSecret
+    contentType: 'Strapi ADMIN_JWT_SECRET (signs admin-panel JWTs).'
   }
 }
 
@@ -107,6 +113,7 @@ resource strapiTransferTokenSaltSecret 'Microsoft.KeyVault/vaults/secrets@2024-1
   name: 'strapi-transfer-token-salt'
   properties: {
     value: strapiTransferTokenSalt
+    contentType: 'Strapi TRANSFER_TOKEN_SALT (hashes data-transfer tokens).'
   }
 }
 
@@ -115,6 +122,7 @@ resource strapiJwtSecretSecret 'Microsoft.KeyVault/vaults/secrets@2024-11-01' = 
   name: 'strapi-jwt-secret'
   properties: {
     value: strapiJwtSecret
+    contentType: 'Strapi users-permissions JWT_SECRET (signs end-user JWTs).'
   }
 }
 

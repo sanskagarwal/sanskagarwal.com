@@ -1,14 +1,34 @@
 {
-    "azureFunctions.deploySubpath": "functions",
-    "azureFunctions.postDeployTask": "npm install (functions)",
-    "azureFunctions.projectLanguage": "TypeScript",
-    "azureFunctions.projectRuntime": "~4",
-    "debug.internalConsoleOptions": "neverOpen",
-    "azureFunctions.preDeployTask": "npm prune (functions)",
-    "azureFunctions.projectLanguageModel": 4,
     "files.exclude": {
-        "**azurite**": true, // Ignore Azurite files
-        "__blobstorage__": true, // Ignore Blob data folder
-        "__queuestorage__": true, // Ignore Queue data folder
+        "**/__azurite_db*__.json": true,
+        "**/__blobstorage__": true,
+        "**/__queuestorage__": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/.next": true,
+        "**/dist": true,
+        "**/.strapi": true,
+        "**/.cache": true,
+        "**/__pycache__": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/.next": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.strapi": true,
+        "**/.cache": true,
+        "**/__pycache__": true,
+        "**/package-lock.json": true,
+        "archive": true
+    },
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/.next/**": true,
+        "**/dist/**": true,
+        "**/.strapi/**": true,
+        "**/.cache/**": true,
+        "**/__blobstorage__/**": true,
+        "**/__queuestorage__/**": true
     }
 }

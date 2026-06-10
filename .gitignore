@@ -1,6 +1,7 @@
 # Local Files
 .DS_Store
 tmp/
+archive/
 
 # Azure Functions
 __azurite_db*__.json
