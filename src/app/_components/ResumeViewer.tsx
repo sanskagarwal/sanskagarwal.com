@@ -42,7 +42,7 @@ const ResumeViewer: React.FC = () => {
                     )}
 
                     <iframe
-                        src={encodeURI(Constants.Resume_URI)}
+                        src={`${encodeURI(Constants.Resume_URI)}#pagemode=none`}
                         title="Resume document"
                         className="h-[85vh] w-full rounded-md border border-border shadow-md"
                         onLoad={() => setIsLoading(false)}
