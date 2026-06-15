@@ -21,5 +21,5 @@ export const Constants = {
         process.env.NEXT_PUBLIC_TANDOOR_URI ?? "https://cook.sanskagarwal.com",
     REMARK_URI:
         process.env.NEXT_PUBLIC_REMARK_URI ??
-        "https://commento.sanskagarwal.com",
+        "https://remark42.sanskagarwal.com",
 };
