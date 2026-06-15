@@ -42,8 +42,8 @@ export const HealthChecks: EndpointCheck[] = [
     },
     {
         // Remark42 ping endpoint returns "pong".
-        name: "COMMENTO",
-        url: "https://commento.sanskagarwal.com/api/v1/ping",
+        name: "REMARK42",
+        url: "https://remark42.sanskagarwal.com/ping",
         expectedContent: "pong",
     },
     {
