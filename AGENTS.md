@@ -18,6 +18,31 @@ This is a monorepo of independent components, each with its own toolchain:
 Each component is self-contained: `cd` into its directory before running its
 package manager or scripts. Do not assume a shared root `package.json`.
 
+## `src/` internals
+
+The Next.js app uses the App Router. Private directories use the `_` prefix convention:
+
+- `_models/` - TypeScript domain types (Blog, Note, Recipe, etc.)
+- `_dataprovider/` - Server-only data access. `RetryQuery.ts` owns the PostgreSQL connection pool and retry logic; `ContentRepository.ts` is a generic factory used by `BlogDataProvider.ts` and `NoteDataProvider.ts`; `RecipeDataProvider.ts` fetches from the Tandoor API instead of Postgres.
+- `_actions/` - Next.js Server Actions (e.g. recipe share-link fetch).
+- `_components/` - Shared React components. `ui/` holds primitives (Badge, Button, Card, etc.); top-level components are feature-level (Navbar, ThemeToggle, ReadingShell, etc.).
+- `_utils/` - `Constants.ts` (public env vars with defaults), `MarkdownToHTML.tsx` (react-markdown with KaTeX, GFM, syntax highlighting, Mermaid), `cn.ts` (class merging).
+
+**Data flow:** Pages are React Server Components that call data-provider functions directly. Data providers are marked `import "server-only"` and query PostgreSQL (blog/notes) or the Tandoor REST API (recipes). Content is authored in Strapi and stored in Postgres; `src/` reads from the same DB directly.
+
+**Theme:** Dark/light mode uses a `dark` class on `<html>`. An inline boot script in `layout.tsx` reads `localStorage.theme` before first paint to avoid flash.
+
+**Accessibility tests** (`src/tests/a11y.spec.ts`) require a live server. They discover real slugs from listing pages at runtime. Run `npm run test:a11y` with the dev server running.
+
+## Environment variables (`src/`)
+
+Copy `src/.env.example` to `src/.env`. Required:
+
+- `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD` - PostgreSQL (same DB as Strapi)
+- `TANDOOR_TOKEN` - API token for the Tandoor recipe app
+- `APPLICATIONINSIGHTS_CONNECTION_STRING` - Azure Application Insights (optional locally)
+- Set `DATABASE_SSL=false` locally when using a Postgres instance without TLS
+
 ## Build & verify
 
 Run commands from the relevant component directory:
